@@ -55,4 +55,16 @@ $route['default_controller'] = 'Login';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
+// Titulaciones
+
+$route['titulacion'] = 'titulacion';
+$route['titulacion/nueva'] = 'titulacion/nueva';
+$route['titulacion/mod/(:any)'] = 'titulacion/mod/$1';
+
+// Categorías
+
+
+$route['categorias'] = 'categorias';
+$route['categorias/nueva'] = 'categorias/nueva';
+$route['categorias/mod/(:any)'] = 'categorias/mod/$1';
 

@@ -22,10 +22,10 @@ class Login extends CI_Controller
 				$this->load->view('login_view',$data);
 				break;
 			case '0':
-				redirect(base_url().'profesor');
+				redirect(base_url().'index.php/profesor');
 				break;
 			case '1':
-				redirect(base_url().'alumno');
+				redirect(base_url().'index.php/alumno');
 				break;	
 			default:		
 				$data['titulo'] = 'Login con roles de usuario en codeigniter';
@@ -63,7 +63,7 @@ class Login extends CI_Controller
 				}
 			}
 		}else{
-			redirect(base_url().'login');
+			redirect(base_url().'index.php/login');
 		}
 	}
 	
@@ -77,6 +77,6 @@ class Login extends CI_Controller
 	public function logout_ci()
 	{
 		$this->session->sess_destroy();
-		$this->index();
+		redirect(base_url().'index.php/login');
 	}
 }

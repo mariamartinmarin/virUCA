@@ -3,7 +3,7 @@
 /**
  * 
  */
-class Editor extends CI_Controller {
+class Alumno extends CI_Controller {
 	
 	public function __construct() {
 		parent::__construct();
@@ -14,11 +14,12 @@ class Editor extends CI_Controller {
 	
 	public function index()
 	{
-		if($this->session->userdata('perfil') == FALSE || $this->session->userdata('perfil') == 'suscriptor')
+		if($this->session->userdata('perfil') != 1)
 		{
-			redirect(base_url().'login');
+			redirect(base_url().'index.php/login');
 		}
-		$data['titulo'] = 'Bienvenido de nuevo ' .$this->session->userdata('perfil');
-		$this->load->view('editor_view',$data);
+		$data['titulo'] = 'Bienvenido!! ' .$this->session->userdata('perfil');
+		$this->load->view('alumno_view',$data);
 	}
+
 }
