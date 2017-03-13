@@ -44,7 +44,7 @@
 
 						<li><?=anchor(base_url().'index.php/titulacion', 'Gestión de titulaciones')?></li>
 
-						<li><?=anchor(base_url().'index.php/titulaciones_listado', 'Gestión de Asignaturas')?></li>
+						<li><?=anchor(base_url().'index.php/asignatura', 'Gestión de Asignaturas')?></li>
 
 
 
@@ -74,8 +74,14 @@
 					</ul>
 				</li>
 								
-				<li>
-					<?=anchor(base_url().'index.php/configuracion', 'Configuración')?>
+				<li class="dropdown">
+					<a class="dropdown-toggle" href="#">Configuración
+						<i class="icon icon-angle-down"></i>
+					</a>
+					<ul class="dropdown-menu">
+						<li><?=anchor(base_url().'index.php/parametros', 'Parametros')?></li>
+						<li><?=anchor(base_url().'index.php/accesos', 'Accesos')?></li>
+					</ul>
 				</li>
 
 				<li><?=anchor(base_url().'index.php/login/logout_ci', 'Salir')?></li>

@@ -68,14 +68,14 @@
                     <div class="row">
                         <div class="col-md-12">
                             <ul class="breadcrumb">
-                                <li><a href="#">Profesores</a></li>
-                                <li class="active">Gestión de Profesores</li>
+                                <li><a href="#">Alumnos</a></li>
+                                <li class="active">Gestión de Alumnos</li>
                             </ul>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <h2>Modificar profesor</h2>
+                            <h2>Modificar alumno</h2>
                         </div>
                     </div>
                 </div>
@@ -83,24 +83,24 @@
 
             <div class="container">
                 <!-- Errores de inserción. -->
-                <?php if($this->session->flashdata('profesor_ok')) { ?>
+                <?php if($this->session->flashdata('alumno_ok')) { ?>
                     <div class="alert alert-success">
-                        <?php echo $this->session->flashdata('profesor_ok');?>
+                        <?php echo $this->session->flashdata('alumno_ok');?>
                     </div>
                 <?php } ?>
 
-                <?php if($this->session->flashdata('profesor_ko')) { ?>
+                <?php if($this->session->flashdata('alumno_ko')) { ?>
                     <div class="alert alert-danger">
-                        <?php echo $this->session->flashdata('profesor_ko'); ?>
+                        <?php echo $this->session->flashdata('alumno_ko'); ?>
                     </div>
                 <?php } ?>
                 <!-- Fin errores -->
 
-                <?php echo form_fieldset('Modificar los datos de un profesor');?>
+                <?php echo form_fieldset('Modificar los datos de un alumno');?>
                 <form action="" method="POST">
                 <?php    
                     foreach ($mod as $fila){ 
-                    $tipo_usuario = 0;
+                    $tipo_usuario = 1;
                     echo form_hidden('iPerfil',$tipo_usuario);
                     echo form_hidden('iId',$fila->iId);
                     $sNombre = array(
@@ -200,7 +200,7 @@
                 </form>
                 <?=form_fieldset_close();?>
                 <hr>
-                <a href="<?=base_url()."index.php/usuarios"?>" class="btn btn-warning">Volver</a>
+                <a href="<?=base_url()."index.php/alumnos"?>" class="btn btn-warning">Volver</a>
             </div>
         </div>
         <?php $this->load->view('footer');?>

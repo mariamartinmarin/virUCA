@@ -52,120 +52,46 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-        <style type="text/css">
-      .error{
-      color: red !important;
-      }
-    </style>
 
     </head>
     <body>
         
-        <div class="body">
-            <?php $this->load->view('menup_view');?>
-            <div role="main" class="main">
-
-                <section class="page-top">
+    <div class="body">
+        <?php $this->load->view('menup_view');?>
+        <div role="main" class="main">
+            <section class="page-top">
                     <div class="container">
                         <div class="row">
                             <div class="col-md-12">
                                 <ul class="breadcrumb">
-                                    <li><a href="#">Partidas</a></li>
-                                    <li class="active">Gestión de Categorías</li>
+                                    <li><a href="#">Curso</a></li>
+                                    <li class="active">Gestión de Asignaturas</li>
                                 </ul>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <h2>Gestión de Categorías</h2>
+                                <h2>Gestión de asignaturas</h2>
                             </div>
                         </div>
                     </div>
-                </section>
+            </section>
 
-                <div class="container">
+            <div class="container">
+                <?php echo form_fieldset('Modificar asignatura');?>
+                <form action="" method="POST">
+                <?php foreach ($mod as $fila){ ?>
+                    <input type="sNombre" class="form-control input-lg" style="width: 400px;" name="sNombre" value="<?=$fila->sNombre?>"/>
+                    <input type="submit" name="submit" value="Modificar" class="btn btn-default" style="margin-top:5px;"/>
+                <?php } ?>
+                </form>
+                <hr>
+                <a href="   " class="btn btn-warning">Volver</a>
 
-                    <!-- Errores de inserción. -->
-                     <?php if($this->session->flashdata('categoria_ok')) { ?>
-                        <div class="alert alert-success">
-                            <?php echo $this->session->flashdata('categoria_ok');?>
-                        </div>
-                    <?php } ?>
-
-                    <?php if($this->session->flashdata('categoria_ko')) { ?>
-                        <div class="alert alert-danger">
-                            <?php echo $this->session->flashdata('categoria_ko'); ?>
-                        </div>
-                    <?php } ?>
-                    <!-- Fin errores -->
-
-
-                    <?=form_open(base_url().'index.php/categorias/nueva');
-                    $sNombre = array(
-                    'name' => 'sNombre',
-                    'id' => 'sNombre',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sNombre'),
-                    'style' => 'width:400px;'
-                    );
-                    $sDescripcion = array(
-                    'name' => 'sDescripcion',
-                    'id' => 'sDescripcion',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sDescripcion'),
-                    'style' => 'width:400px; height:80px;'
-                    );
-                    $submit = array(
-                    'name' => 'submit',
-                    'id' => 'submit',
-                    'value' => 'Enviar',
-                    'title' => 'Enviar',
-                    'class' => 'btn btn-default' 
-                    );
-                    ?>
-
-                    <?=form_fieldset('Añadir una nueva categoría');?>
-
-                    <label for="sNombre">Nombre:</label>
-                    <?=form_input($sNombre)?><p><?=form_error('sNombre','<div class= "error">','</div>');?></p>
-                    <label for="sDescripcion">Descripción:</label>
-                    <?=form_textarea($sDescripcion)?><p><?=form_error('sDescripcion')?></p>
-                    <?=form_submit($submit)?>
-                    <?=form_close()?>
-
-                    
-                    <?=form_fieldset_close();?>
-
-                    <hr class="short">
-                    <?php echo form_fieldset('Listado');?>
-                    <?php foreach($ver as $fila){ ?>
-
-                        <div class="row show-grid">
-                        <div class="col-md-1"><span class="show-grid-block"><?=$fila->iId;?></span></div>
-                        <div class="col-md-3"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
-                        <div class="col-md-5"><span class="show-grid-block"><?=$fila->sDescripcion;?></span></div>
-                        <div class="col-md-3"><span class="show-grid-block">
-                            <a href="<?=base_url("index.php/categorias/mod/$fila->iId")?>" 
-                                class="btn btn-warning icon icon-pencil">
-                            </a>
-                            <a href="<?=base_url("index.php/categorias/eliminar/$fila->iId")?>" 
-                                class="btn btn-warning icon icon-trash-o">
-                            </a>
-                        </span></div>
-                        </div>
-                    <?php
-                    }
-                    ?>
-
-                    <hr class="short">
-
-
-                </div>
             </div>
-            <?php $this->load->view('footer');?>
         </div>
+        <?php $this->load->view('footer');?>
+    </div>
 
 <!-- Libs -->
         <script src="<?=base_url()?>vendor/jquery.js"></script>
@@ -193,3 +119,9 @@
 
     </body>
 </html>
+
+
+
+
+
+

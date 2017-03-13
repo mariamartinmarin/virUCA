@@ -10,6 +10,7 @@ class Login extends CI_Controller
 		$this->load->model('login_model');
 		$this->load->library(array('session','form_validation'));
 		$this->load->helper(array('url','form'));
+		$this->load->helper('date');
 		$this->load->database('default');
     }
 	
@@ -52,6 +53,14 @@ class Login extends CI_Controller
 				$check_user = $this->login_model->login_user($username,$password);
 				if($check_user == TRUE)
 				{
+					// Registramos el acceso.
+					$timestamp = date('Y-m-d G:i:s');
+					$data = array('dFecha' => $timestamp , 
+						'iId_Usuario' => $check_user->iId, 
+						'sIP' => $this->input->ip_address(),
+						'sNombreCompleto' => $check_user->sNombre.", ".$check_user->sApellidos);
+					$this->db->insert('acceso', $data);
+
 					$data = array(
 	                'is_logued_in' 	=> 		TRUE,
 	                'id_usuario' 	=> 		$check_user->iId,

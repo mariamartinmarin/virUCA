@@ -52,11 +52,6 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-        <style type="text/css">
-      .error{
-      color: red !important;
-      }
-    </style>
 
     </head>
     <body>
@@ -70,14 +65,14 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <ul class="breadcrumb">
-                                    <li><a href="#">Partidas</a></li>
-                                    <li class="active">Gestión de Categorías</li>
+                                    <li><a href="#">Curso</a></li>
+                                    <li class="active">Gestión de Asignaturas</li>
                                 </ul>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <h2>Gestión de Categorías</h2>
+                                <h2>Gestión de Asignaturas</h2>
                             </div>
                         </div>
                     </div>
@@ -85,72 +80,92 @@
 
                 <div class="container">
 
-                    <!-- Errores de inserción. -->
-                     <?php if($this->session->flashdata('categoria_ok')) { ?>
-                        <div class="alert alert-success">
-                            <?php echo $this->session->flashdata('categoria_ok');?>
-                        </div>
+                    <?php 
+                        if($this->session->flashdata('correcto')) { 
+                    ?>
+                    <div class="alert alert-success">
+                    <?php
+                       echo $this->session->flashdata('correcto');
+                    ?>
+                    </div>
                     <?php } ?>
 
-                    <?php if($this->session->flashdata('categoria_ko')) { ?>
-                        <div class="alert alert-danger">
-                            <?php echo $this->session->flashdata('categoria_ko'); ?>
-                        </div>
+                    <?php 
+                        if($this->session->flashdata('incorrecto')) { 
+                    ?>
+                    <div class="alert alert-danger">
+                    <?php
+                        echo $this->session->flashdata('incorrecto');
+                    ?>
+                    </div>
                     <?php } ?>
-                    <!-- Fin errores -->
 
 
-                    <?=form_open(base_url().'index.php/categorias/nueva');
+                    <?=form_open(base_url().'index.php/asignatura/nueva');
                     $sNombre = array(
                     'name' => 'sNombre',
                     'id' => 'sNombre',
                     'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sNombre'),
-                    'style' => 'width:400px;'
-                    );
-                    $sDescripcion = array(
-                    'name' => 'sDescripcion',
-                    'id' => 'sDescripcion',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sDescripcion'),
-                    'style' => 'width:400px; height:80px;'
+                    'class' => 'form-control input-lg',
+                    'value' => set_value('sNombre') 
                     );
                     $submit = array(
                     'name' => 'submit',
                     'id' => 'submit',
                     'value' => 'Enviar',
                     'title' => 'Enviar',
-                    'class' => 'btn btn-default' 
+                    'class' => 'btn btn-default'
                     );
                     ?>
 
-                    <?=form_fieldset('Añadir una nueva categoría');?>
-
-                    <label for="sNombre">Nombre:</label>
-                    <?=form_input($sNombre)?><p><?=form_error('sNombre','<div class= "error">','</div>');?></p>
-                    <label for="sDescripcion">Descripción:</label>
-                    <?=form_textarea($sDescripcion)?><p><?=form_error('sDescripcion')?></p>
-                    <?=form_submit($submit)?>
-                    <?=form_close()?>
-
-                    
-                    <?=form_fieldset_close();?>
+                    <?php
+                    echo form_fieldset('Añadir una nueva asignatura');
+                    ?>
+                    <table>
+                    <tr>
+                    <td><?php echo form_label('Asignatura: '); ?></td>
+                    <td><?php echo form_input($sNombre); ?></td>
+                    <td>&nbsp;</td>
+                    <td><?php echo form_submit($submit);?></td>
+                    </tr>
+                    <tr>
+                    <td>
+<!--con la funcion validation_errors ci nos muestra los errores al pulsar el botón submit, la podemos colocar donde queramos-->
+                  <font color="red" style="font-weight: bold; font-size: 14px; text-decoration: underline"><?php echo validation_errors(); ?></font>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td>
+ 
+                    </td>
+                    </tr>
+                    <?php
+                    echo form_close();
+                    ?>
+                    </table>
+                    <?php
+                        echo form_fieldset_close();
+                    ?>
 
                     <hr class="short">
                     <?php echo form_fieldset('Listado');?>
-                    <?php foreach($ver as $fila){ ?>
+
+                    <?=form_open(base_url().'index.php/asignatura/eliminar_todos');?>
+                    
+                    <?php foreach($asignatura as $fila){ ?>
 
                         <div class="row show-grid">
-                        <div class="col-md-1"><span class="show-grid-block"><?=$fila->iId;?></span></div>
-                        <div class="col-md-3"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
-                        <div class="col-md-5"><span class="show-grid-block"><?=$fila->sDescripcion;?></span></div>
-                        <div class="col-md-3"><span class="show-grid-block">
-                            <a href="<?=base_url("index.php/categorias/mod/$fila->iId")?>" 
+                        <div class="col-md-1">
+                            <span class="show-grid-block">
+                            <input type="checkbox" name="asignatura[]" value="<?=$fila->iId;?>">
+                            </span>
+                        </div>
+                        <div class="col-md-9"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
+                        <div class="col-md-2"><span class="show-grid-block">
+                            <a href="<?=base_url("index.php/asignatura/mod/$fila->iId")?>" 
                                 class="btn btn-warning icon icon-pencil">
                             </a>
-                            <a href="<?=base_url("index.php/categorias/eliminar/$fila->iId")?>" 
+                            <a href="<?=base_url("index.php/Asignatura/eliminar/$fila->iId")?>" 
                                 class="btn btn-warning icon icon-trash-o">
                             </a>
                         </span></div>
@@ -158,9 +173,12 @@
                     <?php
                     }
                     ?>
-
+                    <br>
+                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
+                    <?=form_close();?>
+                    <br style="clear:both;">
+                    <?php echo $this->pagination->create_links() ?>
                     <hr class="short">
-
 
                 </div>
             </div>

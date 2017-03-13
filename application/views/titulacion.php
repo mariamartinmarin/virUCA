@@ -154,10 +154,14 @@
 
                         <div class="row show-grid">
                         <div class="col-md-2"><span class="show-grid-block"><?=$fila->iId;?></span></div>
-                        <div class="col-md-6"><span class="show-grid-block"><?=$fila->sTitulacion;?></span></div>
-                        <div class="col-md-4"><span class="show-grid-block">
-                            <a href="<?=base_url("index.php/titulacion/mod/$fila->iId")?>" class="btn btn-warning">Modificar</a>
-                            <a href="<?=base_url("index.php/titulacion/eliminar/$fila->iId")?>" class="btn btn-warning">Eliminar</a>
+                        <div class="col-md-8"><span class="show-grid-block"><?=$fila->sTitulacion;?></span></div>
+                        <div class="col-md-2"><span class="show-grid-block">
+                            <a href="<?=base_url("index.php/titulacion/mod/$fila->iId")?>" 
+                                class="btn btn-warning icon icon-pencil">
+                            </a>
+                            <a href="<?=base_url("index.php/titulacion/eliminar/$fila->iId")?>" 
+                                class="btn btn-warning icon icon-trash-o">
+                            </a>
                         </span></div>
                         </div>
                     <?php

@@ -211,8 +211,12 @@
                         <div class="col-md-3"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
                         <div class="col-md-5"><span class="show-grid-block"><?=$fila->sApellidos;?></span></div>
                         <div class="col-md-3"><span class="show-grid-block">
-                            <a href="<?=base_url("index.php/usuarios/mod/$fila->iId")?>" class="btn btn-warning">Modificar</a>
-                            <a href="<?=base_url("index.php/usuarios/eliminar/$fila->iId")?>" class="btn btn-warning">Eliminar</a>
+                            <a href="<?=base_url("index.php/usuarios/mod/$fila->iId")?>" 
+                                class="btn btn-warning icon icon-pencil">
+                            </a>
+                            <a href="<?=base_url("index.php/usuarios/eliminar/$fila->iId")?>" 
+                                class="btn btn-warning icon icon-trash-o">
+                            </a>
                         </span></div>
                         </div>
                     <?php

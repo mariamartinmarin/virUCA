@@ -1,20 +1,20 @@
 <?php
-class Usuarios extends CI_Controller{
+class Alumnos extends CI_Controller{
     public function __construct() {
         parent::__construct();
-        $this->load->model("usuarios_model");
+        $this->load->model("alumnos_model");
         $this->load->library("session");
     }
      
     //controlador por defecto
     public function index($iId="NULL"){  
-            $usuarios["ver"]=$this->usuarios_model->ver();
-            $this->load->view("usuarios",$usuarios);
+            $alumnos["ver"]=$this->alumnos_model->ver();
+            $this->load->view("alumnos",$alumnos);
     }
 
     public function mod_view($iId){
-       $usuarios["verUsuario"]=$this->usuarios_model->verUsuario($iId);
-       $this->load->view("usuariomod_view",$usuarios);
+       $alumnos["verAlumno"]=$this->alumnos_model->verAlumno($iId);
+       $this->load->view("alumnomod_view",$alumnos);
     }
     
     public function nueva(){
@@ -37,7 +37,7 @@ class Usuarios extends CI_Controller{
                 $this->index();
             } else {
                 // Hacemos la inserción.
-                 $add=$this->usuarios_model->nueva(
+                 $add=$this->alumnos_model->nueva(
                     $this->input->post("iPerfil"), 
                     $this->input->post("sNombre"),
                     $this->input->post("sApellidos"),
@@ -47,19 +47,19 @@ class Usuarios extends CI_Controller{
                     );
                 if($add==true){
                     //Sesion de una sola ejecución
-                    $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, El usuario se registró con éxito.');
+                    $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, El alumno se registró con éxito.');
                 }else{
-                    $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, parece que hubo un problema y no hemos podido añadir el nuevo profesor.');
+                    $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, parece que hubo un problema y no hemos podido añadir el nuevo alumno.');
                 }       
-                redirect(base_url()."index.php/usuarios", "refresh");
+                redirect(base_url()."index.php/alumnos", "refresh");
             }
         }
     }
      
     public function mod($iId){
         if(is_numeric($iId)){
-            $datos["mod"]=$this->usuarios_model->mod($iId);
-            $this->load->view("usuariomod_view",$datos);
+            $datos["mod"]=$this->alumnos_model->mod($iId);
+            $this->load->view("alumnomod_view",$datos);
             
             if($this->input->post("submit")){
                 // Hay que volver a validar los datos.
@@ -76,10 +76,10 @@ class Usuarios extends CI_Controller{
                 $this->form_validation->set_message('max_length', '%s no puede tener más de %s caracteres.');
                 
                 if ($this->form_validation->run() == FALSE) {   
-                    $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong>, no hemos podido modificar los datos del profesor.');               
-                    redirect(base_url()."index.php/usuarios/mod/".$iId, "refresh");
+                    $this->session->set_flashdata('alumno_ko', '<strong>Oops!</strong>, no hemos podido modificar los datos del alumno.');               
+                    redirect(base_url()."index.php/alumnos/mod/".$iId, "refresh");
                 } else {
-                    $mod=$this->usuarios_model->mod(
+                    $mod=$this->alumnos_model->mod(
                         $iId,
                         $this->input->post("submit"),
                         $this->input->post("sNombre"),
@@ -89,17 +89,17 @@ class Usuarios extends CI_Controller{
                         md5($this->input->post("sPassword")),
                         $this->input->post("iPerfil"));
                     if($mod==true){
-                        $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong>, el profesor se modificó correctamente.');
+                        $this->session->set_flashdata('alumno_ok', '<strong>Bien!</strong>, el alumno se modificó correctamente.');
                     }else{
-                        $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong>, no hemos podido modificar los datos del profesor.');
+                        $this->session->set_flashdata('alumno_ko', '<strong>Oops!</strong>, no hemos podido modificar los datos del alumno.');
                     }
 
-                    redirect(base_url()."index.php/usuarios/mod/".$iId, "refresh");
+                    redirect(base_url()."index.php/alumnos/mod/".$iId, "refresh");
 
                 }
             }
         } else {
-            redirect(base_url()."index.php/usuarios"); 
+            redirect(base_url()."index.php/alumno"); 
         }
     }
 
@@ -107,15 +107,15 @@ class Usuarios extends CI_Controller{
     //Controlador para eliminar
     public function eliminar($iId){
         if(is_numeric($iId)){
-            $eliminar=$this->usuarios_model->eliminar($iId);
+            $eliminar=$this->alumnos_model->eliminar($iId);
             if($eliminar==true){
-                $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, el profesor se eliminó con éxito.');
+                $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, el alumno se eliminó con éxito.');
           }else{
-              $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, no se pudo eliminar el profesor.');
+              $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, no se pudo eliminar el alumno.');
           }
-          redirect(base_url()."index.php/usuarios");
+          redirect(base_url()."index.php/alumnos");
         }else{
-          redirect(base_url()."index.php/usuarios");
+          redirect(base_url()."index.php/alumnos");
         }
     }
 }

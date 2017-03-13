@@ -78,19 +78,75 @@
             </section>
 
             <div class="container">
+                
+                <!-- Errores de inserción. -->
+                <?php if($this->session->flashdata('categoria_ok')) { ?>
+                <div class="alert alert-success">
+                     <?php echo $this->session->flashdata('categoria_ok');?>
+                </div>
+                <?php } ?>
+
+                <?php if($this->session->flashdata('categoria_ko')) { ?>
+                    <div class="alert alert-danger">
+                        <?php echo $this->session->flashdata('categoria_ko'); ?>
+                    </div>
+                <?php } ?>
+                <!-- Fin errores -->
+
                 <?php echo form_fieldset('Modificar categoría');?>
                 <form action="" method="POST">
-                <?php foreach ($mod as $fila){ ?>
-                    <label for="sNombre">Nombre:</label>
-                    <input type="sNombre" class="form-control input-lg" style="width: 400px;" name="sNombre" value="<?=$fila->sNombre?>"/>
-                    <label for="sDescripcion">Breve descripción:</label>
-                    <input type="sDescripcion" class="form-control input-lg" style="width: 400px;" name="sDescripcion" value="<?=$fila->sDescripcion?>"/>
-                    <input type="submit" name="submit" value="Modificar" class="btn btn-default" style="margin-top:5px;"/>
-                <?php } ?>
+                <?php foreach ($mod as $fila){ 
+                    echo form_hidden('iId',$fila->iId);
+                    $sNombre = array(
+                    'name' => 'sNombre',
+                    'id' => 'sNombre',
+                    'size' => '50',
+                    'class' => 'form-control',
+                    'value' => $fila->sNombre,
+                    'maxlength' => '100'
+                    );
+
+                    $sDescripcion = array(
+                    'name' => 'sDescripcion',
+                    'id' => 'sDescripcion',
+                    'size' => '50',
+                    'class' => 'form-control',
+                    'value' => $fila->sDescripcion
+                    );
+
+                    $submit = array(
+                    'name' => 'submit',
+                    'id' => 'submit',
+                    'value' => 'Enviar',
+                    'title' => 'Enviar',
+                    'class' => 'btn btn-default' 
+                    );
+                    ?>
+
+                    <!-- Campos del formulario -->
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <label>Nombre *</label>
+                                <?=form_input($sNombre)?>
+                                <?=form_error('sNombre','<div class= "error">','</div>');?>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Descripcion *</label>
+                                <?=form_input($sDescripcion)?>
+                                <?=form_error('sDescripcion', '<div class= "error">','</div>');?>
+                            </div>
+                        </div>
+                    </div>
+                    <?=form_submit($submit)?>
+                    <!-- Fin campos formulario -->
+                   
+                    <?php } ?>
                 </form>
+                <?=form_fieldset_close();?>
                 <hr>
                 <a href="<?=base_url()."index.php/categorias"?>" class="btn btn-warning">Volver</a>
-            </div>
+            </div>        
         </div>
         <?php $this->load->view('footer');?>
     </div>

@@ -86,7 +86,7 @@
 								<div class="box-content">
 									<i class="icon-featured icon icon-user"></i>
 									<h4>Añadir alumno</h4>
-									<p>Añadir alumnos al curso actual.<a href="/" class="learn-more">Añadir + <i class="icon icon-angle-right"></i></a></p>
+									<p>Añadir alumnos al curso actual.<a href="<?=base_url()?>index.php/alumnos" class="learn-more">Añadir + <i class="icon icon-angle-right"></i></a></p>
 								</div>
 							</div>
 						</div>
