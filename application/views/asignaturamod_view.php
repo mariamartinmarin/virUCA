@@ -81,12 +81,27 @@
                 <?php echo form_fieldset('Modificar asignatura');?>
                 <form action="" method="POST">
                 <?php foreach ($mod as $fila){ ?>
-                    <input type="sNombre" class="form-control input-lg" style="width: 400px;" name="sNombre" value="<?=$fila->sNombre?>"/>
+                    <?=form_label('Asignatura: '); ?>
+                    <input type="sNombre" class="form-control" 
+                        style="width: 400px;" name="sNombre" value="<?=$fila->sNombre?>"/>
+                    <?=form_label('Titulación: '); ?>
+                    <select name="iTitulacion" class="form-control" style="width:400px;">
+                    <?php
+                    foreach ($titulaciones as $i => $titulacion) 
+                        if ($i == $fila->iId_Titulacion)
+                            echo "<option value='".$i."' selected>".$titulacion."</option>";
+                        else
+                            echo "<option value='".$i."'>".$titulacion."</option>";
+                       
+                    ?>
+                    </select>
+
+
                     <input type="submit" name="submit" value="Modificar" class="btn btn-default" style="margin-top:5px;"/>
                 <?php } ?>
                 </form>
                 <hr>
-                <a href="   " class="btn btn-warning">Volver</a>
+                <a href="<?=base_url()?>index.php/asignatura/" class="btn btn-warning">Volver</a>
 
             </div>
         </div>

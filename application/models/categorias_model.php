@@ -6,6 +6,25 @@ class Categorias_model extends CI_Model{
         $this->load->database();
     }
     
+    public function filas()
+    {
+      $consulta = $this->db->get('categoria');
+      return  $consulta->num_rows() ;
+    }
+
+    function total_paginados($por_pagina, $segmento) 
+    {
+      $consulta = $this->db->get('categoria', $por_pagina, $segmento);
+      if($consulta->num_rows()>0)
+      {
+        foreach($consulta->result() as $fila)
+        {
+          $data[] = $fila;
+        }
+        return $data;
+      }
+    }
+
     public function ver(){
       $consulta=$this->db->query("SELECT * FROM categoria;");
       return $consulta->result();

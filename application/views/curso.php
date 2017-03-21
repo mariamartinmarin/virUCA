@@ -52,95 +52,79 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-         <style type="text/css">
-            .error{
-            color: red !important;
-            }
-        </style>
+        <style type="text/css">
+      .error{
+      color: red !important;
+      }
+    </style>
     </head>
     <body>
         
-    <div class="body">
-        <?php $this->load->view('menup_view');?>
-        <div role="main" class="main">
-            <section class="page-top">
+        <div class="body">
+            <?php $this->load->view('menup_view');?>
+            <div role="main" class="main">
+
+                <section class="page-top">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <ul class="breadcrumb">
+                                    <li><a href="#">Curso</a></li>
+                                    <li class="active">Gestión de Cursos Académicos</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2>Gestión de Cursos</h2>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+               
                 <div class="container">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <ul class="breadcrumb">
-                                <li><a href="#">Alumnos</a></li>
-                                <li class="active">Gestión de Alumnos</li>
-                            </ul>
+
+                    <!-- Errores de inserción. -->
+                     <?php if($this->session->flashdata('correcto')) { ?>
+                        <div class="alert alert-success">
+                            <?php echo $this->session->flashdata('correcto');?>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h2>Modificar alumno</h2>
+                    <?php } ?>
+
+                    <?php if($this->session->flashdata('incorrecto')) { ?>
+                        <div class="alert alert-danger">
+                            <?php echo $this->session->flashdata('incorrecto'); ?>
                         </div>
-                    </div>
-                </div>
-            </section>
+                    <?php } ?>
+                    <!-- Fin errores -->
 
-            <div class="container">
-                <!-- Errores de inserción. -->
-                <?php if($this->session->flashdata('alumno_ok')) { ?>
-                    <div class="alert alert-success">
-                        <?php echo $this->session->flashdata('alumno_ok');?>
-                    </div>
-                <?php } ?>
+                   <?=form_open(base_url().'index.php/curso/nueva');
+                   $tipo_usuario = 0;
+                   echo form_hidden('iPerfil',$tipo_usuario);
 
-                <?php if($this->session->flashdata('alumno_ko')) { ?>
-                    <div class="alert alert-danger">
-                        <?php echo $this->session->flashdata('alumno_ko'); ?>
-                    </div>
-                <?php } ?>
-                <!-- Fin errores -->
-
-                <?php echo form_fieldset('Modificar los datos de un alumno');?>
-                <form action="" method="POST">
-                <?php    
-                    foreach ($mod as $fila){ 
-                    $tipo_usuario = 1;
-                    echo form_hidden('iPerfil',$tipo_usuario);
-                    echo form_hidden('iId',$fila->iId);
-                    $sNombre = array(
-                    'name' => 'sNombre',
-                    'id' => 'sNombre',
+                    $sCurso = array(
+                    'name' => 'sCurso',
+                    'id' => 'sCurso',
                     'size' => '50',
                     'class' => 'form-control',
-                    'value' => $fila->sNombre,
+                    'value' => set_value('sCurso'),
                     'maxlength' => '100'
                     );
 
-                    $sApellidos = array(
-                    'name' => 'sApellidos',
-                    'id' => 'sApellidos',
+                    $iId_Asignatura = array(
+                    'name' => 'iId_Asignatura',
+                    'id' => 'iId_Asignatura',
                     'size' => '50',
                     'class' => 'form-control',
-                    'value' => $fila->sApellidos
+                    'value' => set_value('iId_Asignatura')
                     );
 
-                    $sEmail = array(
-                    'name' => 'sEmail',
-                    'id' => 'sEmail',
+                    $iId_Titulacion = array(
+                    'name' => 'iId_Titulacion',
+                    'id' => 'iId_Titulacion',
                     'size' => '50',
                     'class' => 'form-control',
-                    'value' => $fila->sEmail
-                    );
-
-                    $sUsuario = array(
-                    'name' => 'sUsuario',
-                    'id' => 'sUsuario',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => $fila->sUsuario
-                    );
-                    $sPassword = array(
-                    'name' => 'sPassword',
-                    'id' => 'sPassword',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => $fila->sPassword
+                    'value' => set_value('iId_Titulacion')
                     );
 
                     $submit = array(
@@ -152,9 +136,11 @@
                     );
                     ?>
 
-                    
-                    <!-- Campos del formulario -->
-                    <div class="row">
+                    <?=form_fieldset('Añadir nuevo curso académico.');?>
+
+                    <!--- formulario organizado con validación -->
+
+                   <div class="row">
                         <div class="form-group">
                             <div class="col-md-6">
                                 <label>Nombre *</label>
@@ -186,38 +172,58 @@
 
                     <div class="row">
                         <div class="form-group">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label>E-mail</label>
                                 <?=form_input($sEmail)?>
                                 <?=form_error('sEmail','<div class= "error">','</div>');?>
                             </div>
-                            <div class="col-md-6">
-                            <?=form_label('Titulación: '); ?>
-                    <select name="iTitulacion" class="form-control" style="width:400px;">
-                    <?php
-                    foreach ($titulaciones as $i => $titulacion) 
-                        if ($i == $fila->iId_Titulacion)
-                            echo "<option value='".$i."' selected>".$titulacion."</option>";
-                        else
-                            echo "<option value='".$i."'>".$titulacion."</option>";
-                       
-                    ?>
-                    </select>
-                            </div>
                         </div>
                     </div>                      
                     <?=form_submit($submit)?>
-                    <!-- Fin campos formulario -->
-                   
-                <?php } ?>
-                </form>
-                <?=form_fieldset_close();?>
-                <hr>
-                <a href="<?=base_url()."index.php/alumnos"?>" class="btn btn-warning">Volver</a>
+                    <?=form_close()?>
+
+                    <!-- Fin del formulario organizado -->
+                    
+                    
+                    <?=form_fieldset_close();?>
+
+                    <hr class="short">
+                    <?php echo form_fieldset('Listado');?>
+                    <?=form_open(base_url().'index.php/usuarios/eliminar_todos');?>
+                    <?php foreach($usuario as $fila){ ?>
+
+                        <div class="row show-grid">
+                        <div class="col-md-1">
+                            <span class="show-grid-block">
+                            <input type="checkbox" name="usuario[]" value="<?=$fila->iId;?>">
+                            </span>
+                        </div>
+                        <div class="col-md-3"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
+                        <div class="col-md-5"><span class="show-grid-block"><?=$fila->sApellidos;?></span></div>
+                        <div class="col-md-3"><span class="show-grid-block">
+                            <a href="<?=base_url("index.php/usuarios/mod/$fila->iId")?>" 
+                                class="btn btn-warning icon icon-pencil">
+                            </a>
+                            <a href="<?=base_url("index.php/usuarios/eliminar/$fila->iId")?>" 
+                                class="btn btn-warning icon icon-trash-o">
+                            </a>
+                        </span></div>
+                        </div>
+                    <?php
+                    }
+                    ?>
+                    <br>
+                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
+                    <?=form_close();?>
+                    <br style="clear:both;">
+                    <?php echo $this->pagination->create_links() ?>
+                    <hr class="short">
+
+
+                </div>
             </div>
+            <?php $this->load->view('footer');?>
         </div>
-        <?php $this->load->view('footer');?>
-    </div>
 
 <!-- Libs -->
         <script src="<?=base_url()?>vendor/jquery.js"></script>
@@ -239,15 +245,12 @@
         <!-- Theme Initializer -->
         <script src="<?=base_url()?>js/theme.plugins.js"></script>
         <script src="<?=base_url()?>js/theme.js"></script>
+
+        <!-- Current Page JS -->
+        <script src="<?=base_url()?>js/views/view.contact.js"></script>
         
         <!-- Custom JS -->
         <script src="<?=base_url()?>js/custom.js"></script>
 
     </body>
 </html>
-
-
-
-
-
-

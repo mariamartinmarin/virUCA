@@ -52,6 +52,11 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
+        <style type="text/css">
+            .error{
+                color: red !important;
+            } 
+        </style>
 
     </head>
     <body>
@@ -107,6 +112,7 @@
                     'id' => 'sTitulacion',
                     'size' => '50',
                     'class' => 'form-control input-lg',
+                    'style' => 'width:400px;',
                     'value' => set_value('sTitulacion') 
                     );
                     $submit = array(
@@ -118,42 +124,28 @@
                     );
                     ?>
 
-                    <?php
-                    echo form_fieldset('Añadir una nueva titulación');
-                    ?>
-                    <table>
-                    <tr>
-                    <td><?php echo form_label('Titulación: '); ?></td>
-                    <td><?php echo form_input($sTitulacion); ?></td>
-                    <td>&nbsp;</td>
-                    <td><?php echo form_submit($submit);?></td>
-                    </tr>
-                    <tr>
-                    <td>
-<!--con la funcion validation_errors ci nos muestra los errores al pulsar el botón submit, la podemos colocar donde queramos-->
-                  <font color="red" style="font-weight: bold; font-size: 14px; text-decoration: underline"><?php echo validation_errors(); ?></font>
-                    </td>
-                    </tr>
-                    <tr>
-                    <td>
- 
-                    </td>
-                    </tr>
-                    <?php
-                    echo form_close();
-                    ?>
-                    </table>
-                    <?php
-                        echo form_fieldset_close();
-                    ?>
+                    <?=form_fieldset('Añadir una nueva titulación');?>
+
+                    <label for="sTitulacion">Titulación:</label>
+                    <?=form_input($sTitulacion)?><p>
+                    <?=form_error('sTitulacion','<div class= "error">','</div>');?></p>
+                    <?=form_submit($submit)?>
+                    <?=form_close()?>
+
+                    
+                    <?=form_fieldset_close();?>
 
                     <hr class="short">
                     <?php echo form_fieldset('Listado');?>
-
-                    <?php foreach($ver as $fila){ ?>
+                    <?=form_open(base_url().'index.php/titulacion/eliminar_todos');?>
+                    <?php foreach($titulacion as $fila){ ?>
 
                         <div class="row show-grid">
-                        <div class="col-md-2"><span class="show-grid-block"><?=$fila->iId;?></span></div>
+                        <div class="col-md-1">
+                            <span class="show-grid-block">
+                            <input type="checkbox" name="titulacion[]" value="<?=$fila->iId;?>">
+                            </span>
+                        </div>
                         <div class="col-md-8"><span class="show-grid-block"><?=$fila->sTitulacion;?></span></div>
                         <div class="col-md-2"><span class="show-grid-block">
                             <a href="<?=base_url("index.php/titulacion/mod/$fila->iId")?>" 
@@ -168,6 +160,11 @@
                     }
                     ?>
 
+                    <br>
+                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
+                    <?=form_close();?>
+                    <br style="clear:both;">
+                    <?php echo $this->pagination->create_links() ?>
                     <hr class="short">
 
 

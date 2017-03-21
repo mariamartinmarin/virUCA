@@ -7,6 +7,17 @@ class Login_model extends CI_Model {
 	public function __construct() {
 		parent::__construct();
 	}
+
+	public function aplicacion_activa() {
+		$this->db->where('iId',0);
+		$query = $this->db->get('parametros');
+		if($query->num_rows() == 1)
+		{
+			return $query->row();
+		}else{
+			return 0;
+		}
+	}
 	
 	public function login_user($username,$password)
 	{

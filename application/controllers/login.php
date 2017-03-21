@@ -53,6 +53,12 @@ class Login extends CI_Controller
 				$check_user = $this->login_model->login_user($username,$password);
 				if($check_user == TRUE)
 				{
+					// Comprobamos primero si la aplicación está disponible (sólo si es alumno).
+					$app = $this->login_model->aplicacion_activa();
+					if ($check_user->iPerfil == 1 && $app->iActiva == 0) {
+						// Acceso a la aplicacion no permitido.
+						redirect(base_url().'index.php/inactiva/');
+					}
 					// Registramos el acceso.
 					$timestamp = date('Y-m-d G:i:s');
 					$data = array('dFecha' => $timestamp , 

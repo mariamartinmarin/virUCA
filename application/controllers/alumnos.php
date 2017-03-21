@@ -4,12 +4,28 @@ class Alumnos extends CI_Controller{
         parent::__construct();
         $this->load->model("alumnos_model");
         $this->load->library("session");
+        $this->load->library('pagination');
     }
      
     //controlador por defecto
     public function index($iId="NULL"){  
-            $alumnos["ver"]=$this->alumnos_model->ver();
-            $this->load->view("alumnos",$alumnos);
+
+        $pages=5; //Número de registros mostrados por páginas
+        $config['base_url'] = base_url().'index.php/alumnos/pagina/';
+        $config['total_rows'] = $this->alumnos_model->filas();//calcula el número de filas  
+        $config['per_page'] = $pages; //Número de registros mostrados por páginas
+        $config['num_links'] = 5; //Número de links mostrados en la paginación
+        $config['first_link'] = 'Primera';//primer link
+        $config['last_link'] = 'Última';//último link
+        $config["uri_segment"] = 3;//el segmento de la paginación
+        $config['next_link'] = 'Siguiente';//siguiente link
+        $config['prev_link'] = 'Anterior';//anterior link
+        $this->pagination->initialize($config); //inicializamos la paginación       
+        $data["alumnos"] = $this->alumnos_model->total_paginados($config['per_page'],$this->uri->segment(3));
+        $data["titulaciones"] = $this->alumnos_model->get_titulaciones();          
+        
+        //cargo la vista y le paso los datos
+        $this->load->view("alumnos",$data);
     }
 
     public function mod_view($iId){
@@ -43,7 +59,8 @@ class Alumnos extends CI_Controller{
                     $this->input->post("sApellidos"),
                     $this->input->post("sEmail"),
                     $this->input->post("sUsuario"),
-                    md5($this->input->post("sPassword"))
+                    md5($this->input->post("sPassword"),
+                    $this->input->post("iTitulacion"))
                     );
                 if($add==true){
                     //Sesion de una sola ejecución
@@ -59,6 +76,7 @@ class Alumnos extends CI_Controller{
     public function mod($iId){
         if(is_numeric($iId)){
             $datos["mod"]=$this->alumnos_model->mod($iId);
+            $datos["titulaciones"] = $this->alumnos_model->get_titulaciones();
             $this->load->view("alumnomod_view",$datos);
             
             if($this->input->post("submit")){
@@ -87,7 +105,8 @@ class Alumnos extends CI_Controller{
                         $this->input->post("sEmail"),
                         $this->input->post("sUsuario"),
                         md5($this->input->post("sPassword")),
-                        $this->input->post("iPerfil"));
+                        $this->input->post("iPerfil"),
+                        $this->input->post("iTitulacion"));
                     if($mod==true){
                         $this->session->set_flashdata('alumno_ok', '<strong>Bien!</strong>, el alumno se modificó correctamente.');
                     }else{
@@ -117,6 +136,19 @@ class Alumnos extends CI_Controller{
         }else{
           redirect(base_url()."index.php/alumnos");
         }
+    }
+
+    //Controlador para eliminar
+    public function eliminar_todos(){
+        foreach ($_POST["alumno"] as $item){
+            $eliminar=$this->alumnos_model->eliminar($item);
+        }
+        if($eliminar==true){
+            $this->session->set_flashdata('correcto', '<strong>Bien!</strong> se eliminaron los datos.');
+        }else{
+            $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
+        } 
+        redirect(base_url()."index.php/alumnos");
     }
 }
 ?>

@@ -61,6 +61,10 @@ $route['titulacion'] = 'titulacion';
 $route['titulacion/nueva'] = 'titulacion/nueva';
 $route['titulacion/mod/(:any)'] = 'titulacion/mod/$1';
 
+$route['titulacion/pagina/(:num)'] = 'titulacion';//cuando no sea la primera página
+$route['titulacion/pagina'] = 'titulacion';//cuando sea la primera página
+
+
 
 // Asignaturas
 
@@ -78,8 +82,21 @@ $route['categorias'] = 'categorias';
 $route['categorias/nueva'] = 'categorias/nueva';
 $route['categorias/mod/(:any)'] = 'categorias/mod/$1';
 
+$route['categorias/pagina/(:num)'] = 'categorias';//cuando no sea la primera página
+$route['categorias/pagina'] = 'categorias';//cuando sea la primera página
+
+
 // Paginación de ACCESOS.
 
 $route['accesos/pagina/(:num)'] = 'accesos';//cuando no sea la primera página
 $route['accesos/pagina'] = 'accesos';//cuando sea la primera página
 
+// Alumnos
+
+$route['alumnos/pagina/(:num)'] = 'alumnos';//cuando no sea la primera página
+$route['alumnos/pagina'] = 'alumnos';//cuando sea la primera página
+
+// Profesores
+
+$route['usuarios/pagina/(:num)'] = 'usuarios';//cuando no sea la primera página
+$route['usuarios/pagina'] = 'usuarios';//cuando sea la primera página

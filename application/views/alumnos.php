@@ -142,6 +142,14 @@
                     'value' => set_value('sPassword')
                     );
 
+                    $sTitulaciones = array(
+                    'name' => 'sTitulaciones',
+                    'id' => 'sTitulaciones',
+                    'size' => '50',
+                    'class' => 'form-control input-lg',
+                    'value' => set_value('sTitulaciones') 
+                    );
+
                     $submit = array(
                     'name' => 'submit',
                     'id' => 'submit',
@@ -187,16 +195,22 @@
 
                     <div class="row">
                         <div class="form-group">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label>E-mail</label>
                                 <?=form_input($sEmail)?>
                                 <?=form_error('sEmail','<div class= "error">','</div>');?>
+                            </div>
+                            <div class="col-md-6">                            
+                                <?=form_label('Titulación: '); ?>
+                                <?=form_dropdown('sTitulaciones', $titulaciones, '', 'class=form-control input-lg'); ?>
+                                
                             </div>
                         </div>
                     </div>                      
                     <?=form_submit($submit)?>
                     <?=form_close()?>
 
+                    
                     <!-- Fin del formulario organizado -->
                     
                     
@@ -204,13 +218,18 @@
 
                     <hr class="short">
                     <?php echo form_fieldset('Listado');?>
-                    <?php foreach($ver as $fila){ ?>
+                    <?=form_open(base_url().'index.php/alumnos/eliminar_todos');?>
+                    <?php foreach($alumnos as $fila){ ?>
 
                         <div class="row show-grid">
-                        <div class="col-md-1"><span class="show-grid-block"><?=$fila->iId;?></span></div>
-                        <div class="col-md-3"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
-                        <div class="col-md-5"><span class="show-grid-block"><?=$fila->sApellidos;?></span></div>
-                        <div class="col-md-3"><span class="show-grid-block">
+                        <div class="col-md-1">
+                            <span class="show-grid-block">
+                            <input type="checkbox" name="alumno[]" value="<?=$fila->iId;?>">
+                            </span>
+                        </div>
+                        <div class="col-md-5"><span class="show-grid-block"><?=$fila->sApellidos;?>, <?=$fila->sNombre;?></span></div>
+                        <div class="col-md-4"><span class="show-grid-block"><?=$fila->sTitulacion;?></span></div>
+                        <div class="col-md-2"><span class="show-grid-block">
                             <a href="<?=base_url("index.php/alumnos/mod/$fila->iId")?>" 
                                 class="btn btn-warning icon icon-pencil">
                             </a>
@@ -222,9 +241,13 @@
                     <?php
                     }
                     ?>
+                    <br>
+                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
+                    <?=form_close();?>
 
+                    <br style="clear:both;">
+                    <?php echo $this->pagination->create_links() ?>
                     <hr class="short">
-
 
                 </div>
             </div>

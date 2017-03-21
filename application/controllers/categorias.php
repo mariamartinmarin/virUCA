@@ -5,13 +5,26 @@ class Categorias extends CI_Controller{
         $this->load->helper("url");  
         $this->load->model("categorias_model");
         $this->load->library("session");
+        $this->load->library('pagination');
     }
      
     //controlador por defecto
     public function index(){
          
-        $categorias["ver"]=$this->categorias_model->ver();
-        $this->load->view("categorias",$categorias);
+        $pages=5; //Número de registros mostrados por páginas
+        $config['base_url'] = base_url().'index.php/categorias/pagina/';
+        $config['total_rows'] = $this->categorias_model->filas();//calcula el número de filas  
+        $config['per_page'] = $pages; //Número de registros mostrados por páginas
+        $config['num_links'] = 5; //Número de links mostrados en la paginación
+        $config['first_link'] = 'Primera';//primer link
+        $config['last_link'] = 'Última';//último link
+        $config["uri_segment"] = 3;//el segmento de la paginación
+        $config['next_link'] = 'Siguiente';//siguiente link
+        $config['prev_link'] = 'Anterior';//anterior link
+        $this->pagination->initialize($config); //inicializamos la paginación       
+        $data["categoria"] = $this->categorias_model->total_paginados($config['per_page'],$this->uri->segment(3));          
+        
+        $this->load->view("categorias",$data);
     }
      
     public function nueva(){
@@ -80,26 +93,6 @@ class Categorias extends CI_Controller{
             redirect(base_url()."index.php/categorias"); 
         }
 
-
-        if(is_numeric($iId)){
-            $datos["mod"]=$this->categorias_model->mod($iId);
-            $this->load->view("categoriasmod_view",$datos);
-            if($this->input->post("submit")){
-                $mod=$this->categorias_model->mod(
-                        $iId,
-                        $this->input->post("submit"),
-                        $this->input->post("sNombre"),
-                        $this->input->post("sDescripcion"));
-                if($mod==true){
-                    $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, la categoria se modificó correctamente.');
-                }else{
-                    $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, no hemos podido modificar los datos.');
-                }
-                redirect(base_url()."index.php/categorias");
-            }
-        }else{
-            redirect(base_url()."index.php/categorias"); 
-        }
     }
      
     //Controlador para eliminar
@@ -116,5 +109,19 @@ class Categorias extends CI_Controller{
           redirect(base_url()."index.php/categorias");
         }
     }
+
+    //Controlador para eliminar
+    public function eliminar_todos(){
+        foreach ($_POST["categoria"] as $item){
+            $eliminar=$this->categorias_model->eliminar($item);
+        }
+        if($eliminar==true){
+            $this->session->set_flashdata('categoria_ok', '<strong>Bien!</strong> se eliminaron los datos.');
+        }else{
+            $this->session->set_flashdata('categoria_ko', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
+        } 
+        redirect(base_url()."index.php/categorias");
+    }
+
 }
 ?>

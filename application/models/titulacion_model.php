@@ -5,6 +5,25 @@ class Titulacion_model extends CI_Model{
         parent::__construct(); 
         $this->load->database();
     }
+
+    public function filas()
+    {
+      $consulta = $this->db->get('titulacion');
+      return  $consulta->num_rows() ;
+    }
+
+    function total_paginados($por_pagina, $segmento) 
+    {
+      $consulta = $this->db->get('titulacion', $por_pagina, $segmento);
+      if($consulta->num_rows()>0)
+      {
+        foreach($consulta->result() as $fila)
+        {
+          $data[] = $fila;
+        }
+        return $data;
+      }
+    }
      
     public function ver(){
         //Hacemos una consulta
@@ -38,12 +57,26 @@ class Titulacion_model extends CI_Model{
     }
      
     public function eliminar($iId){
-       $consulta=$this->db->query("DELETE FROM titulacion WHERE iId=$iId");
-       if($consulta==true){
+      $this->db->select('a.iId');
+      $this->db->from('asignatura a');
+      $this->db->where('a.iId_Titulacion', $iId);
+      $consulta = $this->db->get();
+      
+      $this->db->select('u.iId');
+      $this->db->from('usuario u');
+      $this->db->where('u.iId_Titulacion', $iId);
+      $consulta2 = $this->db->get();
+
+      if (($consulta->num_rows() >= 1) || ($consulta2->num_rows() >= 1)) {
+        return false;
+      } else {
+        $consulta=$this->db->query("DELETE FROM titulacion WHERE iId=$iId");
+        if($consulta==true){
            return true;
-       }else{
+        }else{
            return false;
-       }
+        }
+      }
     }
 }
 ?>

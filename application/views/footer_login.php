@@ -19,8 +19,8 @@
 					<div class="container">
 						<div class="row">
 							<div class="col-md-1">
-								<a href="index.html" class="logo">
-									<img alt="VirUCA Logo" class="img-responsive" src="img/logo-footer.png">
+								<a href="<?=base_url()?>" class="logo">
+									<img alt="VirUCA Logo" class="img-responsive" src="<?=base_url()?>assets/img/logo_viruca.jpg">
 								</a>
 							</div>
 							<div class="col-md-7">

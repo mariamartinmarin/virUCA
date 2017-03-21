@@ -204,10 +204,15 @@
 
                     <hr class="short">
                     <?php echo form_fieldset('Listado');?>
-                    <?php foreach($ver as $fila){ ?>
+                    <?=form_open(base_url().'index.php/usuarios/eliminar_todos');?>
+                    <?php foreach($usuario as $fila){ ?>
 
                         <div class="row show-grid">
-                        <div class="col-md-1"><span class="show-grid-block"><?=$fila->iId;?></span></div>
+                        <div class="col-md-1">
+                            <span class="show-grid-block">
+                            <input type="checkbox" name="usuario[]" value="<?=$fila->iId;?>">
+                            </span>
+                        </div>
                         <div class="col-md-3"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
                         <div class="col-md-5"><span class="show-grid-block"><?=$fila->sApellidos;?></span></div>
                         <div class="col-md-3"><span class="show-grid-block">
@@ -222,7 +227,11 @@
                     <?php
                     }
                     ?>
-
+                    <br>
+                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
+                    <?=form_close();?>
+                    <br style="clear:both;">
+                    <?php echo $this->pagination->create_links() ?>
                     <hr class="short">
 
 

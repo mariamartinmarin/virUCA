@@ -78,17 +78,62 @@
             </section>
 
             <div class="container">
+
+                <!-- Errores de inserción. -->
+                <?php if($this->session->flashdata('titulacion_ok')) { ?>
+                <div class="alert alert-success">
+                     <?php echo $this->session->flashdata('titulacion_ok');?>
+                </div>
+                <?php } ?>
+
+                <?php if($this->session->flashdata('titulacion_ko')) { ?>
+                    <div class="alert alert-danger">
+                        <?php echo $this->session->flashdata('titulacion_ko'); ?>
+                    </div>
+                <?php } ?>
+                <!-- Fin errores -->
+
                 <?php echo form_fieldset('Modificar titulación');?>
                 <form action="" method="POST">
-                <?php foreach ($mod as $fila){ ?>
-                    <input type="sTitulacion" class="form-control input-lg" style="width: 400px;" name="sTitulacion" value="<?=$fila->sTitulacion?>"/>
-                    <input type="submit" name="submit" value="Modificar" class="btn btn-default" style="margin-top:5px;"/>
-                <?php } ?>
-                </form>
-                <hr>
-                <a href="   " class="btn btn-warning">Volver</a>
+                <?php foreach ($mod as $fila){ 
+                    echo form_hidden('iId',$fila->iId);
+                    $sTitulacion = array(
+                    'name' => 'sTitulacion',
+                    'id' => 'sTitulacion',
+                    'size' => '50',
+                    'class' => 'form-control',
+                    'value' => $fila->sTitulacion,
+                    'maxlength' => '100'
+                    );
 
-            </div>
+                    $submit = array(
+                    'name' => 'submit',
+                    'id' => 'submit',
+                    'value' => 'Enviar',
+                    'title' => 'Enviar',
+                    'class' => 'btn btn-default' 
+                    );
+                    ?>
+
+                    <!-- Campos del formulario -->
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <label>Titulación *</label>
+                                <?=form_input($sTitulacion)?>
+                                <?=form_error('sTitulacion','<div class= "error">','</div>');?>
+                            </div>
+                        </div>
+                    </div>
+                    <?=form_submit($submit)?>
+                    <!-- Fin campos formulario -->
+                   
+                    <?php } ?>
+                </form>
+                <?=form_fieldset_close();?>
+                <hr>
+                <a href="<?=base_url()."index.php/titulacion"?>" class="btn btn-warning">Volver</a>
+            </div>        
         </div>
         <?php $this->load->view('footer');?>
     </div>

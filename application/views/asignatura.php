@@ -106,9 +106,18 @@
                     'name' => 'sNombre',
                     'id' => 'sNombre',
                     'size' => '50',
-                    'class' => 'form-control input-lg',
+                    'class' => 'form-control',
                     'value' => set_value('sNombre') 
                     );
+
+                    $sTitulaciones = array(
+                    'name' => 'sTitulaciones',
+                    'id' => 'sTitulaciones',
+                    'size' => '50',
+                    'class' => 'form-control input-lg',
+                    'value' => set_value('sTitulaciones') 
+                    );
+
                     $submit = array(
                     'name' => 'submit',
                     'id' => 'submit',
@@ -121,28 +130,24 @@
                     <?php
                     echo form_fieldset('Añadir una nueva asignatura');
                     ?>
-                    <table>
-                    <tr>
-                    <td><?php echo form_label('Asignatura: '); ?></td>
-                    <td><?php echo form_input($sNombre); ?></td>
-                    <td>&nbsp;</td>
-                    <td><?php echo form_submit($submit);?></td>
-                    </tr>
-                    <tr>
-                    <td>
-<!--con la funcion validation_errors ci nos muestra los errores al pulsar el botón submit, la podemos colocar donde queramos-->
-                  <font color="red" style="font-weight: bold; font-size: 14px; text-decoration: underline"><?php echo validation_errors(); ?></font>
-                    </td>
-                    </tr>
-                    <tr>
-                    <td>
- 
-                    </td>
-                    </tr>
-                    <?php
-                    echo form_close();
-                    ?>
-                    </table>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <?=form_label('Asignatura: '); ?>
+                                <?=form_input($sNombre)?>
+                                <?=form_error('sNombre','<div class= "error">','</div>');?>
+                            </div>
+                            <div class="col-md-6">                            
+                                <?=form_label('Titulación: '); ?>
+                                <?=form_dropdown('sTitulaciones', $titulaciones, '', 'class=form-control input-lg'); ?>
+                                <?=form_error('sApellidos', '<div class= "error">','</div>');?>
+                            </div>
+                        </div>
+                    </div>
+                    <?=form_submit($submit)?>
+                    <?=form_close()?>
+
+                   
                     <?php
                         echo form_fieldset_close();
                     ?>
@@ -160,7 +165,8 @@
                             <input type="checkbox" name="asignatura[]" value="<?=$fila->iId;?>">
                             </span>
                         </div>
-                        <div class="col-md-9"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
+                        <div class="col-md-5"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
+                        <div class="col-md-4"><span class="show-grid-block"><?=$fila->sTitulacion;?></span></div>
                         <div class="col-md-2"><span class="show-grid-block">
                             <a href="<?=base_url("index.php/asignatura/mod/$fila->iId")?>" 
                                 class="btn btn-warning icon icon-pencil">

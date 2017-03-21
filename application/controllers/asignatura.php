@@ -17,7 +17,6 @@ class Asignatura extends CI_Controller{
      
     //controlador por defecto
     public function index(){
-         
         $pages=5; //Número de registros mostrados por páginas
         $config['base_url'] = base_url().'index.php/asignatura/pagina/';
         $config['total_rows'] = $this->asignatura_model->filas();//calcula el número de filas  
@@ -29,7 +28,9 @@ class Asignatura extends CI_Controller{
         $config['next_link'] = 'Siguiente';//siguiente link
         $config['prev_link'] = 'Anterior';//anterior link
         $this->pagination->initialize($config); //inicializamos la paginación       
-        $data["asignatura"] = $this->asignatura_model->total_paginados($config['per_page'],$this->uri->segment(3));          
+        $data["asignatura"] = $this->asignatura_model->total_paginados($config['per_page'],$this->uri->segment(3));
+        $data["titulaciones"] = $this->asignatura_model->get_titulaciones();
+                  
         
         //$usuarios["ver"]=$this->asignatura_model->ver();
          
@@ -44,7 +45,7 @@ class Asignatura extends CI_Controller{
         if($this->input->post("submit")){
          
         //llamo al metodo add
-        $add=$this->asignatura_model->nueva($this->input->post("sNombre"));
+        $add=$this->asignatura_model->nueva($this->input->post("sNombre"), $this->input->post("sTitulaciones"));
         }
         if($add==true){
             //Sesion de una sola ejecución
@@ -62,12 +63,15 @@ class Asignatura extends CI_Controller{
     public function mod($iId){
         if(is_numeric($iId)){
           $datos["mod"]=$this->asignatura_model->mod($iId);
+          $datos["titulaciones"] = $this->asignatura_model->get_titulaciones();
+          
           $this->load->view("asignaturamod_view",$datos);
           if($this->input->post("submit")){
                 $mod=$this->asignatura_model->mod(
                         $iId,
                         $this->input->post("submit"),
-                        $this->input->post("sNombre"));
+                        $this->input->post("sNombre"),
+                        $this->input->post("iTitulacion"));
                 if($mod==true){
                     //Sesion de una sola ejecución
                     $this->session->set_flashdata('correcto', '<strong>Bien!</strong> la asignatura se modificó correctamente.');

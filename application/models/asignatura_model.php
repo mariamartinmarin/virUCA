@@ -14,7 +14,10 @@ class Asignatura_model extends CI_Model{
 
     function total_paginados($por_pagina, $segmento) 
     {
-      $consulta = $this->db->get('asignatura', $por_pagina, $segmento);
+      $this->db->select('a.*, t.sTitulacion');
+      $this->db->from('titulacion t');
+      $this->db->join('asignatura a', 't.iId = a.iId_Titulacion');
+      $consulta = $this->db->get('', $por_pagina, $segmento);
       if($consulta->num_rows()>0)
       {
         foreach($consulta->result() as $fila)
@@ -33,8 +36,8 @@ class Asignatura_model extends CI_Model{
         return $consulta->result();
     }
      
-    public function nueva($sNombre){
-        $data = array('sNombre' => $sNombre);
+    public function nueva($sNombre, $sTitulaciones){
+        $data = array('sNombre' => $sNombre, 'iId_Titulacion' => $sTitulaciones);
         if ($this->db->insert('asignatura', $data)) {
             return true;
         } else { 
@@ -42,12 +45,16 @@ class Asignatura_model extends CI_Model{
         }	
     }
      
-    public function mod($iId,$modificar="NULL",$sNombre="NULL"){
+    public function mod($iId,$modificar="NULL",$sNombre="NULL",$iId_Titulacion="NULL"){
         if($modificar=="NULL"){
-            $consulta=$this->db->query("SELECT * FROM asignatura WHERE iId=$iId");
-            return $consulta->result();
+          $this->db->select('a.*, t.iId');
+          $this->db->from('titulacion t');
+          $this->db->join('asignatura a', 't.iId = a.iId_Titulacion');
+          $this->db->where('a.iId', $iId);
+          $consulta = $this->db->get();
+          return $consulta->result();
         }else{
-          $consulta=$this->db->query("UPDATE asignatura SET sNombre='$sNombre' WHERE iId=$iId;");
+          $consulta=$this->db->query("UPDATE asignatura SET sNombre='$sNombre', iId_Titulacion = '$iId_Titulacion' WHERE iId=$iId;");
           if($consulta==true){
               return true;
           }else{
@@ -63,6 +70,17 @@ class Asignatura_model extends CI_Model{
        }else{
            return false;
        }
+    }
+
+    public function get_titulaciones() {
+      $query = $this->db->query("select * from titulacion");
+      if ($query->num_rows() > 0) {
+        // Almacenamos el resultado en una matriz.
+        foreach($query->result() as $row)
+          $titulaciones[htmlspecialchars($row->iId, ENT_QUOTES)] = htmlspecialchars($row->sTitulacion, ENT_QUOTES);
+        $query->free_result();
+        return $titulaciones;
+      }
     }
 }
 ?>
