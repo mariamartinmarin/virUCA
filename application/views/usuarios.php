@@ -204,6 +204,7 @@
 
                     <hr class="short">
                     <?php echo form_fieldset('Listado');?>
+                    <?php if ($usuario != "") { ?>
                     <?=form_open(base_url().'index.php/usuarios/eliminar_todos');?>
                     <?php foreach($usuario as $fila){ ?>
 
@@ -225,6 +226,12 @@
                         </span></div>
                         </div>
                     <?php
+                    } } else {
+                    ?>
+                    <div class="alert alert-success">
+                    Actualmente no hay ningún usuario activo.
+                    </div>
+                    <?php 
                     }
                     ?>
                     <br>

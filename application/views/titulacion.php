@@ -137,6 +137,7 @@
 
                     <hr class="short">
                     <?php echo form_fieldset('Listado');?>
+                    <?php if ($titulacion != "") { ?>
                     <?=form_open(base_url().'index.php/titulacion/eliminar_todos');?>
                     <?php foreach($titulacion as $fila){ ?>
 
@@ -157,9 +158,14 @@
                         </span></div>
                         </div>
                     <?php
+                    } } else {
+                    ?>
+                    <div class="alert alert-success">
+                    Actualmente no hay ninguna titulación activo.
+                    </div>
+                    <?php 
                     }
                     ?>
-
                     <br>
                     <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
                     <?=form_close();?>

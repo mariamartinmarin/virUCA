@@ -52,94 +52,75 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-        <style type="text/css">
-      .error{
-      color: red !important;
-      }
-    </style>
+
     </head>
     <body>
         
-        <div class="body">
-            <?php $this->load->view('menup_view');?>
-            <div role="main" class="main">
-
-                <section class="page-top">
+    <div class="body">
+        <?php $this->load->view('menup_view');?>
+        <div role="main" class="main">
+            <section class="page-top">
                     <div class="container">
                         <div class="row">
                             <div class="col-md-12">
                                 <ul class="breadcrumb">
-                                    <li><a href="#">Configuración</a></li>
-                                    <li class="active">Accesos</li>
+                                    <li><a href="#">Curso</a></li>
+                                    <li class="active">Gestión de Cursos Académicos</li>
                                 </ul>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <h2>Gestión de Accesos al Sistema</h2>
+                                <h2>Modificar curso académico</h2>
                             </div>
                         </div>
                     </div>
-                </section>
-               
-                <div class="container">
+            </section>
 
-                    <!-- Errores de inserción. -->
-                     <?php if($this->session->flashdata('correcto')) { ?>
-                        <div class="alert alert-success">
-                            <?php echo $this->session->flashdata('correcto');?>
-                        </div>
-                    <?php } ?>
+            <div class="container">
+                <?php echo form_fieldset('Modificar curso académico');?>
+                <form action="" method="POST">
+                <?php foreach ($mod as $fila){ ?>
+                    <?=form_label('Curso: '); ?>
+                    <input type="sCurso" class="form-control" 
+                        style="width: 400px;" name="sCurso" value="<?=$fila->sCurso?>"/>
 
-                    <?php if($this->session->flashdata('incorrecto')) { ?>
-                        <div class="alert alert-danger">
-                            <?php echo $this->session->flashdata('incorrecto'); ?>
-                        </div>
-                    <?php } ?>
-                    <!-- Fin errores -->
 
-                    <?php echo form_fieldset('Listado');?>
-                    <?php if ($acceso != "") { ?>
-                    <?=form_open(base_url().'index.php/accesos/eliminar_todos');?>
-                    <?php foreach($acceso as $fila){ 
-                        $cont = 0; ?>
-
-                        <div class="row show-grid">
-                        <div class="col-md-1">
-                            <span class="show-grid-block">
-                            <input type="checkbox" name="acceso[]" value="<?=$fila->iId;?>">
-                            </span>
-                        </div>
-                        <div class="col-md-7"><span class="show-grid-block"><?=$fila->sNombreCompleto;?></span></div>
-                        <div class="col-md-3"><span class="show-grid-block"><?=$fila->dFecha;?></span></div>
-                        <div class="col-md-1"><span class="show-grid-block">
-                            <a href="<?=base_url("index.php/accesos/eliminar/$fila->iId")?>" 
-                                class="btn btn-warning"><i class="icon icon-trash-o"></i></a>
-                        </span></div>
-                        </div>
+                    <?=form_label('Titulación: '); ?>
+                    <select name="iTitulacion" class="form-control" style="width:400px;">
                     <?php
-                    $cont++;
-                    } } else {
+                    foreach ($titulaciones as $i => $titulacion) 
+                        if ($i == $fila->iId_Titulacion)
+                            echo "<option value='".$i."' selected>".$titulacion."</option>";
+                        else
+                            echo "<option value='".$i."'>".$titulacion."</option>";
+                       
                     ?>
-                    <div class="alert alert-success">
-                    Actualmente no hay ninguna categoría activa.
-                    </div>
-                    <?php 
-                    }
+                    </select>
+
+                    <?=form_label('Asignatura: '); ?>
+                    <select name="iAsignatura" class="form-control" style="width:400px;">
+                    <?php
+                    foreach ($asignaturas as $i => $asignatura) 
+                        if ($i == $fila->iId_Asignatura)
+                            echo "<option value='".$i."' selected>".$asignatura."</option>";
+                        else
+                            echo "<option value='".$i."'>".$asignatura."</option>";
+                       
                     ?>
-
-                    <br>
-                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
-                    <?=form_close();?>
-                    <br style="clear:both;">
-                    <?php echo $this->pagination->create_links() ?>
-                    <hr class="short">
+                    </select>
 
 
-                </div>
+                    <input type="submit" name="submit" value="Modificar" class="btn btn-default" style="margin-top:5px;"/>
+                <?php } ?>
+                </form>
+                <hr>
+                <a href="<?=base_url()?>index.php/asignatura/" class="btn btn-warning">Volver</a>
+
             </div>
-            <?php $this->load->view('footer');?>
         </div>
+        <?php $this->load->view('footer');?>
+    </div>
 
 <!-- Libs -->
         <script src="<?=base_url()?>vendor/jquery.js"></script>
@@ -161,12 +142,15 @@
         <!-- Theme Initializer -->
         <script src="<?=base_url()?>js/theme.plugins.js"></script>
         <script src="<?=base_url()?>js/theme.js"></script>
-
-        <!-- Current Page JS -->
-        <script src="<?=base_url()?>js/views/view.contact.js"></script>
         
         <!-- Custom JS -->
         <script src="<?=base_url()?>js/custom.js"></script>
 
     </body>
 </html>
+
+
+
+
+
+

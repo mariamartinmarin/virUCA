@@ -140,6 +140,7 @@
 
                     <hr class="short">
                     <?php echo form_fieldset('Listado');?>
+                    <?php if ($categoria != "") { ?>
                     <?=form_open(base_url().'index.php/categorias/eliminar_todos');?>
                     <?php foreach($categoria as $fila){ ?>
 
@@ -161,6 +162,12 @@
                         </span></div>
                         </div>
                     <?php
+                    } } else {
+                    ?>
+                    <div class="alert alert-success">
+                    Actualmente no hay ninguna categoría activa.
+                    </div>
+                    <?php 
                     }
                     ?>
                     <br>

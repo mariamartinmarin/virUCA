@@ -218,6 +218,7 @@
 
                     <hr class="short">
                     <?php echo form_fieldset('Listado');?>
+                    <?php if ($alumnos != "") { ?>
                     <?=form_open(base_url().'index.php/alumnos/eliminar_todos');?>
                     <?php foreach($alumnos as $fila){ ?>
 
@@ -239,6 +240,12 @@
                         </span></div>
                         </div>
                     <?php
+                    } } else {
+                    ?>
+                    <div class="alert alert-success">
+                    Actualmente no hay ningún alumno activo.
+                    </div>
+                    <?php 
                     }
                     ?>
                     <br>

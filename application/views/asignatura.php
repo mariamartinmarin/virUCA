@@ -154,7 +154,7 @@
 
                     <hr class="short">
                     <?php echo form_fieldset('Listado');?>
-
+                    <?php if ($asignatura != "") { ?>
                     <?=form_open(base_url().'index.php/asignatura/eliminar_todos');?>
                     
                     <?php foreach($asignatura as $fila){ ?>
@@ -177,6 +177,12 @@
                         </span></div>
                         </div>
                     <?php
+                    } } else {
+                    ?>
+                    <div class="alert alert-success">
+                    Actualmente no hay ninguna asignatura activo.
+                    </div>
+                    <?php 
                     }
                     ?>
                     <br>
