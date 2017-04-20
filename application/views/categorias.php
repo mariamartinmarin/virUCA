@@ -45,6 +45,12 @@
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
 
+        <link href="http://cdnjs.cloudflare.com/ajax/libs/octicons/3.5.0/octicons.min.css" rel="stylesheet">
+        <link href="<?=base_url()?>js/colorpicker/dist/css/bootstrap-colorpicker.min.css" rel="stylesheet">
+        <script src="<?=base_url()?>vendor/jquery.js"></script>
+        <script src="<?=base_url()?>js/colorpicker/dist/js/bootstrap-colorpicker.js"></script>
+
+
         <!--[if IE]>
             <link rel="stylesheet" href="css/ie.css">
         <![endif]-->
@@ -59,9 +65,9 @@
     </style>
 
     </head>
-    <body>
-        
-        <div class="body">
+
+<body>
+<div class="body">
             <?php $this->load->view('menup_view');?>
             <div role="main" class="main">
 
@@ -99,46 +105,7 @@
                     <?php } ?>
                     <!-- Fin errores -->
 
-
-                    <?=form_open(base_url().'index.php/categorias/nueva');
-                    $sNombre = array(
-                    'name' => 'sNombre',
-                    'id' => 'sNombre',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sNombre'),
-                    'style' => 'width:400px;'
-                    );
-                    $sDescripcion = array(
-                    'name' => 'sDescripcion',
-                    'id' => 'sDescripcion',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sDescripcion'),
-                    'style' => 'width:400px; height:80px;'
-                    );
-                    $submit = array(
-                    'name' => 'submit',
-                    'id' => 'submit',
-                    'value' => 'Enviar',
-                    'title' => 'Enviar',
-                    'class' => 'btn btn-default' 
-                    );
-                    ?>
-
-                    <?=form_fieldset('Añadir una nueva categoría');?>
-
-                    <label for="sNombre">Nombre:</label>
-                    <?=form_input($sNombre)?><p><?=form_error('sNombre','<div class= "error">','</div>');?></p>
-                    <label for="sDescripcion">Descripción:</label>
-                    <?=form_textarea($sDescripcion)?><p><?=form_error('sDescripcion')?></p>
-                    <?=form_submit($submit)?>
-                    <?=form_close()?>
-
-                    
-                    <?=form_fieldset_close();?>
-
-                    <hr class="short">
+                    <!-- Listado -->
                     <?php echo form_fieldset('Listado');?>
                     <?php if ($categoria != "") { ?>
                     <?=form_open(base_url().'index.php/categorias/eliminar_todos');?>
@@ -150,9 +117,18 @@
                             <input type="checkbox" name="categoria[]" value="<?=$fila->iId;?>">
                             </span>
                         </div>
+                        <div class="col-md-1"><span class="show-grid-block" style="background-color:<?=$fila->sColor;?> ">
+                            
+                        </span></div>
                         <div class="col-md-3"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
-                        <div class="col-md-5"><span class="show-grid-block"><?=$fila->sDescripcion;?></span></div>
-                        <div class="col-md-3"><span class="show-grid-block">
+                        <div class="col-md-5"><span class="show-grid-block">
+                            <?php 
+                                if ($fila->sDescripcion == "")
+                                    echo "---";
+                                else echo $fila->sDescripcion;
+                            ?>
+                        </span></div>
+                        <div class="col-md-2"><span class="show-grid-block">
                             <a href="<?=base_url("index.php/categorias/mod/$fila->iId")?>" 
                                 class="btn btn-warning icon icon-pencil">
                             </a>
@@ -176,36 +152,100 @@
                     <br style="clear:both;">
                     <?php echo $this->pagination->create_links() ?>
                     <hr class="short">
+                    <!-- Fin del listado -->
 
+                    <?=form_open(base_url().'index.php/categorias/nueva');
+                    $sNombre = array(
+                    'name' => 'sNombre',
+                    'id' => 'sNombre',
+                    'size' => '50',
+                    'class' => 'form-control',
+                    'value' => set_value('sNombre'),
+                    'style' => 'width:400px;'
+                    );
+                    $sDescripcion = array(
+                    'name' => 'sDescripcion',
+                    'id' => 'sDescripcion',
+                    'size' => '50',
+                    'class' => 'form-control',
+                    'value' => set_value('sDescripcion'),
+                    'style' => 'width:400px; height:80px;'
+                    );
+                    $sColor = array(
+                    'name' => 'sColor',
+                    'class' => 'form-control',
+                    'value' => '#FF0000',
+                    'type' => 'text'
+                    );
+                    $submit = array(
+                    'name' => 'submit',
+                    'id' => 'submit',
+                    'value' => 'Enviar',
+                    'title' => 'Enviar',
+                    'class' => 'btn btn-default' 
+                    );
+                    ?>
 
+                    <?=form_fieldset('Añadir una nueva categoría');?>
+
+                    <label for="sNombre">Categoría:</label>
+                    <?=form_input($sNombre)?>
+                    <p>
+                        <?=form_error('sNombre','<div class="alert alert-danger" role="alert">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>',
+                            '</div>');
+                        ?>    
+                    </p>
+                    <label for="sDescripcion">Descripción:</label>
+                    <?=form_textarea($sDescripcion)?><p><?=form_error('sDescripcion')?></p>
+                    <div id="cp8" data-format="alias" class="input-group colorpicker-component" style="width:150px;">
+                        <?=form_input($sColor)?>
+                        <span class="input-group-addon"><i></i></span>
+                    </div>
+                    <script>
+                        $(function () {
+                            $('#cp8').colorpicker({
+                                colorSelectors: {
+                                '#000000': '#000000',
+                                '#ffffff': '#ffffff',
+                                '#FF0000': '#FF0000',
+                                '#00FF00': '#00FF00',
+                                '#0000FF': '#0000FF',
+                                '#FFFF00': '#FFFF00',
+                                '#FF00FF': '#FF00FF',
+                                '#800080': '#800080',
+                                '#808000': '#808000',
+                                '#008000': '#008000',
+                                '#000080': '#000080'
+                                }
+                            });
+                        });
+                    </script>
+                    <br>
+                    <?=form_submit($submit)?>
+                    <?=form_close()?>
+
+                    
+                    <?=form_fieldset_close();?>
+
+                    <hr class="short">
+                    
                 </div>
             </div>
             <?php $this->load->view('footer');?>
         </div>
 
-<!-- Libs -->
-        <script src="<?=base_url()?>vendor/jquery.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
-        <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.validate.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.stellar.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.knob.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.gmap.js"></script>
-        <script src="<?=base_url()?>vendor/twitterjs/twitter.js"></script>
-        <script src="<?=base_url()?>vendor/isotope/jquery.isotope.js"></script>
-        <script src="<?=base_url()?>vendor/owl-carousel/owl.carousel.js"></script>
-        <script src="<?=base_url()?>vendor/jflickrfeed/jflickrfeed.js"></script>
-        <script src="<?=base_url()?>vendor/magnific-popup/magnific-popup.js"></script>
-        <script src="<?=base_url()?>vendor/mediaelement/mediaelement-and-player.js"></script>
+    
+<div class="example">
+    <div class="example-title">Aliased color palette</div>
+    
+    <div class="example-content well">
+        <div class="example-content-widget">
+      
+        </div>
         
-        <!-- Theme Initializer -->
-        <script src="<?=base_url()?>js/theme.plugins.js"></script>
-        <script src="<?=base_url()?>js/theme.js"></script>
+    </div>
+</div>
         
-        <!-- Custom JS -->
-        <script src="<?=base_url()?>js/custom.js"></script>
-
-    </body>
+</body>
 </html>

@@ -52,51 +52,51 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 //$route['default_controller'] = 'welcome';
 $route['default_controller'] = 'Login';
-$route['404_override'] = '';
+$route['404_override'] = 'Error404';
 $route['translate_uri_dashes'] = FALSE;
 
 // Titulaciones
 
-$route['titulacion'] = 'titulacion';
-$route['titulacion/nueva'] = 'titulacion/nueva';
-$route['titulacion/mod/(:any)'] = 'titulacion/mod/$1';
+$route['titulacion'] = 'Titulacion';
+$route['titulacion/nueva'] = 'Titulacion/nueva';
+$route['titulacion/mod/(:any)'] = 'Titulacion/mod/$1';
 
-$route['titulacion/pagina/(:num)'] = 'titulacion';//cuando no sea la primera página
-$route['titulacion/pagina'] = 'titulacion';//cuando sea la primera página
+$route['titulacion/pagina/(:num)'] = 'Titulacion';//cuando no sea la primera página
+$route['titulacion/pagina'] = 'Titulacion';//cuando sea la primera página
 
 
 
 // Asignaturas
 
-$route['asignatura'] = 'asignatura';
-$route['asignatura/nueva'] = 'asignatura/nueva';
-$route['asignatura/mod/(:any)'] = 'asignatura/mod/$1';
+$route['asignatura'] = 'Asignatura';
+$route['asignatura/nueva'] = 'Asignatura/nueva';
+$route['asignatura/mod/(:any)'] = 'Asignatura/mod/$1';
 
-$route['asignatura/pagina/(:num)'] = 'asignatura';//cuando no sea la primera página
-$route['asignatura/pagina'] = 'asignatura';//cuando sea la primera página
+$route['asignatura/pagina/(:num)'] = 'Asignatura';//cuando no sea la primera página
+$route['asignatura/pagina'] = 'Asignatura';//cuando sea la primera página
 
 
 // Categorías
 
-$route['categorias'] = 'categorias';
-$route['categorias/nueva'] = 'categorias/nueva';
-$route['categorias/mod/(:any)'] = 'categorias/mod/$1';
+$route['categorias'] = 'Categorias';
+$route['categorias/nueva'] = 'Categorias/nueva';
+$route['categorias/mod/(:any)'] = 'Categorias/mod/$1';
 
-$route['categorias/pagina/(:num)'] = 'categorias';//cuando no sea la primera página
-$route['categorias/pagina'] = 'categorias';//cuando sea la primera página
+$route['categorias/pagina/(:num)'] = 'Categorias';//cuando no sea la primera página
+$route['categorias/pagina'] = 'Categorias';//cuando sea la primera página
 
 
 // Paginación de ACCESOS.
 
-$route['accesos/pagina/(:num)'] = 'accesos';//cuando no sea la primera página
-$route['accesos/pagina'] = 'accesos';//cuando sea la primera página
+$route['accesos/pagina/(:num)'] = 'Accesos';//cuando no sea la primera página
+$route['accesos/pagina'] = 'Accesos';//cuando sea la primera página
 
 // Alumnos
 
-$route['alumnos/pagina/(:num)'] = 'alumnos';//cuando no sea la primera página
-$route['alumnos/pagina'] = 'alumnos';//cuando sea la primera página
+$route['alumnos/pagina/(:num)'] = 'Alumnos';//cuando no sea la primera página
+$route['alumnos/pagina'] = 'Alumnos';//cuando sea la primera página
 
 // Profesores
 
-$route['usuarios/pagina/(:num)'] = 'usuarios';//cuando no sea la primera página
-$route['usuarios/pagina'] = 'usuarios';//cuando sea la primera página
+$route['usuarios/pagina/(:num)'] = 'Usuarios';//cuando no sea la primera página
+$route['usuarios/pagina'] = 'Usuarios';//cuando sea la primera página

@@ -2,7 +2,8 @@
 	<div class="container">
 		<h1 class="logo">
 			<a href="index.html">
-				<img alt="LogoVirUCA" width="111" height="54" data-sticky-width="82" data-sticky-height="40" src="img/logo.png">
+				<img alt="LogoVirUCA" width="111" height="54" data-sticky-width="82" data-sticky-height="40" 
+					src="<?=base_url()?>assets/img/logo_viruca.jpg">
 			</a>
 		</h1>
 															
@@ -22,7 +23,7 @@
 						<i class="icon icon-angle-down"></i>
 					</a>
 					<ul class="dropdown-menu">
-						<li><?=anchor(base_url().'index.php/alumno_datos', 'Mis datos')?></li>
+						<li><?=anchor(base_url().'index.php/datosalumno', 'Mis datos')?></li>
 					</ul>
 				</li>
 
@@ -32,8 +33,7 @@
 						<i class="icon icon-angle-down"></i>
 					</a>
 					<ul class="dropdown-menu">
-						<li><?=anchor(base_url().'index.php/alumno_pregunta_listado', 'Mis preguntas')?></li>
-						<li><?=anchor(base_url().'index.php/alumno_pregunta_alta', 'Alta de preguntas')?></li>
+						<li><?=anchor(base_url().'index.php/pregunta', 'Mis preguntas')?></li>
 					</ul>
 				</li>
 
@@ -54,20 +54,29 @@
 			
 										<table cellspacing="0" class="cart">
 										<tbody>
-											<tr><td><h3 style="text-align: center">
-													Usuario conectado: <?=$this->session->userdata('username')?></h3>
+											<tr><td>
+												<b>Usuario conectado: <?=$this->session->userdata('username')?></b>
 												</td>
 											</tr>
 											<tr>
 												<td class="actions" colspan="6">
 													<div class="actions-continue">
 													<?php
+														$misDatos_url = "location.href='".base_url()."index.php/datosalumno'";
+														$misDatos = array('name' => 'misDatos',
+															'value' => 'Mis Datos',
+															'title' => 'Mis Datos',
+															'class' => 'btn btn-primary',
+															'content' => 'Mis Datos',
+															'onclick' => $misDatos_url);
+
 														$submit = array('name' => 'submit', 
 															'value' => 'Cerrar sesión →', 
 															'title' => 'Cerrar sesión', 
 															'class' => 'btn pull-right btn-primary');
 													?>
 													<?=form_open(base_url().'index.php/login/logout_ci')?>
+													<?=form_button($misDatos);?>
 													<?=form_submit($submit)?>
 													<?=form_close()?>
 													</div>

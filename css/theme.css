@@ -2146,3 +2146,9 @@ body.boxed .body {
 body.boxed #header {
 	padding: 15px 0;
 }
+
+/* Otras clases */
+
+.error {
+	color: red !important;
+}

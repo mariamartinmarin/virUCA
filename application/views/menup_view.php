@@ -1,4 +1,5 @@
 <header id="header">
+
 	<div class="container">
 		<h1 class="logo">
 			<a href="<?=base_url()?>">
@@ -68,7 +69,7 @@
 					</a>
 					<ul class="dropdown-menu">
 						<li><?=anchor(base_url().'index.php/partidas', 'Gestión de partidas')?></li>
-						<li><?=anchor(base_url().'index.php/partida_nueva', 'Empezar una nueva partida')?></li>
+						<li><?=anchor(base_url().'index.php/partida', 'Empezar una nueva partida')?></li>
 						<li><?=anchor(base_url().'index.php/categorias', 'Gestión de categorías')?></li>
 
 					</ul>
@@ -99,20 +100,29 @@
 			
 										<table cellspacing="0" class="cart">
 										<tbody>
-											<tr><td><h3 style="text-align: center">
-													Usuario conectado: <?=$this->session->userdata('username')?></h3>
+											<tr><td>
+												<b>Usuario conectado: <?=$this->session->userdata('username')?></b>
 												</td>
 											</tr>
 											<tr>
 												<td class="actions" colspan="6">
 													<div class="actions-continue">
 													<?php
+														$misDatos_url = "location.href='".base_url()."index.php/datosprofesor'";
+														$misDatos = array('name' => 'misDatos',
+															'value' => 'Mis Datos',
+															'title' => 'Mis Datos',
+															'class' => 'btn btn-primary',
+															'content' => 'Mis Datos',
+															'onclick' => $misDatos_url);
+
 														$submit = array('name' => 'submit', 
 															'value' => 'Cerrar sesión →', 
 															'title' => 'Cerrar sesión', 
 															'class' => 'btn pull-right btn-primary');
 													?>
 													<?=form_open(base_url().'index.php/login/logout_ci')?>
+													<?=form_button($misDatos);?>
 													<?=form_submit($submit)?>
 													<?=form_close()?>
 													</div>

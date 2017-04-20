@@ -17,6 +17,15 @@ class Asignatura extends CI_Controller{
      
     //controlador por defecto
     public function index(){
+        if($this->session->userdata('perfil') != 0)
+        {
+            redirect(base_url().'index.php/login');
+        }
+        if ($this->session->userdata('is_logued_in') == FALSE)  {
+            $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
+            redirect(base_url().'index.php/login');
+        }
+        
         $pages=5; //Número de registros mostrados por páginas
         $config['base_url'] = base_url().'index.php/asignatura/pagina/';
         $config['total_rows'] = $this->asignatura_model->filas();//calcula el número de filas  
@@ -40,22 +49,36 @@ class Asignatura extends CI_Controller{
      
     //controlador para añadir
     public function nueva(){
-         
-        //compruebo si se a enviado submit
         if($this->input->post("submit")){
+            $this->form_validation->set_rules('sNombre', 'Asignatura', 
+                'trim|required|max_length[128]|min_length[4]');
+            // Una vez establecidas las reglas, validamos los campos.
+            $this->form_validation->set_message('required', '<b>%s</b> es obligatorio.');
+            $this->form_validation->set_message('min_length', '<b>%s</b> debe tener al menos <b>%s</b> caracteres.');
+            $this->form_validation->set_message('max_length', 
+                '<b>%s</b> no puede tener más de <b>%s</b> caracteres.');
+
+            if ($this->form_validation->run() == FALSE) {
+                // Si la validación no se pasa, volvemos al directorio raiz.
+                $this->index();
+            } else {
+                // Hacemos la inserción.
+                $add=$this->asignatura_model->nueva($this->input->post("sNombre"), 
+                    $this->input->post("sTitulaciones"));
+        
+                if ($add == true) {
+                    //Sesion de una sola ejecución
+                    $this->session->set_flashdata('correcto', 
+                        '<strong>Bien!</strong> asignatura registrada.');
+                } else {
+                    $this->session->set_flashdata('incorrecto', 
+                        '<strong>Oops!</strong> no se pudo añadir la asignatura.');
+                }
          
-        //llamo al metodo add
-        $add=$this->asignatura_model->nueva($this->input->post("sNombre"), $this->input->post("sTitulaciones"));
+                //redirecciono la pagina a la url por defecto
+                redirect(base_url()."index.php/asignatura");
+            }
         }
-        if($add==true){
-            //Sesion de una sola ejecución
-            $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, la asignatura se registró con éxito.');
-        }else{
-            $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, parece que hubo un problema y no hemos podido añadir la nueva asignatura.');
-        }
-         
-        //redirecciono la pagina a la url por defecto
-        redirect(base_url()."index.php/asignatura");
     }
      
     //controlador para modificar al que 

@@ -85,6 +85,8 @@
 
                 <div class="container">
 
+
+                    <!-- Zona de errores -->
                     <?php 
                         if($this->session->flashdata('correcto')) { 
                     ?>
@@ -104,39 +106,10 @@
                     ?>
                     </div>
                     <?php } ?>
+                    <!-- Fin zona de errores -->
 
-
-                    <?=form_open(base_url().'index.php/titulacion/nueva');
-                    $sTitulacion = array(
-                    'name' => 'sTitulacion',
-                    'id' => 'sTitulacion',
-                    'size' => '50',
-                    'class' => 'form-control input-lg',
-                    'style' => 'width:400px;',
-                    'value' => set_value('sTitulacion') 
-                    );
-                    $submit = array(
-                    'name' => 'submit',
-                    'id' => 'submit',
-                    'value' => 'Enviar',
-                    'title' => 'Enviar',
-                    'class' => 'btn btn-default'
-                    );
-                    ?>
-
-                    <?=form_fieldset('Añadir una nueva titulación');?>
-
-                    <label for="sTitulacion">Titulación:</label>
-                    <?=form_input($sTitulacion)?><p>
-                    <?=form_error('sTitulacion','<div class= "error">','</div>');?></p>
-                    <?=form_submit($submit)?>
-                    <?=form_close()?>
-
-                    
-                    <?=form_fieldset_close();?>
-
-                    <hr class="short">
-                    <?php echo form_fieldset('Listado');?>
+                    <!-- Listado -->
+                     <?php echo form_fieldset('Listado');?>
                     <?php if ($titulacion != "") { ?>
                     <?=form_open(base_url().'index.php/titulacion/eliminar_todos');?>
                     <?php foreach($titulacion as $fila){ ?>
@@ -171,8 +144,41 @@
                     <?=form_close();?>
                     <br style="clear:both;">
                     <?php echo $this->pagination->create_links() ?>
-                    <hr class="short">
+                    <hr class="short"><br>
 
+                    <!-- Fin de listado -->
+
+                    <?=form_open(base_url().'index.php/titulacion/nueva');
+                    $sTitulacion = array(
+                    'name' => 'sTitulacion',
+                    'id' => 'sTitulacion',
+                    'size' => '50',
+                    'class' => 'form-control',
+                    'style' => 'width:400px;',
+                    'value' => set_value('sTitulacion') 
+                    );
+                    $submit = array(
+                    'name' => 'submit',
+                    'id' => 'submit',
+                    'value' => 'Enviar',
+                    'title' => 'Enviar',
+                    'class' => 'btn btn-default'
+                    );
+                    ?>
+
+                    <?=form_fieldset('Añadir una nueva titulación');?>
+
+                    <label for="sTitulacion">Titulación:</label>
+                    <?=form_input($sTitulacion)?><p>
+                    <?=form_error('sTitulacion','<br><div class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?></p>
+                    <?=form_submit($submit)?>
+                    <?=form_close()?>
+
+                    
+                    <?=form_fieldset_close();?>
+
+                    <hr class="short">
 
                 </div>
             </div>

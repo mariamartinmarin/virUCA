@@ -20,17 +20,12 @@
         <!-- Libs CSS -->
         <link rel="stylesheet" href="<?=base_url()?>vendor/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" href="<?=base_url()?>vendor/font-awesome/css/font-awesome.css">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/owl-carousel/owl.carousel.css" media="screen">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/owl-carousel/owl.theme.css" media="screen">
         <link rel="stylesheet" href="<?=base_url()?>vendor/magnific-popup/magnific-popup.css" media="screen">
         <link rel="stylesheet" href="<?=base_url()?>vendor/isotope/jquery.isotope.css" media="screen">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/mediaelement/mediaelementplayer.css" media="screen">
-
+        
         <!-- Theme CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-elements.css">
-        <link rel="stylesheet" href="<?=base_url()?>css/theme-blog.css">
-        <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
 
         <!-- Responsive CSS -->
@@ -98,6 +93,81 @@
                     <?php } ?>
                     <!-- Fin errores -->
 
+                    <!-- Listado -->
+                    <?php if ($usuario != "") { 
+                    // Obtener página.
+                    $npag =  $this->uri->segment(3);
+                    ?>
+
+                    <?php echo form_fieldset('Listado de profesores');
+                    $atributos = array('class' => 'navbar-form', 'role' => 'search');
+                    ?>
+
+                    <?=form_open(base_url().'index.php/usuarios/eliminar_todos/'.$npag);?>
+                    
+                    <div class="panel panel-default">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">
+                            Se están mostrando un total de <b><?=$num_filas;?> registros</b>
+                        </div>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <th>&nbsp;</th>
+                                <th>Nombre</th>
+                                <th>Apellidos</th>
+                                <th>Opciones</th>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                foreach($usuario as $fila){ 
+                                $cont = 0; 
+                                ?>
+
+                                <tr><th>
+                                    <span class="show-grid-block">
+                                        <input type="checkbox" name="usuario[]" value="<?=$fila->iId;?>">
+                                    </span>
+                                </th>
+                                    
+                                <td><?=$fila->sNombre;?></td>
+                                <td><?=$fila->sApellidos;?></td>   
+                                <td>
+                                    <a href="<?=base_url("index.php/usuarios/eliminar/$fila->iId/$npag")?>" 
+                                    class="btn-group-xs"><i class="icon icon-trash-o"></i></a>
+                                    <a href="<?=base_url("index.php/usuarios/mod/$fila->iId/$npag")?>" 
+                                    class="btn-group-xs"><i class="icon icon-pencil"></i></a>
+                                </td>
+                                <?php
+                                $cont++;
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
+                    <br style="clear:both;">
+                    <?php echo $this->pagination->create_links() ?>
+                    <hr class="short">
+                    
+                    
+
+                    <?=form_close();?>
+                    
+                    <?php
+
+                    } else {
+                    ?>
+                    <div class="alert alert-success">
+                    Actualmente no hay ningún profesor en el sistema.
+                    </div>
+                    <?php 
+                    }
+                    ?>
+
+                    <!-- Fin del listado -->
+
                    <?=form_open(base_url().'index.php/usuarios/nueva');
                    $tipo_usuario = 0;
                    echo form_hidden('iPerfil',$tipo_usuario);
@@ -150,22 +220,24 @@
                     'class' => 'btn btn-default' 
                     );
                     ?>
-
+                    
                     <?=form_fieldset('Añadir nuevo profesor.');?>
 
                     <!--- formulario organizado con validación -->
-
+        
                    <div class="row">
                         <div class="form-group">
                             <div class="col-md-6">
                                 <label>Nombre *</label>
                                 <?=form_input($sNombre)?>
-                                <?=form_error('sNombre','<div class= "error">','</div>');?>
+                                <?=form_error('sNombre','<br><div class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
                             </div>
                             <div class="col-md-6">
                                 <label>Apellidos *</label>
                                 <?=form_input($sApellidos)?>
-                                <?=form_error('sApellidos', '<div class= "error">','</div>');?>
+                                <?=form_error('sApellidos', '<br><div class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
                             </div>
                         </div>
                     </div>
@@ -175,12 +247,14 @@
                             <div class="col-md-6">
                                 <label>Usuario *</label>
                                 <?=form_input($sUsuario)?>
-                                <?=form_error('sUsuario','<div class= "error">','</div>');?>
+                                <?=form_error('sUsuario','<br><div class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
                             </div>
                             <div class="col-md-6">
                                 <label>Contraseña *</label>
                                 <?=form_input($sPassword)?>
-                                <?=form_error('sPassword','<div class= "error">','</div>');?>
+                                <?=form_error('sPassword','<br><div class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
                             </div>
                         </div>
                     </div>
@@ -190,7 +264,8 @@
                             <div class="col-md-12">
                                 <label>E-mail</label>
                                 <?=form_input($sEmail)?>
-                                <?=form_error('sEmail','<div class= "error">','</div>');?>
+                                <?=form_error('sEmail','<br><div class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
                             </div>
                         </div>
                     </div>                      
@@ -198,50 +273,9 @@
                     <?=form_close()?>
 
                     <!-- Fin del formulario organizado -->
-                    
-                    
+        
                     <?=form_fieldset_close();?>
-
                     <hr class="short">
-                    <?php echo form_fieldset('Listado');?>
-                    <?php if ($usuario != "") { ?>
-                    <?=form_open(base_url().'index.php/usuarios/eliminar_todos');?>
-                    <?php foreach($usuario as $fila){ ?>
-
-                        <div class="row show-grid">
-                        <div class="col-md-1">
-                            <span class="show-grid-block">
-                            <input type="checkbox" name="usuario[]" value="<?=$fila->iId;?>">
-                            </span>
-                        </div>
-                        <div class="col-md-3"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
-                        <div class="col-md-5"><span class="show-grid-block"><?=$fila->sApellidos;?></span></div>
-                        <div class="col-md-3"><span class="show-grid-block">
-                            <a href="<?=base_url("index.php/usuarios/mod/$fila->iId")?>" 
-                                class="btn btn-warning icon icon-pencil">
-                            </a>
-                            <a href="<?=base_url("index.php/usuarios/eliminar/$fila->iId")?>" 
-                                class="btn btn-warning icon icon-trash-o">
-                            </a>
-                        </span></div>
-                        </div>
-                    <?php
-                    } } else {
-                    ?>
-                    <div class="alert alert-success">
-                    Actualmente no hay ningún usuario activo.
-                    </div>
-                    <?php 
-                    }
-                    ?>
-                    <br>
-                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
-                    <?=form_close();?>
-                    <br style="clear:both;">
-                    <?php echo $this->pagination->create_links() ?>
-                    <hr class="short">
-
-
                 </div>
             </div>
             <?php $this->load->view('footer');?>

@@ -9,10 +9,18 @@ class Accesos extends CI_Controller{
      
     //controlador por defecto
     public function index($iId="NULL"){  
+        if($this->session->userdata('perfil') != 0)
+        {
+            redirect(base_url().'index.php/login');
+        }
+        if ($this->session->userdata('is_logued_in') == FALSE)  {
+            $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
+            redirect(base_url().'index.php/login');
+        }
         // Para la paginación
 
         $data['title'] = 'Paginacion_ci';
-        $pages=5; //Número de registros mostrados por páginas
+        $pages=30; //Número de registros mostrados por páginas
          //Cargamos la librería de paginación
         $config['base_url'] = base_url().'index.php/accesos/pagina/'; // parametro base de la aplicación, si tenemos un .htaccess nos evitamos el index.php
         $config['total_rows'] = $this->accesos_model->filas();//calcula el número de filas  
@@ -23,7 +31,9 @@ class Accesos extends CI_Controller{
         $config["uri_segment"] = 3;//el segmento de la paginación
         $config['next_link'] = 'Siguiente';//siguiente link
         $config['prev_link'] = 'Anterior';//anterior link
-        $this->pagination->initialize($config); //inicializamos la paginación       
+        $this->pagination->initialize($config); //inicializamos la paginación 
+
+        $data["num_filas"] = $config['total_rows'];       
         $data["acceso"] = $this->accesos_model->total_paginados($config['per_page'],$this->uri->segment(3));          
                 
 
@@ -32,8 +42,10 @@ class Accesos extends CI_Controller{
     }
 
     
+
     //Controlador para eliminar
-    public function eliminar($iId="NULL"){
+    public function eliminar($iId="NULL",$npag="NULL"){
+        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
         if(is_numeric($iId)){
             $eliminar=$this->accesos_model->eliminar($iId);
             if($eliminar==true){
@@ -41,15 +53,16 @@ class Accesos extends CI_Controller{
           }else{
               $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, no se pudo eliminar el acceso.');
           }
-          redirect(base_url()."index.php/accesos");
+          redirect(base_url()."index.php/accesos/pagina/$npag");
         }else{
 
-          redirect(base_url()."index.php/accesos");
+          redirect(base_url()."index.php/accesos/pagina/$npag");
         }
     }
 
     //Controlador para eliminar
-    public function eliminar_todos(){
+    public function eliminar_todos($npag="NULL"){
+        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
         foreach ($_POST["acceso"] as $item){
             $eliminar=$this->accesos_model->eliminar($item);
         }
@@ -58,7 +71,7 @@ class Accesos extends CI_Controller{
         }else{
             $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
         } 
-        redirect(base_url()."index.php/accesos");
+        redirect(base_url()."index.php/accesos/pagina/$npag");
     }
 }
 ?>

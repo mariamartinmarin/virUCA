@@ -9,8 +9,17 @@ class Alumnos extends CI_Controller{
      
     //controlador por defecto
     public function index($iId="NULL"){  
-
-        $pages=5; //Número de registros mostrados por páginas
+        if($this->session->userdata('perfil') != 0)
+        {
+            redirect(base_url().'index.php/login');
+        }
+        
+        if ($this->session->userdata('is_logued_in') == FALSE)  {
+            $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
+            redirect(base_url().'index.php/login');
+        }
+        
+        $pages=20; //Número de registros mostrados por páginas
         $config['base_url'] = base_url().'index.php/alumnos/pagina/';
         $config['total_rows'] = $this->alumnos_model->filas();//calcula el número de filas  
         $config['per_page'] = $pages; //Número de registros mostrados por páginas
@@ -22,6 +31,7 @@ class Alumnos extends CI_Controller{
         $config['prev_link'] = 'Anterior';//anterior link
         $this->pagination->initialize($config); //inicializamos la paginación       
         $data["alumnos"] = $this->alumnos_model->total_paginados($config['per_page'],$this->uri->segment(3));
+        $data["num_filas"] = $config['total_rows'];
         $data["titulaciones"] = $this->alumnos_model->get_titulaciones();          
         
         //cargo la vista y le paso los datos
@@ -43,10 +53,10 @@ class Alumnos extends CI_Controller{
             $this->form_validation->set_rules('sPassword', 'Contraseña', 'trim|required|max_length[64]|min_length[8]');
 
             // Una vez establecidas las reglas, validamos los campos.
-            $this->form_validation->set_message('required', '%s es obligatorio.');
-            $this->form_validation->set_message('valid_email', 'El %s no es válido.');
-            $this->form_validation->set_message('min_length', '%s debe tener al menos %s caracteres.');
-            $this->form_validation->set_message('max_length', '%s no puede tener más de %s caracteres.');
+            $this->form_validation->set_message('required', '<b>%s</b> es obligatorio.');
+            $this->form_validation->set_message('valid_email', 'El <b>%s</b> no es válido.');
+            $this->form_validation->set_message('min_length', '<b>%s</b> debe tener al menos <b>%s</b> caracteres.');
+            $this->form_validation->set_message('max_length', '<b>%s</b> no puede tener más de <b>%s</b> caracteres.');
 
             if ($this->form_validation->run() == FALSE) {
                 // Si la validación no se pasa, volvemos al directorio raiz.
@@ -59,8 +69,8 @@ class Alumnos extends CI_Controller{
                     $this->input->post("sApellidos"),
                     $this->input->post("sEmail"),
                     $this->input->post("sUsuario"),
-                    md5($this->input->post("sPassword"),
-                    $this->input->post("iTitulacion"))
+                    $this->input->post("sPassword"),
+                    $this->input->post("sTitulaciones")
                     );
                 if($add==true){
                     //Sesion de una sola ejecución
@@ -73,7 +83,8 @@ class Alumnos extends CI_Controller{
         }
     }
      
-    public function mod($iId){
+    public function mod($iId, $npag="NULL"){
+        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
         if(is_numeric($iId)){
             $datos["mod"]=$this->alumnos_model->mod($iId);
             $datos["titulaciones"] = $this->alumnos_model->get_titulaciones();
@@ -124,7 +135,8 @@ class Alumnos extends CI_Controller{
 
      
     //Controlador para eliminar
-    public function eliminar($iId){
+    public function eliminar($iId,$npag="NULL"){
+        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
         if(is_numeric($iId)){
             $eliminar=$this->alumnos_model->eliminar($iId);
             if($eliminar==true){

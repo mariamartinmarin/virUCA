@@ -122,35 +122,8 @@
                     );
                     ?>
 
-                    <?php
-                    echo form_fieldset('Añadir un nuevo curso');
-                    ?>
-                    <div class="row">
-                        <div class="form-group">
-                            <div class="col-md-3">
-                                <?=form_label('Curso: '); ?>
-                                <?=form_input($sCurso)?>
-                                <?=form_error('sCurso','<div class= "error">','</div>');?>
-                            </div>
-                            <div class="col-md-3">                            
-                                <?=form_label('Titulación: '); ?>
-                                <?=form_dropdown('sTitulaciones', $titulaciones, '', 'class=form-control'); ?>
-                            </div>
-                            <div class="col-md-3">                            
-                                <?=form_label('Asignatura: '); ?>
-                                <?=form_dropdown('sAsignaturas', $asignaturas, '', 'class=form-control'); ?>
-                            </div>
-                        </div>
-                    </div>
-                    <?=form_submit($submit)?>
-                    <?=form_close()?>
+                    <!-- Listado -->
 
-                   
-                    <?php
-                        echo form_fieldset_close();
-                    ?>
-
-                    <hr class="short">
                     <?php echo form_fieldset('Listado');?>
                     <?php if ($curso != "") { ?>
                     <?=form_open(base_url().'index.php/curso/eliminar_todos');?>
@@ -191,6 +164,39 @@
                     <?=form_close();?>
                     <br style="clear:both;">
                     <?php echo $this->pagination->create_links() ?>
+                    <hr class="short"><br>
+
+                    <!-- Fin listado -->
+
+                    <?php
+                    echo form_fieldset('Añadir un nuevo curso');
+                    ?>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-md-3">
+                                <?=form_label('Curso: '); ?>
+                                <?=form_input($sCurso)?>
+                                <?=form_error('sCurso','<br><div class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
+                            </div>
+                            <div class="col-md-3">                            
+                                <?=form_label('Titulación: '); ?>
+                                <?=form_dropdown('sTitulaciones', $titulaciones, '', 'class=form-control'); ?>
+                            </div>
+                            <div class="col-md-3">                            
+                                <?=form_label('Asignatura: '); ?>
+                                <?=form_dropdown('sAsignaturas', $asignaturas, '', 'class=form-control'); ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?=form_submit($submit)?>
+                    <?=form_close()?>
+
+                   
+                    <?php
+                        echo form_fieldset_close();
+                    ?>
+
                     <hr class="short">
 
                 </div>

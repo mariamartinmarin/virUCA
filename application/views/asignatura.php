@@ -80,6 +80,7 @@
 
                 <div class="container">
 
+                    <!-- Zona de errores -->
                     <?php 
                         if($this->session->flashdata('correcto')) { 
                     ?>
@@ -99,60 +100,9 @@
                     ?>
                     </div>
                     <?php } ?>
+                    <!-- Fin zona de errores -->
 
-
-                    <?=form_open(base_url().'index.php/asignatura/nueva');
-                    $sNombre = array(
-                    'name' => 'sNombre',
-                    'id' => 'sNombre',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sNombre') 
-                    );
-
-                    $sTitulaciones = array(
-                    'name' => 'sTitulaciones',
-                    'id' => 'sTitulaciones',
-                    'size' => '50',
-                    'class' => 'form-control input-lg',
-                    'value' => set_value('sTitulaciones') 
-                    );
-
-                    $submit = array(
-                    'name' => 'submit',
-                    'id' => 'submit',
-                    'value' => 'Enviar',
-                    'title' => 'Enviar',
-                    'class' => 'btn btn-default'
-                    );
-                    ?>
-
-                    <?php
-                    echo form_fieldset('Añadir una nueva asignatura');
-                    ?>
-                    <div class="row">
-                        <div class="form-group">
-                            <div class="col-md-6">
-                                <?=form_label('Asignatura: '); ?>
-                                <?=form_input($sNombre)?>
-                                <?=form_error('sNombre','<div class= "error">','</div>');?>
-                            </div>
-                            <div class="col-md-6">                            
-                                <?=form_label('Titulación: '); ?>
-                                <?=form_dropdown('sTitulaciones', $titulaciones, '', 'class=form-control input-lg'); ?>
-                                <?=form_error('sApellidos', '<div class= "error">','</div>');?>
-                            </div>
-                        </div>
-                    </div>
-                    <?=form_submit($submit)?>
-                    <?=form_close()?>
-
-                   
-                    <?php
-                        echo form_fieldset_close();
-                    ?>
-
-                    <hr class="short">
+                    <!-- Listado -->
                     <?php echo form_fieldset('Listado');?>
                     <?php if ($asignatura != "") { ?>
                     <?=form_open(base_url().'index.php/asignatura/eliminar_todos');?>
@@ -190,7 +140,64 @@
                     <?=form_close();?>
                     <br style="clear:both;">
                     <?php echo $this->pagination->create_links() ?>
+                    <hr class="short"><br>
+                    
+                    <!-- Fin del listado -->
+
+                    <?=form_open(base_url().'index.php/asignatura/nueva');
+                    $sNombre = array(
+                    'name' => 'sNombre',
+                    'id' => 'sNombre',
+                    'size' => '50',
+                    'class' => 'form-control',
+                    'value' => set_value('sNombre') 
+                    );
+
+                    $sTitulaciones = array(
+                    'name' => 'sTitulaciones',
+                    'id' => 'sTitulaciones',
+                    'size' => '50',
+                    'class' => 'form-control input-lg',
+                    'value' => set_value('sTitulaciones') 
+                    );
+
+                    $submit = array(
+                    'name' => 'submit',
+                    'id' => 'submit',
+                    'value' => 'Enviar',
+                    'title' => 'Enviar',
+                    'class' => 'btn btn-default'
+                    );
+                    ?>
+
+                    <?php
+                    echo form_fieldset('Añadir una nueva asignatura');
+                    ?>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <?=form_label('Asignatura: '); ?>
+                                <?=form_input($sNombre)?>
+                                <?=form_error('sNombre','<br><div class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
+                            </div>
+                            <div class="col-md-6">                            
+                                <?=form_label('Titulación: '); ?>
+                                <?=form_dropdown('sTitulaciones', $titulaciones, '', 'class=form-control input-lg'); ?>
+                                <?=form_error('sApellidos', '<div class= "error">','</div>');?>
+                            </div>
+                        </div>
+                    </div>
+                    <?=form_submit($submit)?>
+                    <?=form_close()?>
+
+                   
+                    <?php
+                        echo form_fieldset_close();
+                    ?>
+
                     <hr class="short">
+                    
 
                 </div>
             </div>

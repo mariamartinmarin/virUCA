@@ -86,7 +86,7 @@
 								<div class="box-content">
 									<i class="icon-featured icon icon-user"></i>
 									<h4>Mis Datos</h4>
-									<p>Ver/Modificar mis datos.<a href="/" class="learn-more">Añadir + <i class="icon icon-angle-right"></i></a></p>
+									<p>Ver/Modificar mis datos.<a href="<?=base_url()?>index.php/datosalumno" class="learn-more">Ir + <i class="icon icon-angle-right"></i></a></p>
 								</div>
 							</div>
 						</div>
@@ -97,7 +97,7 @@
 									<h4>Añadir pregunta</h4>
 									<p>Añade las preguntas, junto con sus posibles respuestas al juego. Recuerda
 									que esta acción es evaluable por el docente. Trabaja en la originalidad de
-									tus preguntas.<a href="/" class="learn-more">Añadir pregunta + <i class="icon icon-angle-right"></i></a></p>
+									tus preguntas.<a href="<?=base_url()?>index.php/pregunta" class="learn-more">Añadir pregunta + <i class="icon icon-angle-right"></i></a></p>
 								</div>
 							</div>
 						</div>

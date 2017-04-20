@@ -98,28 +98,103 @@
                     <?php } ?>
                     <!-- Fin errores -->
 
-                    <?php echo form_fieldset('Listado');?>
-                    <?php if ($acceso != "") { ?>
-                    <?=form_open(base_url().'index.php/accesos/eliminar_todos');?>
-                    <?php foreach($acceso as $fila){ 
-                        $cont = 0; ?>
+                    <!-- Listado -->
 
-                        <div class="row show-grid">
-                        <div class="col-md-1">
-                            <span class="show-grid-block">
-                            <input type="checkbox" name="acceso[]" value="<?=$fila->iId;?>">
-                            </span>
+                    <?php if ($acceso != "") { 
+                    // Obtener página.
+                    $npag =  $this->uri->segment(3);
+                    ?>
+
+                    <?php echo form_fieldset('Listado de accesos al sistema');
+                    $atributos = array('class' => 'navbar-form', 'role' => 'search');
+                    ?>
+
+                    <!-- Panel para búsquedas -->
+                    <?=form_open(base_url().'index.php/accesos/buscar', $atributos);
+                        $sBusqueda = array(
+                        'name' => 'sBusqueda',
+                        'id' => 'sBusqueda',
+                        'style' => 'width:200px;',
+                        'class' => 'form-control',
+                        'value' => set_value('sBusqueda'),
+                        'maxlength' => '512',
+                        'placeholder' => '¿Qué buscamos?'
+                        );
+                        $submit = array(
+                        'name' => 'submit',
+                        'id' => 'submit',
+                        'value' => 'Buscar',
+                        'title' => 'Buscar',
+                        'class' => 'btn btn-default' 
+                        );
+                        ?>
+                        <div class="form-group">
+                            <?=form_label('Búsqueda: ')?>
+                            <?=form_input($sBusqueda);?>
                         </div>
-                        <div class="col-md-7"><span class="show-grid-block"><?=$fila->sNombreCompleto;?></span></div>
-                        <div class="col-md-3"><span class="show-grid-block"><?=$fila->dFecha;?></span></div>
-                        <div class="col-md-1"><span class="show-grid-block">
-                            <a href="<?=base_url("index.php/accesos/eliminar/$fila->iId")?>" 
-                                class="btn btn-warning"><i class="icon icon-trash-o"></i></a>
-                        </span></div>
+                        <?=form_submit($submit);?>
+                    <?=form_close()?>            
+                    
+                        
+                    <br>
+                    <!-- Fin del panel para búsquedas -->
+                    
+                    <?=form_open(base_url().'index.php/accesos/eliminar_todos/'.$npag);?>
+                    
+                    <div class="panel panel-default">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">
+                            Se están mostrando un total de <b><?=$num_filas;?> registros</b>
                         </div>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <th>&nbsp;</th>
+                                <th>Nombre completo</th>
+                                <th>Fecha de conexión</th>
+                                <th>IP</th>
+                                <th>&nbsp;</th>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                foreach($acceso as $fila){ 
+                                $cont = 0; 
+                                ?>
+
+                                <tr><th>
+                                    <span class="show-grid-block">
+                                        <input type="checkbox" name="acceso[]" value="<?=$fila->iId;?>">
+                                    </span>
+                                </th>
+                                    
+                                <td><?=$fila->sNombreCompleto;?></td>
+                                <td><?=$fila->dFecha;?></td>
+                                <td><?=$fila->sIP;?></td>   
+                                <td>
+                                    <a href="<?=base_url("index.php/accesos/eliminar/$fila->iId/$npag")?>" 
+                                    class="btn-group-xs"><i class="icon icon-trash-o"></i></a>
+                                    </span>
+                                </td>
+                                <?php
+                                $cont++;
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
+                    <br style="clear:both;">
+                    <?php echo $this->pagination->create_links() ?>
+                    <hr class="short">
+                    
+                    </div>
+
+                    <?=form_close();?>
+                    
                     <?php
-                    $cont++;
-                    } } else {
+
+                    } else {
                     ?>
                     <div class="alert alert-success">
                     Actualmente no hay ninguna categoría activa.
@@ -127,13 +202,6 @@
                     <?php 
                     }
                     ?>
-
-                    <br>
-                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
-                    <?=form_close();?>
-                    <br style="clear:both;">
-                    <?php echo $this->pagination->create_links() ?>
-                    <hr class="short">
 
 
                 </div>

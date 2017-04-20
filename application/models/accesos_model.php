@@ -13,7 +13,12 @@ class Accesos_model extends CI_Model{
 
     function total_paginados($por_pagina,$segmento) 
     {
-      $consulta = $this->db->get('acceso', $por_pagina, $segmento);
+      $this->db->select('*');
+      $this->db->from('acceso');
+      $this->db->order_by('dFecha', 'DESC');
+      $consulta = $this->db->get('', $por_pagina, $segmento);
+
+      //$consulta = $this->db->get('acceso', $por_pagina, $segmento);
       if($consulta->num_rows()>0)
       {
         foreach($consulta->result() as $fila)
@@ -26,7 +31,7 @@ class Accesos_model extends CI_Model{
 
     
     public function ver(){
-      $consulta=$this->db->query("SELECT * FROM acceso");
+      $consulta=$this->db->query("SELECT * FROM acceso ORDER BY iId asc");
       return $consulta->result();
     }
 

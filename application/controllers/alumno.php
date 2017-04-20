@@ -18,6 +18,11 @@ class Alumno extends CI_Controller {
 		{
 			redirect(base_url().'index.php/login');
 		}
+		if ($this->session->userdata('is_logued_in') == FALSE)  {
+            $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
+            redirect(base_url().'index.php/login');
+        }
+        
 		$data['titulo'] = 'Bienvenido!! ' .$this->session->userdata('perfil');
 		$this->load->view('alumno_view',$data);
 	}

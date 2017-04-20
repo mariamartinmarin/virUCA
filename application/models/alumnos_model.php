@@ -14,6 +14,7 @@ class Alumnos_model extends CI_Model{
 
     function total_paginados($por_pagina, $segmento) 
     {
+     
       $this->db->select('u.*, t.sTitulacion');
       $this->db->from('titulacion t');
       $this->db->join('usuario u', 't.iId = u.iId_Titulacion');
@@ -47,7 +48,7 @@ class Alumnos_model extends CI_Model{
         'sApellidos' => $sApellidos,
         'sEmail' => $sEmail,
         'sUsuario' => $sUsuario,
-        'sPassword' => $sPassword,
+        'sPassword' => sha1($sPassword),
         'iId_Titulacion' => $sTitulaciones
         );
       if ($this->db->insert('usuario', $data)) {

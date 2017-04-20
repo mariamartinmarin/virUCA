@@ -9,6 +9,17 @@ class Usuarios extends CI_Controller{
      
     //controlador por defecto
     public function index($iId="NULL"){  
+        // Controles para cargar la página.
+        if($this->session->userdata('perfil') != 0)
+        {
+            redirect(base_url().'index.php/login');
+        }
+
+        if ($this->session->userdata('is_logued_in') == FALSE)  {
+            $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
+            redirect(base_url().'index.php/login');
+        }
+        
         $pages=5; //Número de registros mostrados por páginas
         $config['base_url'] = base_url().'index.php/usuarios/pagina/';
         $config['total_rows'] = $this->usuarios_model->filas();//calcula el número de filas  
@@ -19,7 +30,9 @@ class Usuarios extends CI_Controller{
         $config["uri_segment"] = 3;//el segmento de la paginación
         $config['next_link'] = 'Siguiente';//siguiente link
         $config['prev_link'] = 'Anterior';//anterior link
-        $this->pagination->initialize($config); //inicializamos la paginación       
+        $this->pagination->initialize($config); //inicializamos la paginación   
+
+        $data["num_filas"] = $config['total_rows'];           
         $data["usuario"] = $this->usuarios_model->total_paginados($config['per_page'],$this->uri->segment(3));          
         
         $this->load->view("usuarios",$data);
@@ -40,10 +53,10 @@ class Usuarios extends CI_Controller{
             $this->form_validation->set_rules('sPassword', 'Contraseña', 'trim|required|max_length[64]|min_length[8]');
 
             // Una vez establecidas las reglas, validamos los campos.
-            $this->form_validation->set_message('required', '%s es obligatorio.');
-            $this->form_validation->set_message('valid_email', 'El %s no es válido.');
-            $this->form_validation->set_message('min_length', '%s debe tener al menos %s caracteres.');
-            $this->form_validation->set_message('max_length', '%s no puede tener más de %s caracteres.');
+            $this->form_validation->set_message('required', '<b>%s</B> es obligatorio.');
+            $this->form_validation->set_message('valid_email', 'El <b>%s</b> no es válido.');
+            $this->form_validation->set_message('min_length', '<b>%s</b> debe tener al menos <b>%s</b> caracteres.');
+            $this->form_validation->set_message('max_length', '<b>%s</b> no puede tener más de <b>%s</b> caracteres.');
 
             if ($this->form_validation->run() == FALSE) {
                 // Si la validación no se pasa, volvemos al directorio raiz.
@@ -118,7 +131,8 @@ class Usuarios extends CI_Controller{
 
      
     //Controlador para eliminar
-    public function eliminar($iId){
+    public function eliminar($iId, $npag="NULL"){
+        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
         if(is_numeric($iId)){
             $eliminar=$this->usuarios_model->eliminar($iId);
             if($eliminar==true){
@@ -126,14 +140,15 @@ class Usuarios extends CI_Controller{
           }else{
               $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, no se pudo eliminar el profesor.');
           }
-          redirect(base_url()."index.php/usuarios");
+          redirect(base_url()."index.php/usuarios/pagina/$npag");
         }else{
-          redirect(base_url()."index.php/usuarios");
+          redirect(base_url()."index.php/usuarios/pagina/$npag");
         }
     }
 
     //Controlador para eliminar
-    public function eliminar_todos(){
+    public function eliminar_todos($npag="NULL"){
+        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
         foreach ($_POST["usuario"] as $item){
             $eliminar=$this->usuarios_model->eliminar($item);
         }
@@ -142,7 +157,7 @@ class Usuarios extends CI_Controller{
         }else{
             $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
         } 
-        redirect(base_url()."index.php/usuarios");
+        redirect(base_url()."index.php/usuarios/pagina/$npag");
     }
 }
 ?>

@@ -19,7 +19,6 @@ class Login extends CI_Controller
 		switch ($this->session->userdata('perfil')) {
 			case '':
 				$data['token'] = $this->token();
-				$data['titulo'] = 'Login con roles de usuario en codeigniter';
 				$this->load->view('login_view',$data);
 				break;
 			case '0':
@@ -29,7 +28,6 @@ class Login extends CI_Controller
 				redirect(base_url().'index.php/alumno');
 				break;	
 			default:		
-				$data['titulo'] = 'Login con roles de usuario en codeigniter';
 				$this->load->view('login_view',$data);
 				break;		
 		}
@@ -39,10 +37,15 @@ class Login extends CI_Controller
 	{
 		if($this->input->post('token') && $this->input->post('token') == $this->session->userdata('token'))
 		{
-            $this->form_validation->set_rules('username', 'nombre de usuario', 'required|trim|min_length[2]|max_length[150]');
-            $this->form_validation->set_rules('password', 'password', 'required|trim|min_length[5]|max_length[150]');
+            $this->form_validation->set_rules('username', 'Nombre', 'required|trim|min_length[2]|max_length[150]');
+            $this->form_validation->set_rules('password', 'Contraseña', 
+            	'required|trim|min_length[5]|max_length[150]');
  
-            //lanzamos mensajes de error si es que los hay
+            // Una vez establecidas las reglas, validamos los campos.
+            $this->form_validation->set_message('required', 'El campo <b>%s</b> es obligatorio.');
+            $this->form_validation->set_message('min_length', 'El campo <b>%s</b> debe tener al menos %s caracteres.');
+            $this->form_validation->set_message('max_length', '<b>%s</b> no puede tener más de %s caracteres.');
+
             
 			if($this->form_validation->run() == FALSE)
 			{
@@ -74,6 +77,7 @@ class Login extends CI_Controller
 	                'username' 		=> 		$check_user->sUsuario
             		);		
 					$this->session->set_userdata($data);
+					//$this->session->mark_as_temp($data, 30);
 					$this->index();
 				}
 			}

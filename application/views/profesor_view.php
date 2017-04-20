@@ -6,7 +6,7 @@
 
 		<!-- Basic -->
 		<meta charset="utf-8">
-		<title>VirUCA</title>		
+		<title>VirUCA <?=$this->session->userdata('is_logued_in');?></title>		
 		<meta name="keywords" content="" />
 		<meta name="description" content="">
 		<meta name="author" content="">
@@ -44,7 +44,11 @@
 
 		<!-- Head Libs -->
 		<script src="<?=base_url()?>vendor/modernizr.js"></script>
-
+		<script type="text/javascript" language="javascript">
+	function misDatos() {
+	 window.alert("puta mierda");
+	}
+	</script>
 		<!--[if IE]>
 			<link rel="stylesheet" href="css/ie.css">
 		<![endif]-->
@@ -95,7 +99,7 @@
 								<div class="box-content">
 									<i class="icon-featured icon icon-book"></i>
 									<h4>Revisión de preguntas</h4>
-									<p>Revisar las preguntas de los alumnos antes de ser publicadas.<a href="/" class="learn-more">Revisar <i class="icon icon-angle-right"></i></a></p>
+									<p>Revisar las preguntas de los alumnos antes de ser publicadas.<a href="<?=base_url()?>index.php/preguntas" class="learn-more">Revisar <i class="icon icon-angle-right"></i></a></p>
 								</div>
 							</div>
 						</div>

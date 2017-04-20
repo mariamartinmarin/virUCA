@@ -17,7 +17,9 @@ class Usuarios_model extends CI_Model{
       $this->db->select('*');
       $this->db->from('usuario');
       $this->db->where('iPerfil', 0);
+      $this->db->order_by('sApellidos', 'ASC');
       $consulta = $this->db->get('', $por_pagina, $segmento);
+
       if($consulta->num_rows()>0)
       {
         foreach($consulta->result() as $fila)

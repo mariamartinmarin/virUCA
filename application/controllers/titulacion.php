@@ -18,6 +18,14 @@ class Titulacion extends CI_Controller{
      
     //controlador por defecto
     public function index(){
+        if($this->session->userdata('perfil') != 0)
+        {
+            redirect(base_url().'index.php/login');
+        }
+        if ($this->session->userdata('is_logued_in') == FALSE)  {
+            $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
+            redirect(base_url().'index.php/login');
+        }
         $pages=5; //Número de registros mostrados por páginas
         $config['base_url'] = base_url().'index.php/titulacion/pagina/';
         $config['total_rows'] = $this->titulacion_model->filas();//calcula el número de filas  
@@ -40,9 +48,9 @@ class Titulacion extends CI_Controller{
         $this->form_validation->set_rules('sTitulacion', 'Titulación', 'trim|required|max_length[32]|min_length[2]');
             
         // Una vez establecidas las reglas, validamos los campos.
-        $this->form_validation->set_message('required', '%s es obligatorio.');
-        $this->form_validation->set_message('min_length', '%s debe tener al menos %s caracteres.');
-        $this->form_validation->set_message('max_length', '%s no puede tener más de %s caracteres.');
+        $this->form_validation->set_message('required', '<b>%s</b> es obligatorio.');
+        $this->form_validation->set_message('min_length', '<b>%s</b> debe tener al menos <b>%s</b> caracteres.');
+        $this->form_validation->set_message('max_length', '<b>%s</b> no puede tener más de <b>%s</b> caracteres.');
 
         if ($this->form_validation->run() == FALSE) {
             // Si la validación no se pasa, volvemos al directorio raiz.

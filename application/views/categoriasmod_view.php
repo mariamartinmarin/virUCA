@@ -45,6 +45,12 @@
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
 
+        <link href="http://cdnjs.cloudflare.com/ajax/libs/octicons/3.5.0/octicons.min.css" rel="stylesheet">
+        <link href="<?=base_url()?>js/colorpicker/dist/css/bootstrap-colorpicker.min.css" rel="stylesheet">
+        <script src="<?=base_url()?>vendor/jquery.js"></script>
+        <script src="<?=base_url()?>js/colorpicker/dist/js/bootstrap-colorpicker.js"></script>
+
+
         <!--[if IE]>
             <link rel="stylesheet" href="css/ie.css">
         <![endif]-->
@@ -114,6 +120,13 @@
                     'value' => $fila->sDescripcion
                     );
 
+                    $sColor = array(
+                    'name' => 'sColor',
+                    'class' => 'form-control',
+                    'value' => $fila->sColor,
+                    'type' => 'text'
+                    );
+
                     $submit = array(
                     'name' => 'submit',
                     'id' => 'submit',
@@ -138,6 +151,37 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <div id="cp8" data-format="alias" class="input-group colorpicker-component" 
+                                    style="width:150px;">
+                                    <?=form_input($sColor)?>
+                                    <span class="input-group-addon"><i></i></span>
+                                </div>
+                                <script>
+                                    $(function () {
+                                        $('#cp8').colorpicker({
+                                            colorSelectors: {
+                                            '#000000': '#000000',
+                                            '#ffffff': '#ffffff',
+                                            '#FF0000': '#FF0000',
+                                            '#00FF00': '#00FF00',
+                                            '#0000FF': '#0000FF',
+                                            '#FFFF00': '#FFFF00',
+                                            '#FF00FF': '#FF00FF',
+                                            '#800080': '#800080',
+                                            '#808000': '#808000',
+                                            '#008000': '#008000',
+                                            '#000080': '#000080'
+                                            }
+                                        });
+                                    });
+                                </script>
+                                <br>
+                            </div>
+                        </div>
+                    </div>
                     <?=form_submit($submit)?>
                     <!-- Fin campos formulario -->
                    
@@ -151,29 +195,6 @@
         <?php $this->load->view('footer');?>
     </div>
 
-<!-- Libs -->
-        <script src="<?=base_url()?>vendor/jquery.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
-        <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.validate.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.stellar.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.knob.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.gmap.js"></script>
-        <script src="<?=base_url()?>vendor/twitterjs/twitter.js"></script>
-        <script src="<?=base_url()?>vendor/isotope/jquery.isotope.js"></script>
-        <script src="<?=base_url()?>vendor/owl-carousel/owl.carousel.js"></script>
-        <script src="<?=base_url()?>vendor/jflickrfeed/jflickrfeed.js"></script>
-        <script src="<?=base_url()?>vendor/magnific-popup/magnific-popup.js"></script>
-        <script src="<?=base_url()?>vendor/mediaelement/mediaelement-and-player.js"></script>
-        
-        <!-- Theme Initializer -->
-        <script src="<?=base_url()?>js/theme.plugins.js"></script>
-        <script src="<?=base_url()?>js/theme.js"></script>
-        
-        <!-- Custom JS -->
-        <script src="<?=base_url()?>js/custom.js"></script>
 
     </body>
 </html>

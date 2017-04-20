@@ -9,7 +9,14 @@ class Parametros extends CI_Controller{
      
     //controlador por defecto
     public function index(){
-         
+        if($this->session->userdata('perfil') != 0)
+        {
+            redirect(base_url().'index.php/login');
+        }
+        if ($this->session->userdata('is_logued_in') == FALSE)  {
+            $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
+            redirect(base_url().'index.php/login');
+        }
         $data["parametros"] = $this->parametros_model->ver();
         $this->load->view("parametros",$data);
     }
