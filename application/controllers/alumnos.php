@@ -30,9 +30,12 @@ class Alumnos extends CI_Controller{
         $config['next_link'] = 'Siguiente';//siguiente link
         $config['prev_link'] = 'Anterior';//anterior link
         $this->pagination->initialize($config); //inicializamos la paginación       
-        $data["alumnos"] = $this->alumnos_model->total_paginados($config['per_page'],$this->uri->segment(3));
+        $data["alumnos"] = $this->alumnos_model->total_paginados(
+            $config['per_page'],
+            $this->uri->segment(3),
+            $pages);
         $data["num_filas"] = $config['total_rows'];
-        $data["titulaciones"] = $this->alumnos_model->get_titulaciones();          
+        $data["cursos"] = $this->alumnos_model->get_cursos();          
         
         //cargo la vista y le paso los datos
         $this->load->view("alumnos",$data);
@@ -70,7 +73,7 @@ class Alumnos extends CI_Controller{
                     $this->input->post("sEmail"),
                     $this->input->post("sUsuario"),
                     $this->input->post("sPassword"),
-                    $this->input->post("sTitulaciones")
+                    $this->input->post("sCursos")
                     );
                 if($add==true){
                     //Sesion de una sola ejecución
@@ -83,11 +86,10 @@ class Alumnos extends CI_Controller{
         }
     }
      
-    public function mod($iId, $npag="NULL"){
-        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
+    public function mod($iId){
         if(is_numeric($iId)){
             $datos["mod"]=$this->alumnos_model->mod($iId);
-            $datos["titulaciones"] = $this->alumnos_model->get_titulaciones();
+            $datos["cursos"] = $this->alumnos_model->get_cursos();
             $this->load->view("alumnomod_view",$datos);
             
             if($this->input->post("submit")){
@@ -96,8 +98,7 @@ class Alumnos extends CI_Controller{
                 $this->form_validation->set_rules('sApellidos', 'Apellidos', 'trim|required|max_length[128]|min_length[2]');
                 $this->form_validation->set_rules('sUsuario', 'Usuario', 'trim|required|max_length[32]|min_length[2]');
                 $this->form_validation->set_rules('sEmail', 'E-mail', 'trim|valid_email|required|max_length[128]|min_length[2]');
-                $this->form_validation->set_rules('sPassword', 'Contraseña', 'trim|required|max_length[64]|min_length[8]');
-
+                
                 // Una vez establecidas las reglas, validamos los campos.
                 $this->form_validation->set_message('required', '%s es obligatorio.');
                 $this->form_validation->set_message('valid_email', 'El %s no es válido.');
@@ -115,13 +116,12 @@ class Alumnos extends CI_Controller{
                         $this->input->post("sApellidos"),
                         $this->input->post("sEmail"),
                         $this->input->post("sUsuario"),
-                        md5($this->input->post("sPassword")),
                         $this->input->post("iPerfil"),
-                        $this->input->post("iTitulacion"));
+                        $this->input->post("iCurso"));
                     if($mod==true){
-                        $this->session->set_flashdata('alumno_ok', '<strong>Bien!</strong>, el alumno se modificó correctamente.');
+                        $this->session->set_flashdata('alumno_ok', '<strong>Bien!</strong> el alumno se modificó correctamente.');
                     }else{
-                        $this->session->set_flashdata('alumno_ko', '<strong>Oops!</strong>, no hemos podido modificar los datos del alumno.');
+                        $this->session->set_flashdata('alumno_ko', '<strong>Oops!</strong> no hemos podido modificar los datos del alumno.');
                     }
 
                     redirect(base_url()."index.php/alumnos/mod/".$iId, "refresh");
@@ -136,31 +136,32 @@ class Alumnos extends CI_Controller{
      
     //Controlador para eliminar
     public function eliminar($iId,$npag="NULL"){
-        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         if(is_numeric($iId)){
-            $eliminar=$this->alumnos_model->eliminar($iId);
-            if($eliminar==true){
-                $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, el alumno se eliminó con éxito.');
-          }else{
-              $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, no se pudo eliminar el alumno.');
+            $eliminar = $this->alumnos_model->eliminar($iId);
+            if ($eliminar == true) {
+                $this->session->set_flashdata('correcto', '<strong>Bien!</strong> el alumno se eliminó con éxito.');
+            }else{
+              $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudo eliminar el alumno. Recuerde que no es posible eliminar un alumno que tenga preguntas asociadas.');
           }
-          redirect(base_url()."index.php/alumnos");
+          redirect(base_url()."index.php/alumnos/pagina/$npag");
         }else{
-          redirect(base_url()."index.php/alumnos");
+          redirect(base_url()."index.php/alumnos/pagina/$npag");
         }
     }
 
     //Controlador para eliminar
-    public function eliminar_todos(){
-        foreach ($_POST["alumno"] as $item){
+    public function eliminar_todos($npag = "NULL"){
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
+        foreach ($_POST["alumnos"] as $item){
             $eliminar=$this->alumnos_model->eliminar($item);
         }
-        if($eliminar==true){
+        if ($eliminar == true){
             $this->session->set_flashdata('correcto', '<strong>Bien!</strong> se eliminaron los datos.');
         }else{
-            $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
+            $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro. Recuerde que no es posible eliminar un alumno que tenga preguntas asociadas.');
         } 
-        redirect(base_url()."index.php/alumnos");
+        redirect(base_url()."index.php/alumnos/pagina/$npag");
     }
 }
 ?>

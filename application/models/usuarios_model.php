@@ -12,7 +12,8 @@ class Usuarios_model extends CI_Model{
       return  $consulta->num_rows() ;
     }
 
-    function total_paginados($por_pagina, $segmento) 
+    
+    function total_paginados($por_pagina, $segmento, $pages) 
     {
       $this->db->select('*');
       $this->db->from('usuario');
@@ -27,7 +28,22 @@ class Usuarios_model extends CI_Model{
           $data[] = $fila;
         }
         return $data;
-      }
+      } else {
+        $this->db->select('*');
+        $this->db->from('usuario');
+        $this->db->where('iPerfil', 0);
+        $this->db->order_by('sApellidos', 'ASC');
+
+        $segmento_anterior = $segmento - $pages;
+        if ($segmento_anterior < 0) $segmento_anterior = "";
+          $consulta = $this->db->get('', $por_pagina, $segmento_anterior);
+          if($consulta->num_rows()>0) {
+            foreach($consulta->result() as $fila) {
+              $data[] = $fila;
+            }
+            return $data;
+          }
+        }
     }
 
     public function ver(){
@@ -46,7 +62,7 @@ class Usuarios_model extends CI_Model{
         'sApellidos' => $sApellidos,
         'sEmail' => $sEmail,
         'sUsuario' => $sUsuario,
-        'sPassword' => $sPassword
+        'sPassword' => sha1($sPassword)
         );
       if ($this->db->insert('usuario', $data)) {
         return true;
@@ -60,8 +76,7 @@ class Usuarios_model extends CI_Model{
         $sNombre="NULL", 
         $sApellidos="NULL", 
         $sEmail="NULL", 
-        $sUsuario="NULL", 
-        $sPassword="NULL") {
+        $sUsuario="NULL") {
       
       if($modificar=="NULL"){
         $consulta=$this->db->query("SELECT * FROM usuario WHERE iId=$iId");
@@ -71,8 +86,7 @@ class Usuarios_model extends CI_Model{
             sNombre = '$sNombre', 
             sApellidos = '$sApellidos',
             sEmail = '$sEmail',
-            sUsuario = '$sUsuario',
-            sPassword = '$sPassword' 
+            sUsuario = '$sUsuario' 
             WHERE iId = $iId;");
         if($consulta==true){
           return true;

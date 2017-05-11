@@ -12,13 +12,15 @@ class Curso_model extends CI_Model{
       return  $consulta->num_rows() ;
     }
 
-    function total_paginados($por_pagina, $segmento) 
+    function total_paginados_aux($por_pagina, $segmento, $pages) 
     {
       $this->db->select('curso.*, titulacion.sTitulacion, asignatura.sNombre');
       $this->db->from('curso');
       $this->db->join('titulacion', 'titulacion.iId = curso.iId_Titulacion');
       $this->db->join('asignatura', 'asignatura.iId = curso.iId_Asignatura');
+      $this->db->order_by('curso.sCurso', 'ASC');
       $consulta = $this->db->get('', $por_pagina, $segmento);
+
       if($consulta->num_rows()>0)
       {
         foreach($consulta->result() as $fila)
@@ -26,6 +28,41 @@ class Curso_model extends CI_Model{
           $data[] = $fila;
         }
         return $data;
+      } 
+    }
+
+    function total_paginados($por_pagina, $segmento, $pages) 
+    {
+      $this->db->select('curso.*, titulacion.sTitulacion, asignatura.sNombre');
+      $this->db->from('curso');
+      $this->db->join('titulacion', 'titulacion.iId = curso.iId_Titulacion');
+      $this->db->join('asignatura', 'asignatura.iId = curso.iId_Asignatura');
+      $this->db->order_by('curso.sCurso', 'ASC');
+      $consulta = $this->db->get('', $por_pagina, $segmento);
+
+      if($consulta->num_rows()>0)
+      {
+        foreach($consulta->result() as $fila)
+        {
+          $data[] = $fila;
+        }
+        return $data;
+      } else {
+          $this->db->select('curso.*, titulacion.sTitulacion, asignatura.sNombre');
+          $this->db->from('curso');
+          $this->db->join('titulacion', 'titulacion.iId = curso.iId_Titulacion');
+          $this->db->join('asignatura', 'asignatura.iId = curso.iId_Asignatura');
+          $this->db->order_by('curso.sCurso', 'ASC');
+      
+          $segmento_anterior = $segmento - $pages;
+          if ($segmento_anterior < 0) $segmento_anterior = "";
+          $consulta = $this->db->get('', $por_pagina, $segmento_anterior);
+          if($consulta->num_rows()>0) {
+            foreach($consulta->result() as $fila) {
+              $data[] = $fila;
+            }
+            return $data;
+          }
       }
     }
      

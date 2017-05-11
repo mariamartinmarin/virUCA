@@ -125,7 +125,7 @@
                                     <p>Para hacer la aplicación <b>INACCESIBLE TEMPORALMENTE</b> para los alumnos, 
                                     desmarque el <i>checkbox</i> y guarde los cambios.</p>
                                 </div>
-                                <input type="checkbox" checked="true" name="iActiva[]" value="0">
+                                <input type="checkbox" checked="true" name="iActiva[]" value="1">
                             <?php } else { ?>
                                 <div class="alert alert-danger">
                                     <p>En estos momentos la aplicación se encuentra <b>INACTIVA</b>, esto quiere decir que los alumnos no podrán introducir preguntas ni registrarse en la 
@@ -133,7 +133,7 @@
                                     <p>Para cambiar esta situación y que la aplicación sea accesible para todo el
                                     mundo, marque el <i>checkbox</i> y guarde los cambios.</p>
                                 </div>
-                                <input type="checkbox" name="iActiva[]" value="1">
+                                <input type="checkbox" name="iActiva[]" value="0">
                             <?php } ?>
                             </span>
                         </div>

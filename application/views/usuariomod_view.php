@@ -135,13 +135,6 @@
                     'class' => 'form-control',
                     'value' => $fila->sUsuario
                     );
-                    $sPassword = array(
-                    'name' => 'sPassword',
-                    'id' => 'sPassword',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => $fila->sPassword
-                    );
 
                     $submit = array(
                     'name' => 'submit',
@@ -177,22 +170,13 @@
                                 <?=form_error('sUsuario','<div class= "error">','</div>');?>
                             </div>
                             <div class="col-md-6">
-                                <label>Contraseña *</label>
-                                <?=form_input($sPassword)?>
-                                <?=form_error('sPassword','<div class= "error">','</div>');?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="form-group">
-                            <div class="col-md-12">
                                 <label>E-mail</label>
                                 <?=form_input($sEmail)?>
                                 <?=form_error('sEmail','<div class= "error">','</div>');?>
                             </div>
                         </div>
-                    </div>                      
+                    </div>
+                    
                     <?=form_submit($submit)?>
                     <!-- Fin campos formulario -->
                    

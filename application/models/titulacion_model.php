@@ -12,7 +12,7 @@ class Titulacion_model extends CI_Model{
       return  $consulta->num_rows() ;
     }
 
-    function total_paginados($por_pagina, $segmento) 
+    function total_paginados($por_pagina, $segmento, $pages) 
     {
       $consulta = $this->db->get('titulacion', $por_pagina, $segmento);
       if($consulta->num_rows()>0)
@@ -22,7 +22,18 @@ class Titulacion_model extends CI_Model{
           $data[] = $fila;
         }
         return $data;
-      }
+      } else {
+        //$consulta = $this->db->get('titulacion', $por_pagina, $segmento);
+        $segmento_anterior = $segmento - $pages;
+        if ($segmento_anterior < 0) $segmento_anterior = "";
+          $consulta = $this->db->get('titulacion', $por_pagina, $segmento_anterior);
+          if($consulta->num_rows()>0) {
+            foreach($consulta->result() as $fila) {
+              $data[] = $fila;
+            }
+            return $data;
+          }
+        }
     }
      
     public function ver(){
@@ -62,9 +73,9 @@ class Titulacion_model extends CI_Model{
       $this->db->where('a.iId_Titulacion', $iId);
       $consulta = $this->db->get();
       
-      $this->db->select('u.iId');
-      $this->db->from('usuario u');
-      $this->db->where('u.iId_Titulacion', $iId);
+      $this->db->select('c.iId');
+      $this->db->from('curso c');
+      $this->db->where('c.iId_Titulacion', $iId);
       $consulta2 = $this->db->get();
 
       if (($consulta->num_rows() >= 1) || ($consulta2->num_rows() >= 1)) {

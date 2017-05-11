@@ -12,7 +12,7 @@ class Categorias_model extends CI_Model{
       return  $consulta->num_rows() ;
     }
 
-    function total_paginados($por_pagina, $segmento) 
+    function total_paginados($por_pagina, $segmento, $pages) 
     {
       $consulta = $this->db->get('categoria', $por_pagina, $segmento);
       if($consulta->num_rows()>0)
@@ -22,7 +22,18 @@ class Categorias_model extends CI_Model{
           $data[] = $fila;
         }
         return $data;
-      }
+      } else {
+        
+        $segmento_anterior = $segmento - $pages;
+        if ($segmento_anterior < 0) $segmento_anterior = "";
+          $consulta = $this->db->get('categoria', $por_pagina, $segmento_anterior);
+          if($consulta->num_rows()>0) {
+            foreach($consulta->result() as $fila) {
+              $data[] = $fila;
+            }
+            return $data;
+          }
+        }
     }
 
     public function ver(){

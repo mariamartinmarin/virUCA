@@ -12,12 +12,14 @@ class Asignatura_model extends CI_Model{
       return  $consulta->num_rows() ;
     }
 
-    function total_paginados($por_pagina, $segmento) 
+    function total_paginados($por_pagina, $segmento, $pages) 
     {
       $this->db->select('a.*, t.sTitulacion');
       $this->db->from('titulacion t');
       $this->db->join('asignatura a', 't.iId = a.iId_Titulacion');
+      $this->db->order_by('a.sNombre', 'ASC');
       $consulta = $this->db->get('', $por_pagina, $segmento);
+      
       if($consulta->num_rows()>0)
       {
         foreach($consulta->result() as $fila)
@@ -25,7 +27,22 @@ class Asignatura_model extends CI_Model{
           $data[] = $fila;
         }
         return $data;
-      }
+      } else {
+        $this->db->select('a.*, t.sTitulacion');
+        $this->db->from('titulacion t');
+        $this->db->join('asignatura a', 't.iId = a.iId_Titulacion');
+        $this->db->order_by('a.sNombre', 'ASC');
+        $segmento_anterior = $segmento - $pages;
+        if ($segmento_anterior < 0) $segmento_anterior = "";
+          $consulta = $this->db->get('', $por_pagina, $segmento_anterior);
+      
+          if($consulta->num_rows()>0) {
+            foreach($consulta->result() as $fila) {
+              $data[] = $fila;
+            }
+            return $data;
+          }
+        }
     }
      
     public function ver(){

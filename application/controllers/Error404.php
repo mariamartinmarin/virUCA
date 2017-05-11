@@ -4,6 +4,6 @@ if (!defined('BASEPATH'))
 class Error404 extends CI_Controller { 
    public function index(){
    		$data['titulo'] = "Oops! parece que hubo un problema.";
-   		$this->load->view('Error404',$data);
+   		$this->load->view('error404',$data);
    }
 }

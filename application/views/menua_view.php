@@ -42,7 +42,7 @@
 				<li><?=anchor(base_url().'index.php/login/logout_ci', 'Salir')?></li>
 								
 				<li class="dropdown mega-menu-item mega-menu-shop">
-					<a class="dropdown-toggle mobile-redirect" href="shop-cart.html">
+					<a class="dropdown-toggle mobile-redirect" href="#">
 						<i class="icon icon-user"></i> Datos de la sesión
 						<i class="icon icon-angle-down"></i>
 					</a>

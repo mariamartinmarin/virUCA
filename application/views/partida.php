@@ -52,11 +52,6 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-        <style type="text/css">
-            .error{
-                color: red !important;
-            } 
-        </style>
 
     </head>
     <body>
@@ -105,11 +100,11 @@
                     </div>
                     <?php } ?>
 
-                    <?php if ($cursos != "") { ?>
+                    <?php if ($cursos != "" && $paneles != "") { ?>
 
-                    <div class="alert alert-success">
+                    <blockquote>
                         Vamos a empezar una nueva partida de <b>VirUCA</b>, pero antes debemos saber cuántos grupos se han organizado para poder organizar los turnos del juego. Recuerda que este valor, ya no podrá cambiar una vez que la partida empiece. Además, también necesito saber a qué curso vamos a 
-                    </div>
+                    </blockquote>
                     
 
                     <?=form_open(base_url().'index.php/partida/nueva');
@@ -130,6 +125,14 @@
                     'value' => set_value('sCursos') 
                     );
 
+                    $sPaneles = array(
+                    'name' => 'sPaneles',
+                    'id' => 'sPaneles',
+                    'size' => '50',
+                    'class' => 'form-control',
+                    'value' => set_value('sPaneles') 
+                    );
+
                     $submit = array(
                     'name' => 'submit',
                     'id' => 'submit',
@@ -141,33 +144,42 @@
 
                     <?=form_fieldset('Empezar nueva partida');?>
 
-                    
-
                     <div class="row">
                     <div class="form-group">
                     <div class="col-md-6">
                         <label for="nGrupos">¿Cuántos grupos se han organizado?</label>
-                        <?=form_input($nGrupos)?><p>
-                        <?=form_error('nGrupos','<div class= "error">','</div>');?></p>
+                        <?=form_input($nGrupos)?>
+                        <?=form_error('nGrupos','<br><div class="alert alert-danger" role="alert">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>',
+                            '</div>');?>
                     </div>
                     <div class="col-md-6">                            
                         <?=form_label('Curso: '); ?>
-                        <?=form_dropdown('sCursos', $cursos, '', 'class=form-control input-lg'); ?>
+                        <?=form_dropdown('sCursos', $cursos, '', 'class=form-control input-lg'); ?><br>
                     </div>
 
-                    <?=form_submit($submit)?>
+                    </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <?=form_label('Seleccione un panel: '); ?>
+                                <?=form_dropdown('sPaneles', $paneles, '', 'class=form-control input-lg'); ?><br>
+                                <?=form_submit($submit)?>
+                            </div>
+                        </div>
+                    </div>
+                        
+
                     <?=form_close()?>
-                    </div>
-                    </div>
-
                     <?=form_fieldset_close();?>
 
                     <?php
                     } else {
                     ?>
                     <div class="alert alert-success">
-                    Lo sentimos!! No hay ningún <b>curso académico</b> registrado en el sistema. Para poder crear
-                    una partida, deberá existir al menos, un curso académico.
+                    Lo sentimos!! Asegúrate que en el sistema existe al menos un <b>curso académico</b> y un panel de juego activo, si no es así, no podremos empezar la partida
                     </div>
                     <?php
                     $gCursos = array(
@@ -185,8 +197,6 @@
                     ?>
 
                     <hr class="short">
-                    
-                    
 
                 </div>
             </div>
@@ -195,18 +205,9 @@
 
 <!-- Libs -->
         <script src="<?=base_url()?>vendor/jquery.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
         <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.validate.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.stellar.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.knob.js"></script>
         <script src="<?=base_url()?>vendor/jquery.gmap.js"></script>
-        <script src="<?=base_url()?>vendor/twitterjs/twitter.js"></script>
         <script src="<?=base_url()?>vendor/isotope/jquery.isotope.js"></script>
-        <script src="<?=base_url()?>vendor/owl-carousel/owl.carousel.js"></script>
-        <script src="<?=base_url()?>vendor/jflickrfeed/jflickrfeed.js"></script>
         <script src="<?=base_url()?>vendor/magnific-popup/magnific-popup.js"></script>
         <script src="<?=base_url()?>vendor/mediaelement/mediaelement-and-player.js"></script>
         

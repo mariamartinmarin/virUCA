@@ -27,6 +27,10 @@
         <link rel="stylesheet" href="<?=base_url()?>css/theme.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-elements.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
+        <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
+
+        <!-- Custom Loader -->
+        <link rel="stylesheet" href="<?=base_url()?>css/loader.css">
 
         <!-- Responsive CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme-responsive.css" />
@@ -39,6 +43,17 @@
 
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
+        <script src="<?=base_url()?>vendor/jquery.js"></script>
+        <script type="text/javascript" src="<?=base_url()?>js/tablesorter/jquery.tablesorter.js"></script>
+        <script type="text/javascript" src="<?=base_url()?>js/busquedasimple.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() 
+            { 
+                $("#table_usuarios").tablesorter({sortList: [[1,0], [2,0]]} ); 
+            } 
+            );
+            $(window).load(function() { $(".loader").fadeOut("slow");}); 
+        </script>
 
         <!--[if IE]>
             <link rel="stylesheet" href="css/ie.css">
@@ -47,14 +62,12 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-        <style type="text/css">
-      .error{
-      color: red !important;
-      }
-    </style>
+        
     </head>
     <body>
-        
+        <div id="preloader">
+            <div id="loader">&nbsp;</div>
+        </div>
         <div class="body">
             <?php $this->load->view('menup_view');?>
             <div role="main" class="main">
@@ -102,43 +115,62 @@
                     <?php echo form_fieldset('Listado de profesores');
                     $atributos = array('class' => 'navbar-form', 'role' => 'search');
                     ?>
-
+                    <blockquote>
+                        Administrar y crear usuarios <b>Profesores</b> en el sistema. En la parte inferior tiene el formulario para dar de alta nuevos usuarios.
+                    </blockquote>
+                    
                     <?=form_open(base_url().'index.php/usuarios/eliminar_todos/'.$npag);?>
+                    <div class="input-group">
+                        <span class="input-group-addon">Buscar</span>
+                        <input id="filtrar" type="text" class="form-control" placeholder="Buscar en esta página">
+                    </div>
+                    <hr class="short">
                     
                     <div class="panel panel-default">
                         <!-- Default panel contents -->
                         <div class="panel-heading">
                             Se están mostrando un total de <b><?=$num_filas;?> registros</b>
                         </div>
-                        <table class="table table-bordered table-striped">
-                            <thead>
+
+                        <table class="table table-bordered table-striped" id="table_usuarios">
+                            <thead><tr>
                                 <th>&nbsp;</th>
                                 <th>Nombre</th>
                                 <th>Apellidos</th>
                                 <th>Opciones</th>
-                            </thead>
-                            <tbody>
+                            </tr></thead>
+                            <tbody class="buscar">
                                 <?php 
                                 foreach($usuario as $fila){ 
-                                $cont = 0; 
                                 ?>
 
-                                <tr><th>
+                                <tr><td>
                                     <span class="show-grid-block">
                                         <input type="checkbox" name="usuario[]" value="<?=$fila->iId;?>">
                                     </span>
-                                </th>
-                                    
+                                </td>
+                   
                                 <td><?=$fila->sNombre;?></td>
                                 <td><?=$fila->sApellidos;?></td>   
                                 <td>
-                                    <a href="<?=base_url("index.php/usuarios/eliminar/$fila->iId/$npag")?>" 
-                                    class="btn-group-xs"><i class="icon icon-trash-o"></i></a>
+                                    <?php if (($this->session->userdata('id_usuario') == $fila->iId) || 
+                                        ($this->session->userdata('id_usuario') == 44)) { ?>
+
+                                    <?php if ($fila->iId != 44)  { ?>
+                                    <a href="#" 
+                                        data-bb="confirm" 
+                                        data-id="<?=$fila->iId;?>"
+                                        data-pg="<?=$npag?>" 
+                                        class="btn-group-xs">
+                                            <i class="icon icon-trash-o"></i>
+                                    </a>
+                                    <?php } ?>
                                     <a href="<?=base_url("index.php/usuarios/mod/$fila->iId/$npag")?>" 
                                     class="btn-group-xs"><i class="icon icon-pencil"></i></a>
+                                    <?php } else { echo "---"; } ?>
                                 </td>
+                                </tr>
                                 <?php
-                                $cont++;
                                 }
                                 ?>
                             </tbody>
@@ -262,7 +294,7 @@
                     <div class="row">
                         <div class="form-group">
                             <div class="col-md-12">
-                                <label>E-mail</label>
+                                <label>E-mail *</label>
                                 <?=form_input($sEmail)?>
                                 <?=form_error('sEmail','<br><div class="alert alert-danger" role="alert">
   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
@@ -281,32 +313,58 @@
             <?php $this->load->view('footer');?>
         </div>
 
-<!-- Libs -->
-        <script src="<?=base_url()?>vendor/jquery.js"></script>
+        <!-- Libs -->
         <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
         <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
         <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
         <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.validate.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.stellar.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.knob.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.gmap.js"></script>
-        <script src="<?=base_url()?>vendor/twitterjs/twitter.js"></script>
-        <script src="<?=base_url()?>vendor/isotope/jquery.isotope.js"></script>
-        <script src="<?=base_url()?>vendor/owl-carousel/owl.carousel.js"></script>
-        <script src="<?=base_url()?>vendor/jflickrfeed/jflickrfeed.js"></script>
-        <script src="<?=base_url()?>vendor/magnific-popup/magnific-popup.js"></script>
-        <script src="<?=base_url()?>vendor/mediaelement/mediaelement-and-player.js"></script>
         
+        <script type="text/javascript">
+        $(window).load(function() {
+            $('#preloader').fadeOut('slow');
+            $('body').css({'overflow':'visible'});
+        })
+        </script>
         <!-- Theme Initializer -->
         <script src="<?=base_url()?>js/theme.plugins.js"></script>
         <script src="<?=base_url()?>js/theme.js"></script>
 
-        <!-- Current Page JS -->
-        <script src="<?=base_url()?>js/views/view.contact.js"></script>
         
         <!-- Custom JS -->
         <script src="<?=base_url()?>js/custom.js"></script>
+
+        <!-- BOOT BOX -->
+        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
+        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+        
+        <script type="text/javascript">
+        bootbox.setDefaults({ locale: "es"});
+
+        $(function() {
+            var cajas = {};
+
+            $(document).on("click", "a[data-bb]", function(e) {
+                e.preventDefault();
+                var type = $(this).data("bb");
+                var id = $(this).data("id");
+                var pg = $(this).data("pg");
+                if (typeof cajas[type] === 'function') {
+                    cajas[type](id, pg);
+                }
+            });
+
+            cajas.confirm = function(id, pg) {
+                bootbox.confirm("¿Estás seguro que quieres eliminar a este profesor?", function(result) {
+                    if (result == true) {
+                        location.href = 'usuarios/eliminar/'+id+'/'+pg;
+                    }
+            });
+            };
+  
+        });
+
+        </script>
+        <!-- FIN BOOT -->
 
     </body>
 </html>

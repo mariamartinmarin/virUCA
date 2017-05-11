@@ -29,8 +29,12 @@ class Categorias extends CI_Controller{
         $config["uri_segment"] = 3;//el segmento de la paginación
         $config['next_link'] = 'Siguiente';//siguiente link
         $config['prev_link'] = 'Anterior';//anterior link
-        $this->pagination->initialize($config); //inicializamos la paginación       
-        $data["categoria"] = $this->categorias_model->total_paginados($config['per_page'],$this->uri->segment(3));          
+        $this->pagination->initialize($config); //inicializamos la paginación  
+        $data["num_filas"] = $config['total_rows'];     
+        $data["categoria"] = $this->categorias_model->total_paginados(
+            $config['per_page'],
+            $this->uri->segment(3),
+            $pages);          
         
         $this->load->view("categorias",$data);
     }
@@ -116,22 +120,24 @@ class Categorias extends CI_Controller{
     }
      
     //Controlador para eliminar
-    public function eliminar($iId){
+    public function eliminar($iId,$npag = "NULL"){
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         if(is_numeric($iId)){
             $eliminar=$this->categorias_model->eliminar($iId);
             if($eliminar==true){
-                $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, la categoria se eliminó con éxito.');
+                $this->session->set_flashdata('correcto', '<strong>Bien!</strong> la categoria se eliminó con éxito.');
           }else{
-              $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, no se pudo eliminar la categoria.');
+              $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudo eliminar la categoria.');
           }
-          redirect(base_url()."index.php/categorias");
+          redirect(base_url()."index.php/categorias/pagina/$npag");
         }else{
-          redirect(base_url()."index.php/categorias");
+          redirect(base_url()."index.php/categorias/pagina/$npag");
         }
     }
 
     //Controlador para eliminar
-    public function eliminar_todos(){
+    public function eliminar_todos($npag = "NULL"){
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         foreach ($_POST["categoria"] as $item){
             $eliminar=$this->categorias_model->eliminar($item);
         }
@@ -140,7 +146,7 @@ class Categorias extends CI_Controller{
         }else{
             $this->session->set_flashdata('categoria_ko', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
         } 
-        redirect(base_url()."index.php/categorias");
+        redirect(base_url()."index.php/categorias/pagina/$npag");
     }
 
 }

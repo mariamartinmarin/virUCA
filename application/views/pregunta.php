@@ -98,43 +98,105 @@
                     <?php } ?>
                     <!-- Fin errores -->
 
-                   
-                    <?php echo form_fieldset('Mis preguntas');?>
-                    <?php if ($pregunta != "") { ?>
-                    <?=form_open(base_url().'index.php/pregunta/eliminar_todos');?>
-                    <?php foreach($pregunta as $fila){ ?>
+                    <!-- Listado -->
+                    <?php if ($pregunta != "") { 
+                    // Obtener página.
+                    $npag =  $this->uri->segment(3);
+                    ?>
 
-                        <div class="row show-grid">
-                        <div class="col-md-1">
-                            <span class="show-grid-block">
-                            <input type="checkbox" name="pregunta[]" value="<?=$fila->iId;?>">
-                            </span>
+                    <?php echo form_fieldset('Listado de preguntas');
+                    $atributos = array('class' => 'navbar-form', 'role' => 'search');
+                    ?>
+                    <blockquote>
+                        Desde aquí podrás gestionar tus propias preguntas, y ver si los profesores han validado tu pregunta para que aparezca en el juego. Recuerda, que una vez que la pregunta esté validada y/o puntuada, no podrás ni modificarla ni eliminarla.
+                    </blockquote>
+                    
+                    <?=form_open(base_url().'index.php/preguntas/eliminar_todos/'.$npag);?>
+                    
+                    <div class="panel panel-default">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">
+                            Se están mostrando un total de <b><?=$num_filas;?> registros</b>
                         </div>
-                        <div class="col-md-8"><span class="show-grid-block"><?=substr($fila->sPregunta,0,75)." ...";?></span></div>
-                        <div class="col-md-3"><span class="show-grid-block">
-                            <a href="<?=base_url("index.php/pregunta/mod/$fila->iId")?>" 
-                                class="btn btn-warning icon icon-pencil">
-                            </a>
-                            <a href="<?=base_url("index.php/pregunta/eliminar/$fila->iId")?>" 
-                                class="btn btn-warning icon icon-trash-o">
-                            </a>
-                        </span></div>
-                        </div>
-                        <?php
-                    } } else {
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <th>&nbsp;</th>
+                                <th>Texto de la pregunta</th>
+                                <th>Activa</th>
+                                <th>Opciones</th>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                foreach($pregunta as $fila){ 
+                                $cont = 0; 
+                                ?>
+
+                                <tr><th>
+                                    <span class="show-grid-block">
+                                        <input type="checkbox" name="pregunta[]" value="<?=$fila->iId;?>">
+                                    </span>
+                                </th>
+                                    
+                                <td><?=substr($fila->sPregunta,0,75)." ...";?></td>
+                                <td>
+                                <?php
+                                    if ($fila->bActiva)
+                                        echo "<span class='glyphicon glyphicon-ok' aria-hidden='true'></span>";
+                                    else
+                                        echo "<span class='glyphicon glyphicon-remove' aria-hidden='true'></span>";
+                                ?>    
+                                </td>
+
+                                <?php 
+                                if ($fila->bActiva == 1) { ?>
+                                    <td>
+                                    <a href="<?=base_url("index.php/pregunta/mod/$fila->iId/$npag")?>" 
+                                    class="btn-group-xs"><i class="icon icon-eye"></i></a>
+                                    </td>
+                                <?php } else { ?>
+                                    <td>
+                                    <a href="#" 
+                                        data-bb="confirm" 
+                                        data-id="<?=$fila->iId;?>"
+                                        data-pg="<?=$npag?>" 
+                                        class="btn-group-xs">
+                                            <i class="icon icon-trash-o"></i>
+                                    </a>
+                                    <a href="<?=base_url("index.php/pregunta/mod/$fila->iId/$npag")?>" 
+                                    class="btn-group-xs"><i class="icon icon-pencil"></i></a>
+                                    </td>
+                                <?php } ?>
+                                
+                                <?php
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
+                    <br style="clear:both;">
+                    <?php echo $this->pagination->create_links() ?>
+                    <hr class="short">
+                    
+                    
+
+                    <?=form_close();?>
+                    
+                    <?php
+
+                    } else {
                     ?>
                     <div class="alert alert-success">
-                    Aún no has introducido ninguna pregunta.
+                    Actualmente no hay ninguna pregunta en el sistema.
                     </div>
                     <?php 
                     }
                     ?>
-                    <br>
-                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
-                    <?=form_close();?>
-                    <br style="clear:both;">
-                    <?php echo $this->pagination->create_links() ?>
-                    <hr class="short">
+
+                    <!-- Fin del listado -->
+
 
                      
                     <!-- Formulario de alta -->
@@ -332,6 +394,40 @@
         
         <!-- Custom JS -->
         <script src="<?=base_url()?>js/custom.js"></script>
+
+        <!-- BOOT BOX -->
+        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
+        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+        
+        <script type="text/javascript">
+        bootbox.setDefaults({
+          locale: "es"
+        });
+        $(function() {
+            var cajas = {};
+
+            $(document).on("click", "a[data-bb]", function(e) {
+                e.preventDefault();
+                var type = $(this).data("bb");
+                var id = $(this).data("id");
+                var pg = $(this).data("pg");
+                if (typeof cajas[type] === 'function') {
+                    cajas[type](id, pg);
+                }
+            });
+
+            cajas.confirm = function(id, pg) {
+                bootbox.confirm("¿Estás seguro que quieres borrar la pregunta?", function(result) {
+                    if (result == true) {
+                        location.href = '<?=base_url()?>index.php/pregunta/eliminar/'+id+'/'+pg;
+                    }
+            });
+            };
+  
+        });
+
+        </script>
+        <!-- FIN BOOT -->
 
     </body>
 </html>

@@ -20,19 +20,17 @@
         <!-- Libs CSS -->
         <link rel="stylesheet" href="<?=base_url()?>vendor/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" href="<?=base_url()?>vendor/font-awesome/css/font-awesome.css">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/owl-carousel/owl.carousel.css" media="screen">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/owl-carousel/owl.theme.css" media="screen">
         <link rel="stylesheet" href="<?=base_url()?>vendor/magnific-popup/magnific-popup.css" media="screen">
         <link rel="stylesheet" href="<?=base_url()?>vendor/isotope/jquery.isotope.css" media="screen">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/mediaelement/mediaelementplayer.css" media="screen">
-
+        
         <!-- Theme CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-elements.css">
-        <link rel="stylesheet" href="<?=base_url()?>css/theme-blog.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
-        <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
-
+        
+        <!-- Custom Loader -->
+        <link rel="stylesheet" href="<?=base_url()?>css/loader.css">
+        
         <!-- Responsive CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme-responsive.css" />
 
@@ -44,6 +42,21 @@
 
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
+        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+        <script src="<?=base_url()?>vendor/jquery.js"></script>
+        <script type="text/javascript" src="<?=base_url()?>js/tablesorter/jquery.tablesorter.js"></script>
+        <script type="text/javascript" src="<?=base_url()?>js/busquedasimple.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() 
+            { 
+                $("#table_alumnos").tablesorter( {sortList: [[1,0], [2,0], [3,0]]} ); 
+            } 
+            ); 
+            $(window).load(function() { $(".loader").fadeOut("slow");});
+        </script>
+
+
+
 
         <!--[if IE]>
             <link rel="stylesheet" href="css/ie.css">
@@ -52,14 +65,12 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-        <style type="text/css">
-      .error{
-      color: red !important;
-      }
-    </style>
+        
     </head>
     <body>
-        
+        <div id="preloader">
+            <div id="loader">&nbsp;</div>
+        </div>
         <div class="body">
             <?php $this->load->view('menup_view');?>
             <div role="main" class="main">
@@ -100,7 +111,7 @@
 
                     <!-- Listado -->
 
-                    <?php if ($alumnos != "") { 
+                    <?php if ($alumnos != "" && $cursos != "") { 
                     // Obtener página.
                     $npag =  $this->uri->segment(3);
                     ?>
@@ -108,45 +119,58 @@
                     <?php echo form_fieldset('Listado de alumnos');
                     $atributos = array('class' => 'navbar-form', 'role' => 'search');
                     ?>
-
+                    <blockquote>
+                        Administrar y crear usuarios <b>Alumnos</b> en el sistema. En la parte inferior tiene el formulario para dar de alta nuevos usuarios.
+                    </blockquote>
+                    
                     <?=form_open(base_url().'index.php/alumnos/eliminar_todos/'.$npag);?>
+                    <div class="input-group">
+                        <span class="input-group-addon">Buscar</span>
+                        <input id="filtrar" type="text" class="form-control" placeholder="Buscar en esta página">
+                    </div>
+
+                    <hr class="short">
                     
                     <div class="panel panel-default">
                         <!-- Default panel contents -->
                         <div class="panel-heading">
                             Se están mostrando un total de <b><?=$num_filas;?> registros</b>
                         </div>
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-bordered table-striped"  id="table_alumnos">
                             <thead>
                                 <th>&nbsp;</th>
                                 <th>Nombre</th>
                                 <th>Apellidos</th>
-                                <th>Titulación</th>
+                                <th>Curso Académico</th>
                                 <th>Opciones</th>
                             </thead>
-                            <tbody>
+                            <tbody class="buscar">
                                 <?php 
                                 foreach($alumnos as $fila){ 
-                                $cont = 0; 
                                 ?>
 
-                                <tr><th>
+                                <tr><td>
                                     <span class="show-grid-block">
                                         <input type="checkbox" name="alumnos[]" value="<?=$fila->iId;?>">
                                     </span>
-                                </th>
+                                </td>
                                     
                                 <td><?=$fila->sNombre;?></td>
                                 <td><?=$fila->sApellidos;?></td>  
-                                <td><?=$fila->sTitulacion;?></td> 
+                                <td><?=$fila->sCurso;?></td> 
                                 <td>
-                                    <a href="<?=base_url("index.php/alumnos/eliminar/$fila->iId/$npag")?>" 
-                                    class="btn-group-xs"><i class="icon icon-trash-o"></i></a>
+                                    <a href="#" 
+                                        data-bb="confirm" 
+                                        data-id="<?=$fila->iId;?>"
+                                        data-pg="<?=$npag?>" 
+                                        class="btn-group-xs">
+                                            <i class="icon icon-trash-o"></i>
+                                    </a>
+
                                     <a href="<?=base_url("index.php/alumnos/mod/$fila->iId/$npag")?>" 
                                     class="btn-group-xs"><i class="icon icon-pencil"></i></a>
                                 </td>
                                 <?php
-                                $cont++;
                                 }
                                 ?>
                             </tbody>
@@ -167,14 +191,24 @@
 
                     } else {
                     ?>
-                    <div class="alert alert-success">
-                    Actualmente no hay ningún alumno activo.
-                    </div>
-                    <?php 
+                        <div class="alert alert-success">
+                            Actualmente no hay ningún alumno activo.
+                        </div>
+                        <?php
+                        if ($cursos == '') {
+                        ?>
+                        <div class="alert alert-success">
+                            No se pueden dar de alta alumnos si no hay ningún <b>Curso Académico</b> en el sistema.
+                        </div>
+                        <?php
+                        } 
                     }
                     ?>
 
                     <!-- Fin del listado -->
+
+                    <?php if ($cursos != '') { ?>
+                        
 
                    <?=form_open(base_url().'index.php/alumnos/nueva');
                    $tipo_usuario = 1;
@@ -220,12 +254,12 @@
                     'value' => set_value('sPassword')
                     );
 
-                    $sTitulaciones = array(
-                    'name' => 'sTitulaciones',
-                    'id' => 'sTitulaciones',
+                    $sCursos = array(
+                    'name' => 'sCursos',
+                    'id' => 'sCursos',
                     'size' => '50',
                     'class' => 'form-control input-lg',
-                    'value' => set_value('sTitulaciones') 
+                    'value' => set_value('sCursos') 
                     );
 
                     $submit = array(
@@ -284,8 +318,8 @@
   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
                             </div>
                             <div class="col-md-6">                            
-                                <?=form_label('Titulación: '); ?>
-                                <?=form_dropdown('sTitulaciones', $titulaciones, '', 'class=form-control input-lg'); ?>
+                                <?=form_label('Curso Académico: '); ?>
+                                <?=form_dropdown('sCursos', $cursos, '', 'class=form-control input-lg'); ?>
                                 
                             </div>
                         </div>
@@ -296,6 +330,11 @@
                     <!-- Fin del formulario organizado -->
                     
                     <?=form_fieldset_close();?>
+
+                    <?php
+
+                    } 
+                    ?>
                     <hr class="short">
                     
 
@@ -305,21 +344,19 @@
         </div>
 
 <!-- Libs -->
-        <script src="<?=base_url()?>vendor/jquery.js"></script>
+        
         <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
         <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
         <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
         <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.validate.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.stellar.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.knob.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.gmap.js"></script>
-        <script src="<?=base_url()?>vendor/twitterjs/twitter.js"></script>
-        <script src="<?=base_url()?>vendor/isotope/jquery.isotope.js"></script>
-        <script src="<?=base_url()?>vendor/owl-carousel/owl.carousel.js"></script>
-        <script src="<?=base_url()?>vendor/jflickrfeed/jflickrfeed.js"></script>
-        <script src="<?=base_url()?>vendor/magnific-popup/magnific-popup.js"></script>
-        <script src="<?=base_url()?>vendor/mediaelement/mediaelement-and-player.js"></script>
+        
+        <script type="text/javascript">
+        $(window).load(function() {
+            $('#preloader').fadeOut('slow');
+            $('body').css({'overflow':'visible'});
+        })
+        </script>
+        <!-- Theme Initializer -->
         
         <!-- Theme Initializer -->
         <script src="<?=base_url()?>js/theme.plugins.js"></script>
@@ -330,6 +367,40 @@
         
         <!-- Custom JS -->
         <script src="<?=base_url()?>js/custom.js"></script>
+
+        <!-- BOOT BOX -->
+        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
+        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+        
+        <script type="text/javascript">
+        bootbox.setDefaults({
+          locale: "es"
+        });
+        $(function() {
+            var cajas = {};
+
+            $(document).on("click", "a[data-bb]", function(e) {
+                e.preventDefault();
+                var type = $(this).data("bb");
+                var id = $(this).data("id");
+                var pg = $(this).data("pg");
+                if (typeof cajas[type] === 'function') {
+                    cajas[type](id, pg);
+                }
+            });
+
+            cajas.confirm = function(id, pg) {
+                bootbox.confirm("¿Estás seguro que quieres borrar a este alumno?", function(result) {
+                    if (result == true) {
+                        location.href = '<?=base_url()?>index.php/alumnos/eliminar/'+id+'/'+pg;
+                    }
+            });
+            };
+  
+        });
+
+        </script>
+        <!-- FIN BOOT -->
 
     </body>
 </html>

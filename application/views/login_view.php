@@ -143,7 +143,7 @@
 														?>
 															<p><div class="alert alert-danger" role="alert">
 															<span class="glyphicon glyphicon-exclamation-sign"aria-hidden="true">&nbsp;</span>
-														 	<?=$this->session->flashdata('usuario_incorrecto')?>
+														 	<?=$this->session->flashdata('SESSION_ERR')?>
 														 	</div></p>
 														<?php
 														}

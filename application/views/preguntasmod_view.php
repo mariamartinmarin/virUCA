@@ -240,14 +240,14 @@
                                 <div class="alert alert-success">
                                     <p>La pregunta está activa y puede aparecer en el juego.</p>
                                 </div>
-                                <input type="checkbox" checked="true" name="bActiva" value="0">
+                                <input type="checkbox" checked="true" name="bActiva[]" value="1">
                                 
                                 <?php } else { ?>
                                 
                                 <div class="alert alert-danger">
                                     <p>La pregunta está inactiva y no aparecerá en el juego.</p>
                                 </div>
-                                <input type="checkbox" name="bActiva" value="1">
+                                <input type="checkbox" name="bActiva[]" value="0">
                                 <?php } ?>
                                 <!-- -->
                             </div>
@@ -267,7 +267,8 @@
                 </form>
                 <?=form_fieldset_close();?>
                 <hr>
-                <a href="<?=base_url()."index.php/usuarios"?>" class="btn btn-warning">Volver</a>
+                <a href="<?=base_url()."index.php/preguntas"?>" class="btn btn-warning">Listado</a>
+                <a href="<?=base_url()."index.php/preguntasalta"?>" class="btn btn-warning">Dar de alta</a>
             </div>
         </div>
         <?php $this->load->view('footer');?>

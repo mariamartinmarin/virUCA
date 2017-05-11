@@ -6,25 +6,39 @@
 						</div>
 						<div class="col-md-3">
 							<div class="newsletter">
-								<h4>Profesores</h4>
+								<h4>Usuarios</h4>
 								<ul class="contact">
-									<li><a href="#">Listado</a></li>
-									<li><a href="#">Alta profesor</a></li>
+									<li><a href="<?=base_url()?>index.php/usuarios">Gestión de Profesores</a></li>
+									<li><a href="<?=base_url()?>index.php/alumnos">Gestión de Alumnos</a></li>
+								</ul>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="newsletter">
+								<h4>Curso</h4>
+								<ul class="contact">
+									<li><a href="<?=base_url()?>index.php/curso">Curso Académico</a></li>
+									<li><a href="<?=base_url()?>index.php/titulacion">Gestión de Titulaciones</a></li>
+									<li><a href="<?=base_url()?>index.php/asignatura">Gestión de Asignaturas</a></li>
+									
 								</ul>
 							
 							</div>
 						</div>
 						<div class="col-md-3">
 							<div class="newsletter">
-								<h4>Alumnos</h4>
+								<h4>Más</h4>
 								<ul class="contact">
-									<li><a href="#">Listado</a></li>
-									<li><a href="#">Alta alumno</a></li>
+									<li><a href="<?=base_url()?>index.php/preguntas">Gestión de Preguntas</a></li>
+									<li><a href="<?=base_url()?>index.php/categorias">Categorías</a></li>
+									<li><a href="<?=base_url()?>index.php/parametros">Parámetros</a></li>
+									<li><a href="<?=base_url()?>index.php/accesos">Accesos</a></li>
+									
 								</ul>
 							
 							</div>
 						</div>
-						<div class="col-md-4">
+						<div class="col-md-3">
 							<div class="contact-details">
 								<h4>Contactanos!</h4>
 								<ul class="contact">

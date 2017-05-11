@@ -4,19 +4,13 @@ class Curso extends CI_Controller{
         //llamamos al constructor de la clase padre
         parent::__construct(); 
          
-        //llamo al helper url
-        $this->load->helper("url");  
-         
-        //llamo o incluyo el modelo
         $this->load->model("curso_model");
-         
-        //cargo la libreria de sesiones
         $this->load->library("session");
         $this->load->library('pagination');
     }
      
     //controlador por defecto
-    public function index(){
+    public function index($iId="NULL"){
         if($this->session->userdata('perfil') != 0)
         {
             redirect(base_url().'index.php/login');
@@ -25,6 +19,7 @@ class Curso extends CI_Controller{
             $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
             redirect(base_url().'index.php/login');
         }
+
         $pages=5; //Número de registros mostrados por páginas
         $config['base_url'] = base_url().'index.php/curso/pagina/';
         $config['total_rows'] = $this->curso_model->filas();//calcula el número de filas  
@@ -35,14 +30,15 @@ class Curso extends CI_Controller{
         $config["uri_segment"] = 3;//el segmento de la paginación
         $config['next_link'] = 'Siguiente';//siguiente link
         $config['prev_link'] = 'Anterior';//anterior link
-        $this->pagination->initialize($config); //inicializamos la paginación       
-        $data["curso"] = $this->curso_model->total_paginados($config['per_page'],$this->uri->segment(3));
+        $this->pagination->initialize($config); //inicializamos la paginación   
+
+        $data["num_filas"] = $config['total_rows'];       
+        $data["curso"] = $this->curso_model->total_paginados($config['per_page'],
+            $this->uri->segment(3),
+            $pages);
         $data["titulaciones"] = $this->curso_model->get_titulaciones();
         $data["asignaturas"] = $this->curso_model->get_asignaturas();
                   
-        
-        //$usuarios["ver"]=$this->asignatura_model->ver();
-         
         //cargo la vista y le paso los datos
         $this->load->view("curso",$data);
     }
@@ -115,7 +111,8 @@ class Curso extends CI_Controller{
     }
      
     //Controlador para eliminar
-    public function eliminar($iId){
+    public function eliminar($iId, $npag="NULL"){
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         if(is_numeric($iId)){
           $eliminar=$this->curso_model->eliminar($iId);
           if($eliminar==true){
@@ -123,15 +120,16 @@ class Curso extends CI_Controller{
           }else{
               $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudo eliminar el curso.');
           }
-          redirect(base_url()."index.php/curso");
+          redirect(base_url()."index.php/curso/pagina/$npag");
         }else{
-          redirect(base_url()."index.php/curso");
+          redirect(base_url()."index.php/curso/pagina/$npag");
         }
     }
 
     //Controlador para eliminar
-    public function eliminar_todos(){
-        foreach ($_POST["curso"] as $item){
+    public function eliminar_todos($npag = "NULL"){
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
+        foreach ($_POST["cursos"] as $item){
             $eliminar=$this->curso_model->eliminar($item);
         }
         if($eliminar==true){
@@ -139,7 +137,7 @@ class Curso extends CI_Controller{
         }else{
             $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
         } 
-        redirect(base_url()."index.php/curso");
+        redirect(base_url()."index.php/curso/pagina/$npag");
     }
 
 }

@@ -3,17 +3,9 @@ class Titulacion extends CI_Controller{
     public function __construct() {
         //llamamos al constructor de la clase padre
         parent::__construct(); 
-         
-        //llamo al helper url
-        $this->load->helper("url");  
-         
-        //llamo o incluyo el modelo
         $this->load->model("titulacion_model");
-         
-        //cargo la libreria de sesiones
         $this->load->library("session");
-
-        $this->load->library('pagination');
+         $this->load->library('pagination');
     }
      
     //controlador por defecto
@@ -36,8 +28,13 @@ class Titulacion extends CI_Controller{
         $config["uri_segment"] = 3;//el segmento de la paginación
         $config['next_link'] = 'Siguiente';//siguiente link
         $config['prev_link'] = 'Anterior';//anterior link
+        $data["num_filas"] = $config['total_rows'];           
+        
         $this->pagination->initialize($config); //inicializamos la paginación       
-        $data["titulacion"] = $this->titulacion_model->total_paginados($config['per_page'],$this->uri->segment(3));          
+        $data["titulacion"] = $this->titulacion_model->total_paginados(
+            $config['per_page'],
+            $this->uri->segment(3),
+            $pages);          
         
         $this->load->view("titulacion",$data);
     }
@@ -109,7 +106,8 @@ class Titulacion extends CI_Controller{
     }
      
     //Controlador para eliminar
-    public function eliminar($iId){
+    public function eliminar($iId, $npag="NULL"){
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         if(is_numeric($iId)){
           $eliminar=$this->titulacion_model->eliminar($iId);
           if($eliminar==true){
@@ -124,7 +122,8 @@ class Titulacion extends CI_Controller{
     }
 
     //Controlador para eliminar
-    public function eliminar_todos(){
+    public function eliminar_todos($npag="NULL"){
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         foreach ($_POST["titulacion"] as $item){
             $eliminar=$this->titulacion_model->eliminar($item);
         }

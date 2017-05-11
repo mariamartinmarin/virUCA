@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-03-2017 a las 20:58:26
+-- Tiempo de generación: 11-05-2017 a las 21:14:02
 -- Versión del servidor: 5.6.17
 -- Versión de PHP: 5.5.12
 
@@ -33,20 +33,7 @@ CREATE TABLE IF NOT EXISTS `acceso` (
   `sIP` varchar(64) NOT NULL,
   `sNombreCompleto` varchar(128) NOT NULL,
   UNIQUE KEY `iId` (`iId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
-
---
--- Volcado de datos para la tabla `acceso`
---
-
-INSERT INTO `acceso` (`iId`, `iId_Usuario`, `dFecha`, `sIP`, `sNombreCompleto`) VALUES
-(4, 1, '0000-00-00 00:00:00', '::1', 'María, Martín Marín'),
-(5, 1, '0000-00-00 00:00:00', '::1', 'María, Martín Marín'),
-(6, 1, '0000-00-00 00:00:00', '::1', 'María, Martín Marín'),
-(7, 1, '0000-00-00 00:00:00', '::1', 'María, Martín Marín'),
-(8, 1, '0000-00-00 00:00:00', '::1', 'María, Martín Marín'),
-(9, 1, '2017-03-13 16:40:20', '::1', 'María, Martín Marín'),
-(10, 1, '2017-03-13 17:54:56', '::1', 'María, Martín Marín');
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=139 ;
 
 -- --------------------------------------------------------
 
@@ -70,22 +57,10 @@ CREATE TABLE IF NOT EXISTS `alumnoscursos` (
 CREATE TABLE IF NOT EXISTS `asignatura` (
   `iId` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `sNombre` varchar(128) NOT NULL,
+  `iId_Titulacion` int(11) NOT NULL,
   PRIMARY KEY (`iId`),
   UNIQUE KEY `iId` (`iId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
-
---
--- Volcado de datos para la tabla `asignatura`
---
-
-INSERT INTO `asignatura` (`iId`, `sNombre`) VALUES
-(2, 'Virología II'),
-(3, 'Estructura de Datos y de la Información'),
-(4, 'Programación Orientada a Objetos'),
-(5, 'Diseño de Algoritmos'),
-(6, 'Calidad de los Sistemas Software'),
-(8, 'Programación Concurrente y distribuida'),
-(9, 'Ingeniería Web');
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 -- --------------------------------------------------------
 
@@ -97,16 +72,10 @@ CREATE TABLE IF NOT EXISTS `categoria` (
   `iId` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `sNombre` varchar(256) NOT NULL,
   `sDescripcion` varchar(2048) NOT NULL,
+  `sColor` varchar(8) NOT NULL COMMENT 'Código hex del color de la categoría.',
   PRIMARY KEY (`iId`),
   UNIQUE KEY `iId` (`iId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Preguntas VirUCA' AUTO_INCREMENT=9 ;
-
---
--- Volcado de datos para la tabla `categoria`
---
-
-INSERT INTO `categoria` (`iId`, `sNombre`, `sDescripcion`) VALUES
-(2, 'Virología', '');
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Preguntas VirUCA' AUTO_INCREMENT=16 ;
 
 -- --------------------------------------------------------
 
@@ -121,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `curso` (
   `sCurso` varchar(128) NOT NULL COMMENT 'Aqui ponemos el Curso académico.',
   PRIMARY KEY (`iId`),
   UNIQUE KEY `iId` (`iId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 -- --------------------------------------------------------
 
@@ -144,6 +113,50 @@ CREATE TABLE IF NOT EXISTS `cursopartida` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `panel`
+--
+
+CREATE TABLE IF NOT EXISTS `panel` (
+  `iId` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `iCasillas` int(32) NOT NULL COMMENT 'Número de casillas del panel.',
+  `sNombre` varchar(32) NOT NULL COMMENT 'Nombre del panel',
+  `bActivo` tinyint(1) NOT NULL DEFAULT '0',
+  `bEliminar` tinyint(1) NOT NULL DEFAULT '1',
+  `iId_Propietario` int(11) NOT NULL COMMENT 'Identificador del usuario que ha creado el panel.',
+  PRIMARY KEY (`iId`),
+  UNIQUE KEY `iId` (`iId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `panelcasillas`
+--
+
+CREATE TABLE IF NOT EXISTS `panelcasillas` (
+  `iId` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `iId_Panel` int(32) NOT NULL,
+  `iId_Categoria` int(32) NOT NULL,
+  `eFuncion` enum('Ninguno','Viento','Retroceder') NOT NULL DEFAULT 'Ninguno' COMMENT 'Tipología de la casilla.',
+  `iNumCasilla` int(11) NOT NULL,
+  UNIQUE KEY `iId` (`iId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=72 ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `parametros`
+--
+
+CREATE TABLE IF NOT EXISTS `parametros` (
+  `iActiva` int(32) NOT NULL,
+  `iId` int(8) NOT NULL,
+  PRIMARY KEY (`iId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `partida`
 --
 
@@ -151,10 +164,14 @@ CREATE TABLE IF NOT EXISTS `partida` (
   `iId` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `dFecha` date NOT NULL,
   `nGrupos` int(2) NOT NULL COMMENT 'Número de grupos que se crean en la partida.',
-  `bFinalizada` tinyint(1) NOT NULL,
+  `bFinalizada` tinyint(1) NOT NULL DEFAULT '0',
+  `iId_Panel` int(11) NOT NULL,
+  `iId_Curso` int(8) NOT NULL,
+  `iId_Profesor` int(11) NOT NULL,
+  `bEmpezada` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`iId`),
   UNIQUE KEY `iId` (`iId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Partida VirUCA.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Partida VirUCA.' AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -167,9 +184,12 @@ CREATE TABLE IF NOT EXISTS `pregunta` (
   `sPregunta` varchar(512) NOT NULL,
   `nPuntuacion` float NOT NULL,
   `bActiva` tinyint(1) NOT NULL,
+  `iId_Usuario` int(11) NOT NULL,
+  `iId_Categoria` int(11) NOT NULL,
+  `sObservaciones` varchar(3000) NOT NULL,
   PRIMARY KEY (`iId`),
   UNIQUE KEY `iId` (`iId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Preguntas VirUCA. Esta tabla almacenará las preguntas del juego.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Preguntas VirUCA. Esta tabla almacenará las preguntas del juego.' AUTO_INCREMENT=24 ;
 
 -- --------------------------------------------------------
 
@@ -182,9 +202,10 @@ CREATE TABLE IF NOT EXISTS `respuesta` (
   `iId_Pregunta` int(16) NOT NULL,
   `sRespuesta` varchar(512) NOT NULL,
   `bVerdadera` tinyint(1) NOT NULL,
+  `iOrden` int(11) NOT NULL COMMENT 'Orden de la respuesta a la hora de ser mostrada y modificada.',
   PRIMARY KEY (`iId`),
   UNIQUE KEY `iId` (`iId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Respuestas VirUCA. Se almacenarán las diferentes respuestas.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Respuestas VirUCA. Se almacenarán las diferentes respuestas.' AUTO_INCREMENT=92 ;
 
 -- --------------------------------------------------------
 
@@ -197,18 +218,7 @@ CREATE TABLE IF NOT EXISTS `titulacion` (
   `sTitulacion` varchar(128) NOT NULL,
   PRIMARY KEY (`iId`),
   UNIQUE KEY `iId` (`iId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;
-
---
--- Volcado de datos para la tabla `titulacion`
---
-
-INSERT INTO `titulacion` (`iId`, `sTitulacion`) VALUES
-(1, 'Grado en Biotecnología'),
-(2, 'Grado en Ingeniería Informática'),
-(3, 'Grado en Ingeniería Industrial'),
-(5, 'Grado en Ingeniería de Producto'),
-(6, 'Grado en Ingeniería Naval');
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 -- --------------------------------------------------------
 
@@ -224,17 +234,13 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   `sPassword` varchar(64) NOT NULL,
   `sEmail` varchar(128) NOT NULL,
   `iPerfil` int(2) NOT NULL COMMENT '0 (Perfil profesor/Administrador); 1 (Perfil de alumno)',
+  `iId_Titulacion` int(11) NOT NULL,
+  `token` varchar(64) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `request_token` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`iId`),
   UNIQUE KEY `iId` (`iId`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Usuarios VIRUCA' AUTO_INCREMENT=10 ;
-
---
--- Volcado de datos para la tabla `usuario`
---
-
-INSERT INTO `usuario` (`iId`, `sNombre`, `sApellidos`, `sUsuario`, `sPassword`, `sEmail`, `iPerfil`) VALUES
-(1, 'María', 'Martín Marín', 'mariamartin', 'd033e22ae348aeb5660fc2140aec35850c4da997', 'maria.martin.marin@gmail.com', 0),
-(2, 'alumno', 'alumno alumno', 'alumno', 'a33551b48362d4acb3aa69c45936bcf3', 'mari.martin.marin@gmail.com', 1);
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Usuarios VIRUCA' AUTO_INCREMENT=46 ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

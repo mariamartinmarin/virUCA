@@ -33,7 +33,9 @@ class Usuarios extends CI_Controller{
         $this->pagination->initialize($config); //inicializamos la paginación   
 
         $data["num_filas"] = $config['total_rows'];           
-        $data["usuario"] = $this->usuarios_model->total_paginados($config['per_page'],$this->uri->segment(3));          
+        $data["usuario"] = $this->usuarios_model->total_paginados($config['per_page'],
+            $this->uri->segment(3),
+            $pages);          
         
         $this->load->view("usuarios",$data);
     }
@@ -69,7 +71,7 @@ class Usuarios extends CI_Controller{
                     $this->input->post("sApellidos"),
                     $this->input->post("sEmail"),
                     $this->input->post("sUsuario"),
-                    md5($this->input->post("sPassword"))
+                    $this->input->post("sPassword")
                     );
                 if($add==true){
                     //Sesion de una sola ejecución
@@ -93,7 +95,6 @@ class Usuarios extends CI_Controller{
                 $this->form_validation->set_rules('sApellidos', 'Apellidos', 'trim|required|max_length[128]|min_length[2]');
                 $this->form_validation->set_rules('sUsuario', 'Usuario', 'trim|required|max_length[32]|min_length[2]');
                 $this->form_validation->set_rules('sEmail', 'E-mail', 'trim|valid_email|required|max_length[128]|min_length[2]');
-                $this->form_validation->set_rules('sPassword', 'Contraseña', 'trim|required|max_length[64]|min_length[8]');
 
                 // Una vez establecidas las reglas, validamos los campos.
                 $this->form_validation->set_message('required', '%s es obligatorio.');
@@ -112,7 +113,6 @@ class Usuarios extends CI_Controller{
                         $this->input->post("sApellidos"),
                         $this->input->post("sEmail"),
                         $this->input->post("sUsuario"),
-                        md5($this->input->post("sPassword")),
                         $this->input->post("iPerfil"));
                     if($mod==true){
                         $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong>, el profesor se modificó correctamente.');
@@ -132,7 +132,7 @@ class Usuarios extends CI_Controller{
      
     //Controlador para eliminar
     public function eliminar($iId, $npag="NULL"){
-        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         if(is_numeric($iId)){
             $eliminar=$this->usuarios_model->eliminar($iId);
             if($eliminar==true){
@@ -148,7 +148,7 @@ class Usuarios extends CI_Controller{
 
     //Controlador para eliminar
     public function eliminar_todos($npag="NULL"){
-        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         foreach ($_POST["usuario"] as $item){
             $eliminar=$this->usuarios_model->eliminar($item);
         }

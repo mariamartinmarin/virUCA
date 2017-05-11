@@ -33,6 +33,9 @@
         <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
 
+        <!-- Custom Loader -->
+        <link rel="stylesheet" href="<?=base_url()?>css/loader.css">
+
         <!-- Responsive CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme-responsive.css" />
 
@@ -44,7 +47,17 @@
 
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
-
+        <script src="<?=base_url()?>vendor/jquery.js"></script>
+        <script type="text/javascript" src="<?=base_url()?>js/tablesorter/jquery.tablesorter.js"></script>
+        <script type="text/javascript" src="<?=base_url()?>js/busquedasimple.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() 
+            { 
+                $("#table_titulacion").tablesorter({sortList: [[1,0], [2,0]]} ); 
+            } 
+            );
+            $(window).load(function() { $(".loader").fadeOut("slow");}); 
+        </script>
         <!--[if IE]>
             <link rel="stylesheet" href="css/ie.css">
         <![endif]-->
@@ -52,15 +65,12 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-        <style type="text/css">
-            .error{
-                color: red !important;
-            } 
-        </style>
 
     </head>
     <body>
-        
+        <div id="preloader">
+            <div id="loader">&nbsp;</div>
+        </div>
         <div class="body">
             <?php $this->load->view('menup_view');?>
             <div role="main" class="main">
@@ -109,45 +119,87 @@
                     <!-- Fin zona de errores -->
 
                     <!-- Listado -->
-                     <?php echo form_fieldset('Listado');?>
-                    <?php if ($titulacion != "") { ?>
-                    <?=form_open(base_url().'index.php/titulacion/eliminar_todos');?>
-                    <?php foreach($titulacion as $fila){ ?>
+                    <?php if ($titulacion != "") { 
+                    // Obtener página.
+                    $npag =  $this->uri->segment(3);
+                    ?>
 
-                        <div class="row show-grid">
-                        <div class="col-md-1">
-                            <span class="show-grid-block">
-                            <input type="checkbox" name="titulacion[]" value="<?=$fila->iId;?>">
-                            </span>
+                    <?php echo form_fieldset('Listado de titulaciones');
+                    $atributos = array('class' => 'navbar-form', 'role' => 'search');
+                    ?>
+                    <blockquote>
+                        Administrar las diferentes <b>titulaciones</b> que podrán participar en una partida de <b>VirUCA</b>
+                    </blockquote>
+                    
+                    <?=form_open(base_url().'index.php/titulacion/eliminar_todos/'.$npag);?>
+                    
+                    <div class="panel panel-default">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">
+                            Se están mostrando un total de <b><?=$num_filas;?> registros</b>
                         </div>
-                        <div class="col-md-8"><span class="show-grid-block"><?=$fila->sTitulacion;?></span></div>
-                        <div class="col-md-2"><span class="show-grid-block">
-                            <a href="<?=base_url("index.php/titulacion/mod/$fila->iId")?>" 
-                                class="btn btn-warning icon icon-pencil">
-                            </a>
-                            <a href="<?=base_url("index.php/titulacion/eliminar/$fila->iId")?>" 
-                                class="btn btn-warning icon icon-trash-o">
-                            </a>
-                        </span></div>
-                        </div>
+                        <table class="table table-bordered table-striped" id="table_titulacion">
+                            <thead>
+                                <th>&nbsp;</th>
+                                <th>Titulación</th>
+                                <th>Opciones</th>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                foreach($titulacion as $fila){ 
+                                $cont = 0; 
+                                ?>
+
+                                <tr><th>
+                                    <span class="show-grid-block">
+                                        <input type="checkbox" name="titulacion[]" value="<?=$fila->iId;?>">
+                                    </span>
+                                </th>
+                                    
+                                <td><?=$fila->sTitulacion;?></td>  
+                                <td>
+                                    <a href="#" 
+                                        data-bb="confirm" 
+                                        data-id="<?=$fila->iId;?>"
+                                        data-pg="<?=$npag?>" 
+                                        class="btn-group-xs">
+                                            <i class="icon icon-trash-o"></i>
+                                    </a>
+                                    <a href="<?=base_url("index.php/titulacion/mod/$fila->iId/$npag")?>" 
+                                    class="btn-group-xs"><i class="icon icon-pencil"></i></a>
+                                </td>
+                                <?php
+                                $cont++;
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
+                    <br style="clear:both;">
+                    <?php echo $this->pagination->create_links() ?>
+                    <hr class="short">
+                    
+                    
+
+                    <?=form_close();?>
+                    
                     <?php
-                    } } else {
+
+                    } else {
                     ?>
                     <div class="alert alert-success">
-                    Actualmente no hay ninguna titulación activo.
+                    Actualmente no hay ninguna titulación en el sistema.
                     </div>
                     <?php 
                     }
                     ?>
-                    <br>
-                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
-                    <?=form_close();?>
-                    <br style="clear:both;">
-                    <?php echo $this->pagination->create_links() ?>
-                    <hr class="short"><br>
 
-                    <!-- Fin de listado -->
+                    <!-- Fin del listado -->
 
+                    
                     <?=form_open(base_url().'index.php/titulacion/nueva');
                     $sTitulacion = array(
                     'name' => 'sTitulacion',
@@ -186,22 +238,17 @@
         </div>
 
 <!-- Libs -->
-        <script src="<?=base_url()?>vendor/jquery.js"></script>
         <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
         <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
         <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
         <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.validate.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.stellar.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.knob.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.gmap.js"></script>
-        <script src="<?=base_url()?>vendor/twitterjs/twitter.js"></script>
-        <script src="<?=base_url()?>vendor/isotope/jquery.isotope.js"></script>
-        <script src="<?=base_url()?>vendor/owl-carousel/owl.carousel.js"></script>
-        <script src="<?=base_url()?>vendor/jflickrfeed/jflickrfeed.js"></script>
-        <script src="<?=base_url()?>vendor/magnific-popup/magnific-popup.js"></script>
-        <script src="<?=base_url()?>vendor/mediaelement/mediaelement-and-player.js"></script>
         
+        <script type="text/javascript">
+        $(window).load(function() {
+            $('#preloader').fadeOut('slow');
+            $('body').css({'overflow':'visible'});
+        })
+        </script>
         <!-- Theme Initializer -->
         <script src="<?=base_url()?>js/theme.plugins.js"></script>
         <script src="<?=base_url()?>js/theme.js"></script>
@@ -209,5 +256,38 @@
         <!-- Custom JS -->
         <script src="<?=base_url()?>js/custom.js"></script>
 
+        <!-- BOOT BOX -->
+        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
+        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+        
+        <script type="text/javascript">
+        bootbox.setDefaults({
+          locale: "es"
+        });
+        $(function() {
+            var cajas = {};
+
+            $(document).on("click", "a[data-bb]", function(e) {
+                e.preventDefault();
+                var type = $(this).data("bb");
+                var id = $(this).data("id");
+                var pg = $(this).data("pg");
+                if (typeof cajas[type] === 'function') {
+                    cajas[type](id, pg);
+                }
+            });
+
+            cajas.confirm = function(id, pg) {
+                bootbox.confirm("¿Estás seguro que quieres borrar la titulación?", function(result) {
+                    if (result == true) {
+                        location.href = '<?=base_url()?>index.php/titulacion/eliminar/'+id+'/'+pg;
+                    }
+            });
+            };
+  
+        });
+
+        </script>
+        <!-- FIN BOOT -->
     </body>
 </html>

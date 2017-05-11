@@ -96,7 +96,15 @@
                 <?php } ?>
                 <!-- Fin errores -->
 
-                <?php echo form_fieldset('Modificar pregunta');?>
+                <?php 
+                foreach ($mod as $fila){
+                    if ($fila->nPuntuacion == 0)
+                        echo form_fieldset('Modificar pregunta');
+                    else
+                        echo form_fieldset('Visualizar pregunta');
+                }
+                ?>
+
                 <form action="" method="POST">
                 <?php    
                     foreach ($mod as $fila){ 
@@ -201,15 +209,24 @@
                             </div>
 
                             </div>
-                    </div>                      
-                    <?=form_submit($submit)?>
+                    </div>  
+                    <?php 
+                    if ($fila->nPuntuacion == 0)
+                        echo form_submit($submit);
+                    else { ?>
+                        <div class="alert alert-success">
+                        La pregunta <b>ya ha sido calificada por tu profesor</b>, por lo que no puedes modificar el contenido
+                        de la misma.
+                        </div>
+                    <?php } ?>
+                
                     <!-- Fin campos formulario -->
                    
                 <?php } ?>
                 </form>
                 <?=form_fieldset_close();?>
                 <hr>
-                <a href="<?=base_url()."index.php/usuarios"?>" class="btn btn-warning">Volver</a>
+                <a href="<?=base_url()."index.php/pregunta"?>" class="btn btn-warning">Volver a Mis Preguntas</a>
             </div>
         </div>
         <?php $this->load->view('footer');?>

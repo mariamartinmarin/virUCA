@@ -13,14 +13,14 @@ class Pregunta_model extends CI_Model{
       return  $consulta->num_rows() ;
     }
 
-    function total_paginados($por_pagina, $segmento) 
+    function total_paginados($por_pagina, $segmento, $pages) 
     {
       $id_usuario = $this->session->userdata('id_usuario');
       $this->db->select('*');
       $this->db->from('pregunta');
       $this->db->where('iId_Usuario', $id_usuario);
-
       $consulta = $this->db->get('', $por_pagina, $segmento);
+      
       if($consulta->num_rows()>0)
       {
         foreach($consulta->result() as $fila)
@@ -28,7 +28,21 @@ class Pregunta_model extends CI_Model{
           $data[] = $fila;
         }
         return $data;
-      }
+      } else {
+        $this->db->select('*');
+        $this->db->from('pregunta');
+        $this->db->where('iId_Usuario', $id_usuario);
+
+        $segmento_anterior = $segmento - $pages;
+        if ($segmento_anterior < 0) $segmento_anterior = "";
+          $consulta = $this->db->get('', $por_pagina, $segmento_anterior);
+          if($consulta->num_rows()>0) {
+            foreach($consulta->result() as $fila) {
+              $data[] = $fila;
+            }
+            return $data;
+          }
+        }
     }
 
     public function ver(){

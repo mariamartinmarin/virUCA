@@ -135,13 +135,6 @@
                     'class' => 'form-control',
                     'value' => $fila->sUsuario
                     );
-                    $sPassword = array(
-                    'name' => 'sPassword',
-                    'id' => 'sPassword',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => $fila->sPassword
-                    );
 
                     $submit = array(
                     'name' => 'submit',
@@ -177,29 +170,25 @@
                                 <?=form_error('sUsuario','<div class= "error">','</div>');?>
                             </div>
                             <div class="col-md-6">
-                                <label>Contraseña *</label>
-                                <?=form_input($sPassword)?>
-                                <?=form_error('sPassword','<div class= "error">','</div>');?>
+                                <label>E-mail *</label>
+                                <?=form_input($sEmail)?>
+                                <?=form_error('sEmail','<div class= "error">','</div>');?>
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="form-group">
+                            
                             <div class="col-md-6">
-                                <label>E-mail</label>
-                                <?=form_input($sEmail)?>
-                                <?=form_error('sEmail','<div class= "error">','</div>');?>
-                            </div>
-                            <div class="col-md-6">
-                            <?=form_label('Titulación: '); ?>
-                    <select name="iTitulacion" class="form-control" style="width:400px;">
+                            <?=form_label('Curso Académico * '); ?>
+                    <select name="iCurso" class="form-control" style="width:400px;">
                     <?php
-                    foreach ($titulaciones as $i => $titulacion) 
+                    foreach ($cursos as $i => $curso) 
                         if ($i == $fila->iId_Titulacion)
-                            echo "<option value='".$i."' selected>".$titulacion."</option>";
+                            echo "<option value='".$i."' selected>".$curso."</option>";
                         else
-                            echo "<option value='".$i."'>".$titulacion."</option>";
+                            echo "<option value='".$i."'>".$curso."</option>";
                        
                     ?>
                     </select>

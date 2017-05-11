@@ -1,0 +1,29 @@
+/*
+Name: 			panel.css
+Written by: 	María Martín Marín
+Version: 		1.0.0
+*/
+
+.cuadrado {
+	width: 200px;
+	height: 200px;
+	background-color: #fff000;
+}
+
+.circulo-sup {
+	width: 200px;
+	height: 100px;
+	background-color: #fbfbfb;
+	-moz-border-radius: 200px 200px 0 0;
+	-webkit-border-radius: 200px 200px 0 0;
+	border-radius: 100px 100px 0 0;
+}
+
+.circulo-der {
+	width: 100px;
+	height: 200px;
+	background-color: #fbfbfb;
+	-moz-border-radius: 0 200px 200px 0;
+	-webkit-border-radius: 0 200px 200px 0;
+	border-radius: 0 100px 100px 0;
+}

@@ -33,6 +33,9 @@
         <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
 
+        <!-- Custom Loader -->
+        <link rel="stylesheet" href="<?=base_url()?>css/loader.css">
+
         <!-- Responsive CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme-responsive.css" />
 
@@ -52,12 +55,14 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-        <style type="text/css">
-            .error{ color: red !important;}
-        </style>
-
+        <script type="text/javascript">
+            $(window).load(function() { $(".loader").fadeOut("slow");}); 
+        </script>
     </head>
     <body>
+        <div id="preloader">
+            <div id="loader">&nbsp;</div>
+        </div>
         
         <div class="body">
             <?php $this->load->view('menup_view');?>
@@ -103,7 +108,88 @@
                     </div>
                     <?php } ?>
 
+                    <!-- Listado -->
+                    <?php if ($curso != "" && $titulaciones != "" && $asignaturas != "") { 
+                    // Obtener página.
+                    $npag =  $this->uri->segment(3);
+                    ?>
 
+                    <?php echo form_fieldset('Listado de cursos académicos');
+                    $atributos = array('class' => 'navbar-form', 'role' => 'search');
+                    ?>
+                    <blockquote>
+                        Gestionar los diferentes cursos académicos a los que pertenecerán las partidas. El <b>Curso Académico</b> estará obligatoriamente asociado a una <b>Titulación</b> y a una <b>Asignatura</b>.
+                    </blockquote>
+                    
+                    <?=form_open(base_url().'index.php/curso/eliminar_todos/'.$npag);?>
+                    
+                    <div class="panel panel-default">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">
+                            Se están mostrando un total de <b><?=$num_filas;?> registros</b>
+                        </div>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <th>&nbsp;</th>
+                                <th>Curso/Asignatura</th>
+                                <th>Titulación</th>
+                                <th>Opciones</th>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                foreach($curso as $fila){ 
+                                $cont = 0; 
+                                ?>
+
+                                <tr><th>
+                                    <span class="show-grid-block">
+                                        <input type="checkbox" name="cursos[]" value="<?=$fila->iId;?>">
+                                    </span>
+                                </th>
+                                    
+                                <td><?=$fila->sCurso;?> [<?=$fila->sNombre;?>]</td>
+                                <td><?=$fila->sTitulacion;?></td>   
+                                <td>
+                                    <a href="#" 
+                                        data-bb="confirm" 
+                                        data-id="<?=$fila->iId;?>"
+                                        data-pg="<?=$npag?>" 
+                                        class="btn-group-xs">
+                                            <i class="icon icon-trash-o"></i>
+                                    </a>
+                                    <a href="<?=base_url("index.php/curso/mod/$fila->iId/$npag")?>" 
+                                    class="btn-group-xs"><i class="icon icon-pencil"></i></a>
+                                </td>
+                                <?php
+                                $cont++;
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
+                    <br style="clear:both;">
+                    <?php echo $this->pagination->create_links() ?>
+                    <hr class="short">
+                    
+                    <?=form_close();?>
+                    
+                    <?php
+
+                    } else {
+                    ?>
+                    <div class="alert alert-success">
+                    Actualmente no hay ningún curso en el sistema. Además, recuerda que para poder dar de alta un <b>Curso Académico</b> es necesario que existan tanto <b>Asignaturas</b> como <b>Titulaciones</b>
+                    </div>
+                    <?php 
+                    }
+                    ?>
+
+                    <!-- Fin del listado -->
+
+                    <?php if ($asignaturas != "" && $titulaciones != "") { ?>
                     <?=form_open(base_url().'index.php/curso/nueva');
                     $sCurso = array(
                     'name' => 'sCurso',
@@ -121,52 +207,6 @@
                     'class' => 'btn btn-default'
                     );
                     ?>
-
-                    <!-- Listado -->
-
-                    <?php echo form_fieldset('Listado');?>
-                    <?php if ($curso != "") { ?>
-                    <?=form_open(base_url().'index.php/curso/eliminar_todos');?>
-                    
-                    <?php foreach($curso as $fila){ ?>
-
-                        <div class="row show-grid">
-                        <div class="col-md-1">
-                            <span class="show-grid-block">
-                            <input type="checkbox" name="curso[]" value="<?=$fila->iId;?>">
-                            </span>
-                        </div>
-                        <div class="col-md-5"><span class="show-grid-block">
-                            <?=$fila->sCurso;?> [<?=$fila->sTitulacion;?>]
-                            </span>
-                        </div>
-                        <div class="col-md-4"><span class="show-grid-block"><?=$fila->sNombre;?></span></div>
-                        <div class="col-md-2"><span class="show-grid-block">
-                            <a href="<?=base_url("index.php/curso/mod/$fila->iId")?>" 
-                                class="btn btn-warning icon icon-pencil">
-                            </a>
-                            <a href="<?=base_url("index.php/curso/eliminar/$fila->iId")?>" 
-                                class="btn btn-warning icon icon-trash-o">
-                            </a>
-                        </span></div>
-                        </div>
-                    <?php
-                    } } else {
-                    ?>
-                    <div class="alert alert-success">
-                    Actualmente no hay ningún curso activo.
-                    </div>
-                    <?php 
-                    }
-                    ?>
-                    <br>
-                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
-                    <?=form_close();?>
-                    <br style="clear:both;">
-                    <?php echo $this->pagination->create_links() ?>
-                    <hr class="short"><br>
-
-                    <!-- Fin listado -->
 
                     <?php
                     echo form_fieldset('Añadir un nuevo curso');
@@ -193,10 +233,8 @@
                     <?=form_close()?>
 
                    
-                    <?php
-                        echo form_fieldset_close();
-                    ?>
-
+                    <?=form_fieldset_close();?>
+                    <?php } ?>
                     <hr class="short">
 
                 </div>
@@ -210,23 +248,53 @@
         <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
         <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
         <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.validate.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.stellar.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.knob.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.gmap.js"></script>
-        <script src="<?=base_url()?>vendor/twitterjs/twitter.js"></script>
-        <script src="<?=base_url()?>vendor/isotope/jquery.isotope.js"></script>
-        <script src="<?=base_url()?>vendor/owl-carousel/owl.carousel.js"></script>
-        <script src="<?=base_url()?>vendor/jflickrfeed/jflickrfeed.js"></script>
-        <script src="<?=base_url()?>vendor/magnific-popup/magnific-popup.js"></script>
-        <script src="<?=base_url()?>vendor/mediaelement/mediaelement-and-player.js"></script>
         
+        <script type="text/javascript">
+        $(window).load(function() {
+            $('#preloader').fadeOut('slow');
+            $('body').css({'overflow':'visible'});
+        })
+        </script>
         <!-- Theme Initializer -->
         <script src="<?=base_url()?>js/theme.plugins.js"></script>
         <script src="<?=base_url()?>js/theme.js"></script>
         
         <!-- Custom JS -->
         <script src="<?=base_url()?>js/custom.js"></script>
+
+        <!-- BOOT BOX -->
+        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
+        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+        
+        <script type="text/javascript">
+        bootbox.setDefaults({
+          locale: "es"
+        });
+        $(function() {
+            var cajas = {};
+
+            $(document).on("click", "a[data-bb]", function(e) {
+                e.preventDefault();
+                var type = $(this).data("bb");
+                var id = $(this).data("id");
+                var pg = $(this).data("pg");
+                if (typeof cajas[type] === 'function') {
+                    cajas[type](id, pg);
+                }
+            });
+
+            cajas.confirm = function(id, pg) {
+                bootbox.confirm("¿Estás seguro que quieres borrar el curso?", function(result) {
+                    if (result == true) {
+                        location.href = '<?=base_url()?>index.php/curso/eliminar/'+id+'/'+pg;
+                    }
+            });
+            };
+  
+        });
+
+        </script>
+        <!-- FIN BOOT -->
 
     </body>
 </html>

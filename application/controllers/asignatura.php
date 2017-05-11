@@ -3,14 +3,7 @@ class Asignatura extends CI_Controller{
     public function __construct() {
         //llamamos al constructor de la clase padre
         parent::__construct(); 
-         
-        //llamo al helper url
-        $this->load->helper("url");  
-         
-        //llamo o incluyo el modelo
         $this->load->model("asignatura_model");
-         
-        //cargo la libreria de sesiones
         $this->load->library("session");
         $this->load->library('pagination');
     }
@@ -36,8 +29,13 @@ class Asignatura extends CI_Controller{
         $config["uri_segment"] = 3;//el segmento de la paginación
         $config['next_link'] = 'Siguiente';//siguiente link
         $config['prev_link'] = 'Anterior';//anterior link
-        $this->pagination->initialize($config); //inicializamos la paginación       
-        $data["asignatura"] = $this->asignatura_model->total_paginados($config['per_page'],$this->uri->segment(3));
+        $this->pagination->initialize($config); //inicializamos la paginación  
+        $data["num_filas"] = $config['total_rows'];           
+             
+        $data["asignatura"] = $this->asignatura_model->total_paginados(
+            $config['per_page'],
+            $this->uri->segment(3),
+            $pages);
         $data["titulaciones"] = $this->asignatura_model->get_titulaciones();
                   
         
@@ -109,7 +107,9 @@ class Asignatura extends CI_Controller{
     }
      
     //Controlador para eliminar
-    public function eliminar($iId){
+    public function eliminar($iId, $npag = "NULL"){
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
+        
         if(is_numeric($iId)){
           $eliminar=$this->asignatura_model->eliminar($iId);
           if($eliminar==true){
@@ -117,14 +117,16 @@ class Asignatura extends CI_Controller{
           }else{
               $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudo eliminar la asignatura.');
           }
-          redirect(base_url()."index.php/asignatura");
+          redirect(base_url()."index.php/asignatura/pagina/$npag");
         }else{
-          redirect(base_url()."index.php/asignatura");
+          redirect(base_url()."index.php/asignatura/pagina/$npag");
         }
     }
 
     //Controlador para eliminar
-    public function eliminar_todos(){
+    public function eliminar_todos($npag = "NULL"){
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
+        
         foreach ($_POST["asignatura"] as $item){
             $eliminar=$this->asignatura_model->eliminar($item);
         }
@@ -133,7 +135,7 @@ class Asignatura extends CI_Controller{
         }else{
             $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
         } 
-        redirect(base_url()."index.php/asignatura");
+        redirect(base_url()."index.php/asignatura/pagina/$npag");
     }
 
 }

@@ -29,8 +29,11 @@ class Pregunta extends CI_Controller{
         $config['prev_link'] = 'Anterior';//anterior link
         $this->pagination->initialize($config); //inicializamos la paginación 
         $data["categorias"] = $this->pregunta_model->get_categorias();      
-        $data["pregunta"] = $this->pregunta_model->total_paginados($config['per_page'],$this->uri->segment(3));          
-        
+        $data["pregunta"] = $this->pregunta_model->total_paginados(
+            $config['per_page'],
+            $this->uri->segment(3),
+            $pages);          
+        $data["num_filas"] = $config['total_rows'];
         $this->load->view("pregunta",$data);
     }
 
@@ -43,10 +46,10 @@ class Pregunta extends CI_Controller{
         if($this->input->post("submit")){
             // Primero vamos a hacer las validaciones.
             $this->form_validation->set_rules('sPregunta','Pregunta','trim|required|max_length[512]|min_length[10]');
-            $this->form_validation->set_rules('sResp1','Respuesta A','trim|required|max_length[512]|min_length[10]');
-            $this->form_validation->set_rules('sResp2','Respuesta B','trim|required|max_length[512]|min_length[10]');
-            $this->form_validation->set_rules('sResp3','Respuesta C','trim|required|max_length[512]|min_length[10]');
-            $this->form_validation->set_rules('sResp4','Respuesta D','trim|required|max_length[512]|min_length[10]');
+            $this->form_validation->set_rules('sResp1','Respuesta A','trim|required|max_length[512]');
+            $this->form_validation->set_rules('sResp2','Respuesta B','trim|required|max_length[512]');
+            $this->form_validation->set_rules('sResp3','Respuesta C','trim|required|max_length[512]');
+            $this->form_validation->set_rules('sResp4','Respuesta D','trim|required|max_length[512]');
 
             
             // Una vez establecidas las reglas, validamos los campos.
@@ -86,7 +89,7 @@ class Pregunta extends CI_Controller{
         if(is_numeric($iId)){
             $datos["mod"]=$this->pregunta_model->mod($iId);
             $datos["respuestas"] = $this->pregunta_model->respuestas($iId);
-             $datos["categorias"] = $this->pregunta_model->get_categorias();
+            $datos["categorias"] = $this->pregunta_model->get_categorias();
             $this->load->view("preguntamod_view",$datos);
             
             if($this->input->post("submit")){
@@ -138,7 +141,8 @@ class Pregunta extends CI_Controller{
 
      
     //Controlador para eliminar
-    public function eliminar($iId){
+    public function eliminar($iId, $npag = "NULL"){
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         if(is_numeric($iId)){
             $eliminar=$this->pregunta_model->eliminar($iId);
             if($eliminar==true){
@@ -148,14 +152,15 @@ class Pregunta extends CI_Controller{
                 $this->session->set_flashdata('incorrecto',
                     '<strong>Oops!</strong> no se pudo eliminar la pregunta.');
             }
-            redirect(base_url()."index.php/pregunta");
+            redirect(base_url()."index.php/pregunta/pagina/$npag");
         } else {
-          redirect(base_url()."index.php/pregunta");
+          redirect(base_url()."index.php/pregunta/pagina/$npag");
         }
     }
 
     //Controlador para eliminar
-    public function eliminar_todos(){
+    public function eliminar_todos($npag = "NULL"){
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         foreach ($_POST["pregunta"] as $item){
             $eliminar=$this->pregunta_model->eliminar($item);
         }
@@ -165,7 +170,7 @@ class Pregunta extends CI_Controller{
             $this->session->set_flashdata('incorrecto', 
                 '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
         } 
-        redirect(base_url()."index.php/pregunta");
+        redirect(base_url()."index.php/pregunta/pagina/$npag");
     }
 }
 ?>
