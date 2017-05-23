@@ -56,30 +56,7 @@
 							<li><?=anchor(base_url().'index.php/preguntasalta', 'Alta de pregunta')?></li>
 						</ul>
 					</li>
-					<!-- eje`ñ
-
-					<li class="dropdown">
-									<a class="dropdown-toggle" href="#">
-										Pages
-										<i class="icon icon-angle-down"></i>
-									</a>
-									<ul class="dropdown-menu">
-										<li class="dropdown-submenu">
-											<a href="#">Shop</a>
-											<ul class="dropdown-menu">
-												<li><a href="shop-full-width.html">Shop - Full Width</a></li>
-												<li><a href="shop-sidebar.html">Shop - Sidebar</a></li>
-												<li><a href="shop-product-full-width.html">Shop - Product Full Width</a></li>
-												<li><a href="shop-product-sidebar.html">Shop - Product Sidebar</a></li>
-												<li><a href="shop-cart.html">Shop - Cart</a></li>
-												<li><a href="shop-login.html">Shop - Login</a></li>
-												<li><a href="shop-checkout.html">Shop - Checkout</a></li>
-											</ul>
-										</li>
-										<li><a href="page-full-width.html">Full width</a></li>
-										<li>
-										-->
-
+					
 					<li class="dropdown">
 						<a class="dropdown-toggle" href="#">
 							Partidas<i class="icon icon-angle-down"></i>
@@ -90,11 +67,11 @@
 								<a href="#">Paneles</a>
 								<ul class="dropdown-menu">
 									<li><?=anchor(base_url().'index.php/panelesalta', 'Crear Panel')?></li>
-									<li><?=anchor(base_url().'index.php/paneles', 'Listado')?></li>
+									<li><?=anchor(base_url().'index.php/paneles', 'Listado de Paneles')?></li>
 								</ul>
 							</li>
-							<li><?=anchor(base_url().'index.php/partida', 'Empezar partida')?></li>
-							<li><?=anchor(base_url().'index.php/partidas', 'Partidas')?></li>
+							<li><?=anchor(base_url().'index.php/partida', 'Crear Partida')?></li>
+							<li><?=anchor(base_url().'index.php/partidas', 'Listado de Partidas')?></li>
 						</ul>
 						
 					</li>				

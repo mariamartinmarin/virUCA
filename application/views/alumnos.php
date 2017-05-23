@@ -142,6 +142,7 @@
                                 <th>Nombre</th>
                                 <th>Apellidos</th>
                                 <th>Curso Académico</th>
+                                <th>Titulación</th>
                                 <th>Opciones</th>
                             </thead>
                             <tbody class="buscar">
@@ -158,6 +159,7 @@
                                 <td><?=$fila->sNombre;?></td>
                                 <td><?=$fila->sApellidos;?></td>  
                                 <td><?=$fila->sCurso;?></td> 
+                                <td><?=$fila->sTitulacion;?></td>
                                 <td>
                                     <a href="#" 
                                         data-bb="confirm" 

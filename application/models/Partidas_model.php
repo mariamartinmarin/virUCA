@@ -14,11 +14,11 @@ class Partidas_model extends CI_Model{
 
     function total_paginados($por_pagina, $segmento, $pages) 
     {
-      $this->db->select('p.*, pa.sNombre as nombrePanel, cu.sCurso as nombreCurso, u.sNombre as nombreProfesor');
+      $this->db->select('p.*, pa.iId as iId_Partida, pa.sNombre as nombrePanel, cu.sCurso as nombreCurso, u.sNombre as nombreProfesor');
       $this->db->from('partida p');
-      $this->db->join('panel pa', 'pa.iId = p.iId_Panel');
-      $this->db->join('curso cu', 'cu.iId = p.iId_Curso');
-      $this->db->join('usuario u', 'u.iId = p.iId_Profesor');
+      $this->db->join('panel pa', 'p.iId_Panel = pa.iId');
+      $this->db->join('curso cu', 'p.iId_Curso = cu.iId');
+      $this->db->join('usuario u', 'p.iId_Profesor = u.iId');
       $this->db->order_by('dFecha ASC');
 
       $consulta = $this->db->get('', $por_pagina, $segmento);
@@ -32,7 +32,7 @@ class Partidas_model extends CI_Model{
         return $data;
       } else {
 
-        $this->db->select('p.*, pa.sNombre as nombrePanel, cu.sCurso as nombreCurso, u.sNombre as nombreProfesor');
+        $this->db->select('p.*, pa.iId as iId_Partida, pa.sNombre as nombrePanel, cu.sCurso as nombreCurso, u.sNombre as nombreProfesor');
         $this->db->from('partida p');
         $this->db->join('panel pa', 'pa.iId = p.iId_Panel');
         $this->db->join('curso cu', 'cu.iId = p.iId_Curso');
@@ -50,7 +50,28 @@ class Partidas_model extends CI_Model{
           }
         }
     }
- 
+
+    public function get_paneles() {
+      $query = $this->db->query("select * from panel where bActivo = 1");
+      if ($query->num_rows() > 0) {
+        // Almacenamos el resultado en una matriz.
+        foreach($query->result() as $row)
+          $paneles[htmlspecialchars($row->iId, ENT_QUOTES)] = htmlspecialchars($row->sNombre, ENT_QUOTES);
+        $query->free_result();
+        return $paneles;
+      }
+    }
+    
+    public function get_cursos() {
+      $query = $this->db->query("select * from curso");
+      if ($query->num_rows() > 0) {
+        // Almacenamos el resultado en una matriz.
+        foreach($query->result() as $row)
+          $paneles[htmlspecialchars($row->iId, ENT_QUOTES)] = htmlspecialchars($row->sCurso, ENT_QUOTES);
+        $query->free_result();
+        return $paneles;
+      }
+    }
      
     public function mod($iId,
         $modificar="NULL",
@@ -64,9 +85,9 @@ class Partidas_model extends CI_Model{
       } else {
         $consulta=$this->db->query("UPDATE partida SET 
             nGrupos = '$nGrupos', 
-            iId_Panel = '$iId_Panel',
-            iId_Curso = '$iId_Curso',
-            WHERE iId = $iId;");
+            iId_Panel = '$iPanel',
+            iId_Curso = '$iCurso'
+            WHERE iId = $iId");
         if ($consulta == true)
           return true;
         else
@@ -75,29 +96,15 @@ class Partidas_model extends CI_Model{
     }
      
     public function eliminar($iId){
-      $consulta=$this->db->query("DELETE FROM pregunta WHERE iId=$iId");
-      if ($consulta == true){
-        // Borramos las respuestas.
-        $consulta2 = $this->db->query("DELETE FROM respuesta WHERE iId_Pregunta = $iId");
-        if ($consulta2 == true)
-          return true;
-        else return false;
+      // Primero tenemos que eliminar el contenido de la tabla 'cursopartida'
+      $consulta1 = $this->db->query("DELETE FROM cursopartida WHERE iId_Partida = $iId");
+      if ($consulta1 == true) {
+        // Borramos la partida.
+        $consulta2 = $this->db->query("DELETE FROM partida WHERE iId = $iId");
+        if ($consulta2 == true) return true; else return false;
       } else {
         return false;
       }
     }
-
-    public function get_categorias() {
-      $query = $this->db->query("select * from categoria");
-      if ($query->num_rows() > 0) {
-        // Almacenamos el resultado en una matriz.
-        foreach($query->result() as $row)
-          $categorias[htmlspecialchars($row->iId, ENT_QUOTES)] = htmlspecialchars($row->sNombre, ENT_QUOTES);
-        $query->free_result();
-        return $categorias;
-      }
-    }
-
-
 }
 ?>

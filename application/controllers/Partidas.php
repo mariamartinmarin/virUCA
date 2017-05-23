@@ -17,7 +17,7 @@ class Partidas extends CI_Controller{
             $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
             redirect(base_url().'index.php/login');
         }
-        $pages=20; //Número de registros mostrados por páginas
+        $pages=5; //Número de registros mostrados por páginas
         $config['base_url'] = base_url().'index.php/partidas/pagina/';
         $config['total_rows'] = $this->Partidas_model->filas();//calcula el número de filas  
         $config['per_page'] = $pages; //Número de registros mostrados por páginas
@@ -28,7 +28,6 @@ class Partidas extends CI_Controller{
         $config['next_link'] = 'Siguiente';//siguiente link
         $config['prev_link'] = 'Anterior';//anterior link
         $this->pagination->initialize($config); //inicializamos la paginación 
-        $data["categorias"] = $this->Partidas_model->get_categorias();      
         $data["partida"] = $this->Partidas_model->total_paginados(
             $config['per_page'],
             $this->uri->segment(3),
@@ -40,57 +39,46 @@ class Partidas extends CI_Controller{
     public function mod($iId){
         if(is_numeric($iId)){
             $datos["mod"]=$this->Partidas_model->mod($iId);
-            $datos["respuestas"] = $this->Partidas_model->respuestas($iId);
-            $datos["categorias"] = $this->preguntas_model->get_categorias();
-            $this->load->view("preguntasmod_view",$datos);
+            $datos["paneles"] = $this->Partidas_model->get_paneles();
+            $datos["cursos"] = $this->Partidas_model->get_cursos();
+            $this->load->view("partidamod_view",$datos);
             
             if($this->input->post("submit")){
             
             // Primero vamos a hacer las validaciones.
-            $this->form_validation->set_rules('sPregunta','Pregunta','trim|required|max_length[512]|min_length[10]');
-            $this->form_validation->set_rules('sResp1','Respuesta A','trim|required|max_length[512]');
-            $this->form_validation->set_rules('sResp2','Respuesta B','trim|required|max_length[512]');
-            $this->form_validation->set_rules('sResp3','Respuesta C','trim|required|max_length[512]');
-            $this->form_validation->set_rules('sResp4','Respuesta D','trim|required|max_length[512]');
+            $this->form_validation->set_rules('nGrupos', '', 
+                'trim|required|numeric|max_length[2]|min_length[1]|greater_than[1]');
             
             // Una vez establecidas las reglas, validamos los campos.
-            $this->form_validation->set_message('required', '%s es obligatorio.');
-            $this->form_validation->set_message('valid_email', 'El %s no es válido.');
-            $this->form_validation->set_message('min_length', '%s debe tener al menos %s caracteres.');
-            $this->form_validation->set_message('max_length', '%s no puede tener más de %s caracteres.');
+            $this->form_validation->set_message('required', 'El <b>número de grupos</b> es un dato obligatorio.');
+            $this->form_validation->set_message('numeric', 'Se esperaba un valor numérico.');
+            $this->form_validation->set_message('min_length', 'Debe tener al menos 1 dígito.');
+            $this->form_validation->set_message('max_length', 'No puede tener más de 2 dígitos.');
+            $this->form_validation->set_message('greater_than', 'Deben existir al menos, 2 grupos.');
 
             if ($this->form_validation->run() == FALSE) {   
-                $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong> no hemos podido modificar la pregunta.');               
-                redirect(base_url()."index.php/preguntas/mod/".$iId, "refresh");
+                $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong> no hemos podido modificar la pregunta.');
+                $this->Partidas_model->mod($iId);
+                //redirect(base_url()."index.php/partidas/mod/".$iId, "refresh");
             } else {
-                $activa = 1;
-                if ($this->input->post("bActiva")[0] == "") $activa = 0;
-                $mod=$this->preguntas_model->mod(
+                $mod=$this->Partidas_model->mod(
                     $iId,
                     $this->input->post("submit"),
-                    $this->input->post("sPregunta"),
-                    $this->input->post("sResp1"),
-                    $this->input->post("sResp2"),
-                    $this->input->post("sResp3"),
-                    $this->input->post("sResp4"),
-                    $this->input->post("iCategoria"),
-                    $activa, 
-                    $this->input->post("iId_Usuario"), 
-                    $this->input->post("nPuntuacion"),
-                    $this->input->post("verdadera"),
-                    $this->input->post("sObservaciones"));
+                    $this->input->post("nGrupos"),
+                    $this->input->post("iPanel"),
+                    $this->input->post("iCurso"));
 
                 if ($mod == true) {
-                    $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong> la pregunta se modificó con éxito.');
+                    $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong> la partida se modificó con éxito.');
                 } else {
-                    $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong> no hemos podido modificar la pregunta.');
-                    }
+                    $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong> no se puede modificar la partida.');
+                }
 
-                    redirect(base_url()."index.php/preguntas/mod/".$iId, "refresh");
+                    redirect(base_url()."index.php/partidas/mod/".$iId, "refresh");
                 }
             }
         } else {
-            redirect(base_url()."index.php/preguntas"); 
+            redirect(base_url()."index.php/partidas"); 
         }
     }
 
@@ -100,17 +88,17 @@ class Partidas extends CI_Controller{
         if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         
         if(is_numeric($iId)){
-            $eliminar = $this->preguntas_model->eliminar($iId);
+            $eliminar = $this->Partidas_model->eliminar($iId);
             if ($eliminar == true){
                 $this->session->set_flashdata('correcto', 
-                    '<strong>Bien!</strong> la pregunta se eliminó con éxito.');
+                    '<strong>Bien!</strong> la partida se eliminó con éxito.');
             } else {
                 $this->session->set_flashdata('incorrecto',
-                    '<strong>Oops!</strong> no se pudo eliminar la pregunta.');
+                    '<strong>Oops!</strong> no se pudo eliminar la partida. Inténtalo más tarde.');
             }
-            redirect(base_url()."index.php/preguntas/pagina/$npag");
+            redirect(base_url()."index.php/partidas/pagina/$npag");
         } else {
-          redirect(base_url()."index.php/preguntas/pagina/$npag");
+          redirect(base_url()."index.php/partidas/pagina/$npag");
         }
     }
 
@@ -118,16 +106,16 @@ class Partidas extends CI_Controller{
     public function eliminar_todos($npag = "NULL"){
         if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
         
-        foreach ($_POST["pregunta"] as $item){
-            $eliminar = $this->preguntas_model->eliminar($item);
+        foreach ($_POST["partida"] as $item){
+            $eliminar = $this->Partidas_model->eliminar($item);
         }
         if ($eliminar == true){
-            $this->session->set_flashdata('correcto', '<strong>Bien!</strong> se eliminaron los datos.');
+            $this->session->set_flashdata('correcto', '<strong>Bien!</strong> se eliminaron todas las partidas señaladas.');
         } else {
             $this->session->set_flashdata('incorrecto', 
                 '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
         } 
-        redirect(base_url()."index.php/preguntas/pagina/$npag");
+        redirect(base_url()."index.php/partidas/pagina/$npag");
     }
 }
 ?>

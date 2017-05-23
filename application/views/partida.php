@@ -100,11 +100,13 @@
                     </div>
                     <?php } ?>
 
+                    <blockquote>
+                        Vamos a empezar una nueva partida de <b>VirUCA</b>, pero antes debemos saber cuántos grupos se han organizado para poder organizar los turnos del juego. Recuerda que estos valores, ya no podrá cambiar una vez que la partida empiece. Así que asegúrate que los datos de la partida son los correctos antes de comenzar el curso del juego.
+                    </blockquote>
+                    
+
                     <?php if ($cursos != "" && $paneles != "") { ?>
 
-                    <blockquote>
-                        Vamos a empezar una nueva partida de <b>VirUCA</b>, pero antes debemos saber cuántos grupos se han organizado para poder organizar los turnos del juego. Recuerda que este valor, ya no podrá cambiar una vez que la partida empiece. Además, también necesito saber a qué curso vamos a 
-                    </blockquote>
                     
 
                     <?=form_open(base_url().'index.php/partida/nueva');
@@ -136,8 +138,8 @@
                     $submit = array(
                     'name' => 'submit',
                     'id' => 'submit',
-                    'value' => 'Empezar partida!',
-                    'title' => 'Empezar partida!',
+                    'value' => 'Crear Partida!',
+                    'title' => 'Crear Partida!',
                     'class' => 'btn btn-default'
                     );
                     ?>
@@ -179,23 +181,20 @@
                     } else {
                     ?>
                     <div class="alert alert-success">
-                    Lo sentimos!! Asegúrate que en el sistema existe al menos un <b>curso académico</b> y un panel de juego activo, si no es así, no podremos empezar la partida
+                    Lo sentimos!! Asegúrate que en el sistema existe al menos un <b>curso académico</b> y un <b>panel de juego activo</b>, si no es así, no podremos empezar la partida
                     </div>
-                    <?php
-                    $gCursos = array(
-                    'name' => 'gCursos',
-                    'id' => 'gCursos',
-                    'value' => 'Gestionar cursos académicos',
-                    'class' => 'btn btn-default'
-                    );
-                    ?>
-                    <?=form_open(base_url().'index.php/curso');?>
-                    <?=form_submit($gCursos);?>
-                    <?=form_close()?>
+
+                    <input type="button" class="btn btn-warning" value="Gestionar Cursos Académicos" 
+                        onclick="location.href='<?=base_url()?>index.php/curso'">
+
+                    <input type="button" class="btn btn-warning" value="Nuevo Panel" 
+                        onclick="location.href='<?=base_url()?>index.php/panelesalta'">
+
                     <?php 
                     }
                     ?>
 
+                    
                     <hr class="short">
 
                 </div>

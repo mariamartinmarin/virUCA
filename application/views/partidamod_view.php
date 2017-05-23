@@ -52,11 +52,7 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-         <style type="text/css">
-            .error{
-            color: red !important;
-            }
-        </style>
+        
     </head>
     <body>
         
@@ -68,147 +64,104 @@
                     <div class="row">
                         <div class="col-md-12">
                             <ul class="breadcrumb">
-                                <li><a href="#">Alumnos</a></li>
-                                <li class="active">Gestión de Alumnos</li>
+                                <li><a href="#">Preguntas</a></li>
+                                <li class="active">Listado</li>
                             </ul>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h2>Modificar alumno</h2>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2>Modificación de los parámetros de la partida.</h2>
+                            </div>
                         </div>
                     </div>
-                </div>
             </section>
 
             <div class="container">
                 <!-- Errores de inserción. -->
-                <?php if($this->session->flashdata('alumno_ok')) { ?>
+                <?php if($this->session->flashdata('profesor_ok')) { ?>
                     <div class="alert alert-success">
-                        <?php echo $this->session->flashdata('alumno_ok');?>
+                        <?php echo $this->session->flashdata('profesor_ok');?>
                     </div>
                 <?php } ?>
 
-                <?php if($this->session->flashdata('alumno_ko')) { ?>
+                <?php if($this->session->flashdata('profesor_ko')) { ?>
                     <div class="alert alert-danger">
-                        <?php echo $this->session->flashdata('alumno_ko'); ?>
+                        <?php echo $this->session->flashdata('profesor_ko'); ?>
                     </div>
                 <?php } ?>
                 <!-- Fin errores -->
 
-                <?php echo form_fieldset('Modificar los datos de un alumno');?>
+                <?php echo form_fieldset('Modificar partida');?>
+
+                <blockquote>
+                    Puedes modificar el número de grupos que conforman la partida, el panel que se va a usar durante la partida y el curso académico al que pertenece el panel. Pero recuerda, que una vez que de comienzo la partida, no se podrán eliminar ninguno de estos parámetros.
+                </blockquote>
+
                 <form action="" method="POST">
                 <?php    
                     foreach ($mod as $fila){ 
-                    $tipo_usuario = 1;
-                    echo form_hidden('iPerfil',$tipo_usuario);
-                    echo form_hidden('iId',$fila->iId);
-                    $sNombre = array(
-                    'name' => 'sNombre',
-                    'id' => 'sNombre',
-                    'size' => '50',
+                    
+                    $nGrupos = array(
+                    'name' => 'nGrupos',
+                    'id' => 'nGrupos',
+                    'style' => 'width:100px;',
                     'class' => 'form-control',
-                    'value' => $fila->sNombre,
-                    'maxlength' => '100'
+                    'value' => $fila->nGrupos,
+                    'maxlength' => '2'
                     );
-
-                    $sTitulacion = array(
-                    'name' => 'sTitulacion',
-                    'id' => 'sTitulacion',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => $fila->sTitulacion,
-                    'readonly' => 'true'
-                    );
-
-                    $sApellidos = array(
-                    'name' => 'sApellidos',
-                    'id' => 'sApellidos',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => $fila->sApellidos
-                    );
-
-                    $sEmail = array(
-                    'name' => 'sEmail',
-                    'id' => 'sEmail',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => $fila->sEmail
-                    );
-
-                    $sUsuario = array(
-                    'name' => 'sUsuario',
-                    'id' => 'sUsuario',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => $fila->sUsuario
-                    );
-
+ 
                     $submit = array(
                     'name' => 'submit',
                     'id' => 'submit',
-                    'value' => 'Enviar',
-                    'title' => 'Enviar',
+                    'value' => 'Guardar Panel',
+                    'title' => 'Guardar Panel',
                     'class' => 'btn btn-default' 
                     );
+
                     ?>
 
                     
                     <!-- Campos del formulario -->
                     <div class="row">
                         <div class="form-group">
-                            <div class="col-md-6">
-                                <label>Nombre *</label>
-                                <?=form_input($sNombre)?>
-                                <?=form_error('sNombre','<div class= "error">','</div>');?>
+                            <div class="col-md-2">
+                                <label>Grupos *</label>
+                                <?=form_input($nGrupos)?>
+                                <?=form_error('nGrupos','<div class= "error">','</div>');?>
                             </div>
-                            <div class="col-md-6">
-                                <label>Apellidos *</label>
-                                <?=form_input($sApellidos)?>
-                                <?=form_error('sApellidos', '<div class= "error">','</div>');?>
+                            <div class="col-md-5">
+                                <?=form_label('Panel * '); ?>
+                                <select name="iPanel" class="form-control">
+                                <?php
+                                    foreach ($paneles as $i => $panel) 
+                                        if ($i == $fila->iId_Panel)
+                                            echo "<option value='".$i."' selected>".$panel."</option>";
+                                        else
+                                            echo "<option value='".$i."'>".$panel."</option>";   
+                                ?>
+                                </select>
                             </div>
+
+                            <div class="col-md-5">
+                                <?=form_label('Curso académico * '); ?>
+                                <select name="iCurso" class="form-control">
+                                <?php
+                                    foreach ($cursos as $i => $curso) 
+                                        if ($i == $fila->iId_Curso)
+                                            echo "<option value='".$i."' selected>".$curso."</option>";
+                                        else
+                                            echo "<option value='".$i."'>".$curso."</option>";   
+                                ?>
+                                </select>
+                            </div>
+
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="form-group">
-                            <div class="col-md-6">
-                                <label>Usuario *</label>
-                                <?=form_input($sUsuario)?>
-                                <?=form_error('sUsuario','<div class= "error">','</div>');?>
-                            </div>
-                            <div class="col-md-6">
-                                <label>E-mail *</label>
-                                <?=form_input($sEmail)?>
-                                <?=form_error('sEmail','<div class= "error">','</div>');?>
-                            </div>
-                        </div>
-                    </div>
+                
+                    
 
-                    <div class="row">
-                        <div class="form-group">
-                            
-                            <div class="col-md-6">
-                            <?=form_label('Curso Académico * '); ?>
-                    <select name="iCurso" class="form-control" style="width:400px;">
-                    <?php
-                    foreach ($cursos as $i => $curso) 
-                        if ($i == $fila->iId_Titulacion)
-                            echo "<option value='".$i."' selected>".$curso."</option>";
-                        else
-                            echo "<option value='".$i."'>".$curso."</option>";
-                       
-                    ?>
-                    </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Titulación</label>
-                                <?=form_input($sTitulacion)?>
-                                <?=form_error('sTitulacion','<div class= "error">','</div>');?>
-                            </div>
-                        </div>
-                    </div>                      
                     <?=form_submit($submit)?>
                     <!-- Fin campos formulario -->
                    
@@ -216,7 +169,8 @@
                 </form>
                 <?=form_fieldset_close();?>
                 <hr>
-                <a href="<?=base_url()."index.php/alumnos"?>" class="btn btn-warning">Volver</a>
+                <a href="<?=base_url()."index.php/partidas"?>" class="btn btn-warning">Listado</a>
+                <a href="<?=base_url()."index.php/partida"?>" class="btn btn-warning">Dar de alta</a>
             </div>
         </div>
         <?php $this->load->view('footer');?>

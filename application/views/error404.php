@@ -70,19 +70,24 @@
 
 					<section class="page-not-found">
 						<div class="row">
-							<div class="col-md-4 col-md-offset-1">
+							<div class="col-md-5 col-md-offset-1">
 								<div class="page-not-found-main">
-								<img alt="WebNODisponible" src="<?=base_url()?>assets/img/virus_inactiva.jpg">
+								<img alt="WebNODisponible" src="<?=base_url()?>assets/img/virus_inactiva.png" width="390">
 								
 								</div>
 							</div>
-							<div class="col-md-7">
-								<p><b>Oops! página no encontrada.</b> El recurso que busca no está disponible en estos momentos. Si considera que esta información debería estar visible, contacte con el administrador del sitio para solucionar el problema tan pronto como sea 
-								posible.</p>
-								<p>Perdone las molestias que este inconveniente haya podido causarle.</p>
+							<div class="col-md-6">
+								<blockquote><b>Oops! página no encontrada.</b><br>El recurso que busca no está disponible en estos momentos. Si considera que esta información debería estar visible, contacte con el administrador del sitio para solucionar el problema tan pronto como sea posinle.<br><br>Perdone las molestias que este inconveniente haya podido causarle.</blockquote>
 								<hr>
-                				<a href="<?=base_url()?>" class="btn btn-warning">Volver a la página de login</a>
-							</div>
+								<blockquote>
+									<b>Mientras tanto puede acceder a ...</b>
+									<ul>
+										<li><a href="<?=base_url()?>">Página de inicio</a></li>
+										<!--<li><a href="<?=base_url()?>index.php/faqs">FAQ'S</a></li>
+										<li><a href="<?=base_url()?>index.php/help">Ayuda</a></li>-->
+									</ul>
+								</blockquote>
+   							</div>
 						</div>
 					</section>
 

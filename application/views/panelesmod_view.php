@@ -94,15 +94,18 @@
                 <!-- Fin errores -->
 
                 <?php echo form_fieldset('Modificar panel en curso');?>
+                
 
-                <?php if ($enpartida <= 0) { ?>
-
+                
                     <!-- Listado -->
                     <?php if ($categorias != "") { ?>
 
                     <blockquote>
                         En el siguiente listado, se muestran las características asociadas a cada casilla del panel escogido. Podrás cambiar la <b>Categoría</b> y la <b>Función Especial</b> de la casilla. Una vez que hagas todos los cambios, haz clic en el botón <b>Guardar</b> ubicado en la parte baja de este formulario.
                     </blockquote>
+
+                    
+
                     
                     <?php 
                     $atributos = array('id' => 'confpanel');
@@ -125,8 +128,25 @@
                                 <?php
                                 $cont = 1; 
                                 foreach($paneles as $fila){ 
-                                                                
+                                echo "<input type='hidden' name='identificadores[]' value='".$fila->iId_Casilla."'>";                               
                                 ?>
+                                <?php if ($cont == 1) {
+                                    $bActivo = array(
+                                    'name' => 'bActivo',
+                                    'id' => 'bActivo',
+                                    'size' => '50',
+                                    'class' => 'form-control',
+                                    'value' => $fila->bActivo
+                                    );
+                                    echo "<tr><th colspan='4' align='right'>";     
+                                    if ($fila->bActivo == 1) { ?>
+                                        <b>&nbsp;Panel Activo&nbsp;</b><input type="checkbox" checked="true" name="bActivo[]" value="1">
+                                    <?php } else { ?>
+                                        <b>&nbsp;Panel Inactivo&nbsp;</b><input type="checkbox" name="bActivo[]" value="0">
+                                    <?php }
+                                    echo "</th></tr>"; 
+                                }?>
+
 
                                 <tr><th>
                                     <span class="show-grid-block">
@@ -177,9 +197,20 @@
 
                     </div>
                     <input type="hidden" name="iId" id="iId" value="<?=$this->uri->segment(3);?>">
+
+                    <?php if ($enpartida <= 0) { ?>
+
                     <input type="submit" class="btn btn-warning" value="Eliminar Casillas">
                     <input type="button" onclick="javascript: guardar(<?=$this->uri->segment(3);?>)" 
                         class="btn btn-warning" value="Guardar Configuración">
+
+                    <?php } else { ?>
+                    <div class="alert alert-success">
+                    El panel está asociado a una o más partidas en curso y no se pueden modificar hasta que las partidas no se den por finalizadas.
+                    </div>
+                    <?php } ?>
+
+
                     <input type="button" class="btn btn-warning" value="Nuevo Panel" onclick="location.href='<?=base_url()?>index.php/panelesalta'">
                     <hr class="short">
                     
@@ -198,12 +229,7 @@
                     }
                     ?>
                     <!-- Fin del listado -->
-                <?php } else { ?>
-                    <div class="alert alert-success">
-                    El panel está asociado a una o más partidas en curso y no se pueden modificar hasta que las partidas no se den por finalizadas.
-                    </div>
-                <?php } ?>
-
+                
                 <?=form_fieldset_close();?>
 
                 <a href="<?=base_url()."index.php/paneles"?>" class="btn btn-warning">Listado</a>

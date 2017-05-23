@@ -121,15 +121,17 @@
                     <!-- Fin errores -->
 
                     <!-- Listado -->
+                    <blockquote>
+                        Modifica los parámetros de las partidas, pero recuerda que sólo podrás hacerlo con aquellas partidas que no hayan empezado aún. En partidas ya acabadas o que estén empezadas (y no finalizadas) no se podrán modificar ninguno de los parámetros.
+                    </blockquote>
+                    
+                    
                     <?php if ($partida != "") { 
                     // Obtener página.
                     $npag =  $this->uri->segment(3);
                     ?>
 
                     <?php echo form_fieldset('Listado de partidas');?>
-                    <blockquote>
-                        Modifica los parámetros de las partidas, pero recuerda que sólo podrás hacerlo con aquellas partidas que no hayan empezado aún. En partidas ya acabadas o que estén empezadas (y no finalizadas) no se podrán modificar ninguno de los parámetros.
-                    </blockquote>
                     
                     <?=form_open(base_url().'index.php/partidas/eliminar_todos/'.$npag);?>
                     <div class="input-group">
@@ -180,14 +182,23 @@
                                 <td>
 
                                     <a href="#" 
+                                        title="Eliminar"
                                         data-bb="confirm" 
                                         data-id="<?=$fila->iId;?>"
                                         data-pg="<?=$npag?>" 
                                         class="btn-group-xs">
                                             <i class="icon icon-trash-o"></i>
                                     </a>
-                                    <a href="<?=base_url("index.php/partidas/mod/$fila->iId/$npag")?>" 
+                                    <?php if (!$fila->bFinalizada && !$fila->bEmpezada) { ?>
+                                    <a title="Modificar" href="<?=base_url("index.php/partidas/mod/$fila->iId/$npag")?>" 
                                     class="btn-group-xs"><i class="icon icon-pencil"></i></a>
+                                    <?php } ?>
+
+                                    <?php if (!$fila->bFinalizada) { ?>
+                                    <a title="Empezar/Reanudar" 
+                                        href="<?=base_url("index.php/jugar/$fila->iId/$fila->iId_Partida")?>" 
+                                        class="btn-group-xs"><i class="icon icon-play"></i></a>
+                                    <?php } ?>
                                 </td>
                                 <?php } ?>
                             </tbody>
@@ -210,8 +221,10 @@
                     } else {
                     ?>
                     <div class="alert alert-success">
-                    Actualmente no hay ninguna partida en el sistema.
+                    Actualmente no hay ninguna <b>partida</b> en el sistema.
                     </div>
+
+                    <input type="button" class="btn btn-warning" value="Crear Partida" onclick="location.href='<?=base_url()?>index.php/partida'">
                     <?php 
                     }
                     ?>
@@ -257,9 +270,9 @@
             });
 
             cajas.confirm = function(id, pg) {
-                bootbox.confirm("¿Estás seguro que quieres borrar la pregunta?", function(result) {
+                bootbox.confirm("Si eliminamos la partida, se eliminará el progreso de la misma, así como cualquier rastro de esta en el sistema. ¿Estás seguro que quieres borrar la partida?", function(result) {
                     if (result == true) {
-                        location.href = '<?=base_url()?>index.php/preguntas/eliminar/'+id+'/'+pg;
+                        location.href = '<?=base_url()?>index.php/partidas/eliminar/'+id+'/'+pg;
                     }
             });
             };

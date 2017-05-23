@@ -14,9 +14,10 @@ class Alumnos_model extends CI_Model{
 
     function total_paginados($por_pagina, $segmento, $pages) 
     {
-      $this->db->select('u.*, c.sCurso');
+      $this->db->select('u.*, c.sCurso, t.sTitulacion');
       $this->db->from('curso c');
       $this->db->join('usuario u', 'c.iId = u.iId_Titulacion');
+      $this->db->join('titulacion t', 'c.iId_Titulacion = t.iId');
       $this->db->where('iPerfil', 1);
       $this->db->order_by('sApellidos ASC');
       $consulta = $this->db->get('', $por_pagina, $segmento);
@@ -29,9 +30,10 @@ class Alumnos_model extends CI_Model{
         }
         return $data;
       } else {
-        $this->db->select('u.*, c.sCurso');
+        $this->db->select('u.*, c.sCurso, t.sTitulacion');
         $this->db->from('curso c');
         $this->db->join('usuario u', 'c.iId = u.iId_Titulacion');
+        $this->db->join('titulacion t', 'c.iId_Titulacion = t.iId');
         $this->db->where('iPerfil', 1);
         $this->db->order_by('sApellidos ASC');
       
@@ -73,9 +75,10 @@ class Alumnos_model extends CI_Model{
         $iId_Curso="NULL") {
       
       if($modificar=="NULL"){
-        $this->db->select('u.*, c.iId');
+        $this->db->select('u.*, c.iId, t.sTitulacion');
         $this->db->from('curso c');
         $this->db->join('usuario u', 'c.iId = u.iId_Titulacion');
+        $this->db->join('titulacion t', 't.iId = c.iId_Titulacion');
         $this->db->where('u.iId', $iId);
         $consulta = $this->db->get();
         return $consulta->result();

@@ -16,6 +16,7 @@ class Accesos_model extends CI_Model{
       $this->db->select('*');
       $this->db->from('acceso');
       $this->db->order_by('dFecha', 'DESC');
+
       $consulta = $this->db->get('', $por_pagina, $segmento);
 
       //$consulta = $this->db->get('acceso', $por_pagina, $segmento);

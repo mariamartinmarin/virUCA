@@ -74,7 +74,12 @@ class Login extends CI_Controller
 	                'is_logued_in' 	=> 		TRUE,
 	                'id_usuario' 	=> 		$check_user->iId,
 	                'perfil'		=>		$check_user->iPerfil,
-	                'username' 		=> 		$check_user->sUsuario
+	                'username' 		=> 		$check_user->sUsuario,
+	                'iId_Partida'	=>		'',
+	                'iId_Panel'		=>		'',
+	                'iTurno'		=>		'',
+	                'tirada'		=>		'',
+	                'pregunta'		=>		'0'
             		);		
 					$this->session->set_userdata($data);
 					//$this->session->mark_as_temp($data, 30);

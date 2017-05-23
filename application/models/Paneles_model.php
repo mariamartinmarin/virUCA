@@ -48,6 +48,8 @@ class Paneles_model extends CI_Model{
         $this->db->select('iId');
         $this->db->from('partida');
         $this->db->where('iId_Panel', $iId);
+        $this->db->where('bEmpezada', 1);
+
 
         $consulta = $this->db->get();
         return $consulta->num_rows();
@@ -56,7 +58,9 @@ class Paneles_model extends CI_Model{
      
     public function mod($iId,
         $modificar="NULL",
+        $bActivo="NULL",
         $panel="NULL", 
+        $identificadores="NULL",
         $funciones="NULL", 
         $categorias="NULL") {
       
@@ -78,8 +82,16 @@ class Paneles_model extends CI_Model{
           $consulta = $this->db->query("UPDATE panelcasillas SET
             iId_Categoria = '$categorias[$i]',
             eFuncion = '$funciones[$i]'
-            WHERE iId_Panel = $iId AND iNumCasilla = ($i+1);");
+            WHERE iId_Panel = $iId AND iId = $identificadores[$i];");
 
+          if ($consulta == false && $sinErrores == true) $sinErrores = false;
+        }
+
+        // Ahora hay que cambiar los datos del panel, no de las casillas.
+        if ($sinErrores) {
+          $consulta = $this->db->query("UPDATE panel SET
+            bActivo = '$bActivo'
+            WHERE iId = $iId");
           if ($consulta == false && $sinErrores == true) $sinErrores = false;
         }
         return $sinErrores;
@@ -103,8 +115,26 @@ class Paneles_model extends CI_Model{
     }
 
     public function eliminar_casilla($iId){
+      // Obtengo antes el número de casillas del panel actual.
+      $panel_query = $this->db->query("SELECT iId, iId_Panel FROM panelcasillas where iId=$iId");
+      if($panel_query->num_rows()>0) {
+        foreach($panel_query->result() as $fila) {
+          $iId_Panel[] = htmlspecialchars($fila->iId_Panel, ENT_QUOTES);
+        }
+      }
+      
+      $casillas_query = $this->db->query("SELECT iCasillas FROM panel where iId=$iId_Panel[0]");
+      if($casillas_query->num_rows()>0) {
+        foreach($casillas_query->result() as $fila) {
+          $nCasillas[] = htmlspecialchars($fila->iCasillas, ENT_QUOTES);
+        }
+      }
+
       $consulta=$this->db->query("DELETE FROM panelcasillas WHERE iId=$iId");
       if ($consulta == true){
+        // Decrementamos en 1 el campo iCasillas de la tabla panel.
+        $newiCasillas = $nCasillas[0] - 1;
+        $consulta = $this->db->query("UPDATE panel set iCasillas = $newiCasillas where iId = $iId_Panel[0]");
         return true;
       } else {
         return false;

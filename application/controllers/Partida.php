@@ -3,7 +3,7 @@ class Partida extends CI_Controller{
     public function __construct() {
         parent::__construct(); 
         $this->load->helper("url");  
-        $this->load->model("partida_model");
+        $this->load->model("Partida_model");
         $this->load->library("session");
     }
      
@@ -17,8 +17,8 @@ class Partida extends CI_Controller{
             $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
             redirect(base_url().'index.php/login');
         }
-        $data["cursos"] = $this->partida_model->get_cursos();
-        $data["paneles"] = $this->partida_model->get_paneles();
+        $data["cursos"] = $this->Partida_model->get_cursos();
+        $data["paneles"] = $this->Partida_model->get_paneles();
         $this->load->view("partida", $data);
     }
      
@@ -38,7 +38,7 @@ class Partida extends CI_Controller{
             $this->index();
         } else {
             // Hacemos la inserción.
-            $add=$this->partida_model->nueva(
+            $add=$this->Partida_model->nueva(
                 $this->input->post("nGrupos"),
                 $this->session->userdata('id_usuario'),
                 $this->input->post("sCursos"),
@@ -46,7 +46,7 @@ class Partida extends CI_Controller{
             if ($add != true){
                 $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> parece que hubo un problema y no hemos podido crear la nueva partida.');
             }       
-            redirect(base_url()."index.php/juego", "refresh");
+            redirect(base_url()."index.php/partidas", "refresh");
         }
     }     
      

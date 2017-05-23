@@ -117,6 +117,11 @@
                     <!-- Fin errores -->
 
                     <!-- Listado -->
+                    <blockquote>
+                        Desde aquí, podrá crear <b>paneles de juego</b>. Una vez creado el panel, éste se creará con una serie de casillas, especificadas previamente, por defecto, por lo que se aconseja personalizar el panel una vez creado. Además, desde aquí también podrás empezar o reanudar una partida.
+                    </blockquote>
+                    
+
                     <?php if ($paneles != "" && $categorias != "") { 
                     // Obtener página.
                     $npag =  $this->uri->segment(3);
@@ -125,9 +130,6 @@
                     <?php echo form_fieldset('Listado de paneles');
                     $atributos = array('class' => 'navbar-form', 'role' => 'search');
                     ?>
-                    <blockquote>
-                        Desde aquí, podrá crear <b>paneles de juego</b>. Una vez creado el panel, éste se creará con una serie de casillas, especificadas previamente, por defecto, por lo que se aconseja personalizar el panel una vez creado.
-                    </blockquote>
                     
                     <?=form_open(base_url().'index.php/paneles/eliminar_todos/'.$npag);?>
                     <div class="input-group">
@@ -216,8 +218,12 @@
                     } else {
                     ?>
                     <div class="alert alert-success">
-                    Actualmente no hay ningún panel en el sistema, por lo que no podrá iniciar partida.
+                    Actualmente <b>no hay ningún panel</b> en el sistema, por lo que no podrá iniciar partida.
                     </div>
+
+                    <input type="button" class="btn btn-warning" value="Nuevo Panel" 
+                        onclick="location.href='<?=base_url()?>index.php/panelesalta'">
+
                     <?php 
                     }
                     ?>

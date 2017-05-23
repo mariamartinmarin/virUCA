@@ -46,10 +46,15 @@ class Paneles extends CI_Controller{
             $this->load->view("panelesmod_view",$datos);
             
             if(count($this->input->post("categorias")) > 0){
+                $activo = 1;
+                if ($this->input->post("bActivo")[0] == "") $activo = 0;
+        
                 $mod = $this->Paneles_model->mod(
                     $iId,
                     $this->input->post("submit"),
+                    $activo,
                     $this->input->post("panel"),
+                    $this->input->post("identificadores"),
                     $this->input->post("funciones"),
                     $this->input->post("categorias"));
                 
@@ -63,7 +68,7 @@ class Paneles extends CI_Controller{
                 redirect(base_url()."index.php/paneles/mod/".$iId, "refresh");
             } else {
                 $mierda = $this->input->post("submit");
-                $this->session->set_flashdata('profesor_ko', 'Es:'.$mierda);
+                //$this->session->set_flashdata('profesor_ko', 'Es:'.$mierda);
             } 
         } else {
             redirect(base_url()."index.php/paneles"); 

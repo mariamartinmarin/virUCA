@@ -109,7 +109,7 @@
 								<div class="box-content">
 									<i class="icon-featured icon icon-cogs"></i>
 									<h4>Empezar partida</h4>
-									<p>Empezar una nueva partida. <a href="/" class="learn-more">Empezar! <i class="icon icon-angle-right"></i></a></p>
+									<p>Selecciona una partida activa y empieza a jugar. <a href="<?=base_url()?>index.php/partidas" class="learn-more">Empezar! <i class="icon icon-angle-right"></i></a></p>
 								</div>
 							</div>
 						</div>
