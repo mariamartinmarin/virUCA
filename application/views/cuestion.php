@@ -61,15 +61,7 @@
     <![endif]-->
     <script type="text/javascript">
         function enviar(respuesta) {
-            switch (respuesta) {
-                case 1: resp = 'A'; break;
-                case 2: resp = 'B'; break;
-                case 3: resp = 'C'; break;
-                case 4: resp = 'D'; break;
-                default: break;
-            }
-            alert(resp);
-            $('#respuesta').value = resp;
+            $('#respuesta').val(respuesta);
             $('#formRespuesta').submit();
         }
     </script>
@@ -123,11 +115,12 @@
                         '1' => 'B',
                         '2' => 'C',
                         '3' => 'D');
-                    $correcta = "";
                     $cont = 0;
+                    $iId_Pregunta = 0;
                     foreach ($pregunta as $respuesta) {
                         if ($preguntaTxt == 0) {
-                            echo "<h2><b>¿".$respuesta->sPregunta."?</b></h2>";
+                            $iId_Pregunta = $respuesta->iId;
+                            echo "<h3><b>¿".$respuesta->sPregunta."?</b></h3>";
                             $preguntaTxt = 1;
                         }
                         echo "<b>".$arrayRespuestas[$cont].")</b> ".$respuesta->sRespuesta."<br><br>";
@@ -135,12 +128,14 @@
                         $cont++;
                     }
                     $atributos = array('id' => 'formRespuesta');
-                    form_open(base_url().'index.php/jugar/correccion', $atributos);
+                    echo form_open(base_url().'index.php/jugar/correccion', $atributos);
+                        echo "<input type='hidden' name='iId_Pregunta' value='".$iId_Pregunta."'>";
                         echo "<input type='hidden' name='respuesta' value='' id='respuesta'>";
-                        echo "<input type='button' class='btn btn-default' value='A' onclick='javascript:enviar(1)'>";
-                        echo "<input type='button' class='btn btn-default' value='B' onclick='javascript:enviar(2)'>";
-                        echo "<input type='button' class='btn btn-default' value='C' onclick='javascript:enviar(3)'>";
-                        echo "<input type='button' class='btn btn-default' value='D' onclick='javascript:enviar(4)'>";
+                        echo "<label><b>Haz clic en la respuesta que creas correcta:</b></label><br>";
+                        echo "<input type='button' class='btn btn-default' value='Respuesta A' name='A' onclick='javascript:enviar(1)'>";
+                        echo "<input type='button' class='btn btn-default' value='Respuesta B' name='B' onclick='javascript:enviar(2)' style='margin-left:10px;'>";
+                        echo "<input type='button' class='btn btn-default' value='Respuesta C' name='C' onclick='javascript:enviar(3)' style='margin-left:10px;'>";
+                        echo "<input type='button' class='btn btn-default' value='Respuesta D' name='D' onclick='javascript:enviar(4)' style='margin-left:10px;'>";
                     form_close();
                 } else {
                     echo "<blockquote>Lo sentimos, hubo un problema al intentar recuperar la pregunta</blockquote>";

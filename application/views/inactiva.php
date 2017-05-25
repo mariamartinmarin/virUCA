@@ -75,20 +75,24 @@
 
 					<section class="page-not-found">
 						<div class="row">
-							<div class="col-md-4 col-md-offset-1">
+							<div class="col-md-5 col-md-offset-1">
 								<div class="page-not-found-main">
-								<img alt="WebNODisponible" src="<?=base_url()?>assets/img/virus_inactiva.jpg">
+								<img alt="WebNODisponible" src="<?=base_url()?>assets/img/shout.png" width="400">
 								
 								</div>
 							</div>
-							<div class="col-md-7">
-								<p><b>¡No puedes pasar!</b> Por el momento, la página no está activa, y hasta que no nos digan lo contrario, estaremos aquí vigilando para que no pase nadie.
-								</p>
-								<p>... y si crees que no deberíamos estar aquí, pregúntale a tu profesor, que ellos sabrán decirte mejor el motivo :) 
-								</p>
+							<div class="col-md-6">
+								<blockquote><b>Oops! lo sentimos.</b><br>La plataforma <b>VirUCA</b> se encuentra temporalmente fuera de servicio. Si por algún motivo consideras que esta página debería estar visible, contacta con tu profesor o con el administrador del mismo.</blockquote>
 								<hr>
-                				<a href="<?=base_url()?>" class="btn btn-warning">Volver a la página de login</a>
-							</div>
+								<blockquote>
+									<b>Los únicos accesos permitidos en estos casos son ...</b>
+									<ul>
+										<li><a href="<?=base_url()?>">Página de inicio</a></li>
+										<!--<li><a href="<?=base_url()?>index.php/faqs">FAQ'S</a></li>
+										<li><a href="<?=base_url()?>index.php/help">Ayuda</a></li>-->
+									</ul>
+								</blockquote>
+   							</div>
 						</div>
 					</section>
 

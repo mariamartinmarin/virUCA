@@ -33,6 +33,14 @@ class Jugar extends CI_Controller{
             redirect(base_url().'index.php/login');
         }
 
+        // Comprobar que no sea una partida acabada.
+        $query_finalizada = $this->db->query("SELECT bFinalizada FROM partida where iId = $iId_Partida");
+        if ($query_finalizada->num_rows() > 0 && $iTurno != "") {
+            $datos_finalizada = $query_finalizada->row();
+            if ($datos_finalizada->bFinalizada == 1)
+                redirect(base_url().'index.php/partidas');
+        } 
+
         // Comprobamos si se va a continuar con una jugada o lo que quiere hacerse en cargar una partida
         // de primeras.
         if ($iTurno != "" && $tirada != "") {
@@ -53,126 +61,52 @@ class Jugar extends CI_Controller{
         $data["casillas"] = $this->Jugar_model->get_casillas($iId_Panel[0]);
         $data["resumen"] = $this->Jugar_model->get_resumen_partida($iId_Partida);  
 
-        // Inicializamos los valores correspondientes de las variables de sesión.
-        if ($this->session->userdata('iId_Partida') == '') {   
-            $this->session->set_userdata('iId_Partida', $iId_Partida);
-            $this->session->set_userdata('iId_Panel', $iId_Panel);
-            $this->session->set_userdata('iTurno', $iTurno);
-            $this->session->set_userdata('tirada', $tirada);
-            $this->session->set_userdata('pregunta', 0);     
-        }
-
         // Decidimos si vamos a mostrar el tablero, o una pregunta.
         if ($this->session->userdata('pregunta') == 1) 
             redirect(base_url()."index.php/cuestion", "refresh");
         else
             $this->load->view("jugar",$data);
     }
+
+    public function correccion() {
+        
+        $pregunta = $this->Jugar_model->get_respuesta_ok($this->input->post("iId_Pregunta"));
+        if ($pregunta->iOrden == $this->input->post("respuesta")) {
+            // El equipo ha acertado. Hay que comprobar si está en una celda especial, en cuyo caso, el
+            // tratamiento es diferente.
+            $this->Jugar_model->establecer_acierto();
+            $texto = "<strong>¡Enhorabuena!</strong> la respuesta es correcta!";
+            $this->session->set_flashdata('respuesta_ok', $texto);
+        } else {
+            // El equipo no ha acertado. Hay que tener en cuenta, que si es una casilla de retroceso (Jeringuilla)
+            // Hay que hacer que vuelva al inicio de la partida.
+            switch ($pregunta->iOrden) {
+                case '1': $resp = "A"; break;
+                case '2': $resp = "B"; break;
+                case '3': $resp = "C"; break;
+                case '4': $resp = "D"; break; 
+                default: break;
+            }
+
+            // Hay que restaurar la posición del grupo a la que tenía antes.
+            $this->Jugar_model->restablecer_grupo();
+            $texto = "<strong>!Lo siento!</strong> la respuesta no es correcta!.<br>La respuesta correcta a la pregunta <b>".$pregunta->sPregunta."</b><br>era la <b>".$resp."</b>.<br>Lo sentimos, pero retrocederás a la posición anterior.";
+            $this->session->set_flashdata('respuesta_ko', $texto);
+        }
+
+        // Actualizamos las variables de sesión. Hay que tener en cuenta que si el grupo que tiene el turno es
+        // el último, hay que empezar por el primero.
+        $this->Jugar_model->actualizar_session();
+
+        $url = "index.php/jugar/".$this->session->userdata('iId_Partida')."/".$this->session->userdata('iId_Panel');
+        redirect(base_url().$url);
+    }
     
     public function salir($iId_Partida) {
         if (is_numeric($iId_Partida)) {
             $this->Jugar_model->salir($iId_Partida);
-
-            $this->session->unset_userdata('iId_Partida');
-            $this->session->unset_userdata('iId_Panel');
-            $this->session->unset_userdata('iTurno');
-            $this->session->unset_userdata('tirada');
-            $this->session->unset_userdata('pregunta');
         }
         redirect(base_url()."index.php/partidas", "refresh");
-    }
-
-    public function mod($iId){
-        if(is_numeric($iId)){
-            $datos["mod"]=$this->preguntas_model->mod($iId);
-            $datos["respuestas"] = $this->preguntas_model->respuestas($iId);
-            $datos["categorias"] = $this->preguntas_model->get_categorias();
-            $this->load->view("preguntasmod_view",$datos);
-            
-            if($this->input->post("submit")){
-            
-            // Primero vamos a hacer las validaciones.
-            $this->form_validation->set_rules('sPregunta','Pregunta','trim|required|max_length[512]|min_length[10]');
-            $this->form_validation->set_rules('sResp1','Respuesta A','trim|required|max_length[512]');
-            $this->form_validation->set_rules('sResp2','Respuesta B','trim|required|max_length[512]');
-            $this->form_validation->set_rules('sResp3','Respuesta C','trim|required|max_length[512]');
-            $this->form_validation->set_rules('sResp4','Respuesta D','trim|required|max_length[512]');
-            
-            // Una vez establecidas las reglas, validamos los campos.
-            $this->form_validation->set_message('required', '%s es obligatorio.');
-            $this->form_validation->set_message('valid_email', 'El %s no es válido.');
-            $this->form_validation->set_message('min_length', '%s debe tener al menos %s caracteres.');
-            $this->form_validation->set_message('max_length', '%s no puede tener más de %s caracteres.');
-
-            if ($this->form_validation->run() == FALSE) {   
-                $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong> no hemos podido modificar la pregunta.');               
-                redirect(base_url()."index.php/preguntas/mod/".$iId, "refresh");
-            } else {
-                $activa = 1;
-                if ($this->input->post("bActiva")[0] == "") $activa = 0;
-                $mod=$this->preguntas_model->mod(
-                    $iId,
-                    $this->input->post("submit"),
-                    $this->input->post("sPregunta"),
-                    $this->input->post("sResp1"),
-                    $this->input->post("sResp2"),
-                    $this->input->post("sResp3"),
-                    $this->input->post("sResp4"),
-                    $this->input->post("iCategoria"),
-                    $activa, 
-                    $this->input->post("iId_Usuario"), 
-                    $this->input->post("nPuntuacion"),
-                    $this->input->post("verdadera"),
-                    $this->input->post("sObservaciones"));
-
-                if ($mod == true) {
-                    $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong> la pregunta se modificó con éxito.');
-                } else {
-                    $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong> no hemos podido modificar la pregunta.');
-                    }
-
-                    redirect(base_url()."index.php/preguntas/mod/".$iId, "refresh");
-                }
-            }
-        } else {
-            redirect(base_url()."index.php/preguntas"); 
-        }
-    }
-
-     
-    //Controlador para eliminar
-    public function eliminar($iId, $npag = "NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
-        
-        if(is_numeric($iId)){
-            $eliminar = $this->preguntas_model->eliminar($iId);
-            if ($eliminar == true){
-                $this->session->set_flashdata('correcto', 
-                    '<strong>Bien!</strong> la pregunta se eliminó con éxito.');
-            } else {
-                $this->session->set_flashdata('incorrecto',
-                    '<strong>Oops!</strong> no se pudo eliminar la pregunta.');
-            }
-            redirect(base_url()."index.php/preguntas/pagina/$npag");
-        } else {
-          redirect(base_url()."index.php/preguntas/pagina/$npag");
-        }
-    }
-
-    //Controlador para eliminar
-    public function eliminar_todos($npag = "NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
-        
-        foreach ($_POST["pregunta"] as $item){
-            $eliminar = $this->preguntas_model->eliminar($item);
-        }
-        if ($eliminar == true){
-            $this->session->set_flashdata('correcto', '<strong>Bien!</strong> se eliminaron los datos.');
-        } else {
-            $this->session->set_flashdata('incorrecto', 
-                '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
-        } 
-        redirect(base_url()."index.php/preguntas/pagina/$npag");
     }
 }
 ?>

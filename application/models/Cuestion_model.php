@@ -43,10 +43,28 @@ class Cuestion_model extends CI_Model{
         $datos_resumen = $query_resumen->row();
         $iCasilla = $datos_resumen->iCasilla;
 
-        // Ahora vamos a obtener la categoría del panel.
-        $query_panel = $this->db->query("SELECT iId_Categoria FROM panelcasillas where iId_Panel = $iId_Panel");
+        // Ahora vamos a obtener la categoría del panel y si es casilla especial o no.
+        $query_panel = $this->db->query("SELECT iId_Categoria, eFuncion, iNumCasilla 
+                FROM panelcasillas where iId_Panel = $iId_Panel AND iNumCasilla = $iCasilla");
         $datos_panel = $query_panel->row();
         $iId_Categoria = $datos_panel->iId_Categoria;
+        $this->session->set_userdata('eFuncion', $datos_panel->eFuncion);
+
+        // Si la función de la casilla es "VIENTO", vamos a ver donde está la siguiente casilla "VIENTO", si es
+        // que la hay.
+
+        if ($this->session->userdata('eFuncion') == "Viento") {
+          $query_especial = $this->db->query("SELECT iNumCasilla FROM panelcasillas where iId_Panel = $iId_Panel 
+              AND eFuncion ='Viento' 
+              AND iNumCasilla > $iCasilla
+              LIMIT 1");
+          if ($query_especial->num_rows() > 0) {
+            $datos_especial = $query_especial->row();
+            $this->session->set_userdata('iCasillaFuncion', $datos_especial->iNumCasilla );
+          } else {
+            $this->session->set_userdata('iCasillaFuncion', 0);
+          }
+        }
 
         // Finalmente, seleccionamos un iId aleatorio de pregunta.
         $this->db->where('bActiva', 1);

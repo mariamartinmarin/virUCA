@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="<?=base_url()?>css/theme-blog.css">
     <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
     <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
-    <link rel="stylesheet" href="<?=base_url()?>css/panel.css?id=107">
+    <link rel="stylesheet" href="<?=base_url()?>css/panel.css?id=124">
 
     <!-- Responsive CSS -->
     <link rel="stylesheet" href="<?=base_url()?>css/theme-responsive.css" />
@@ -61,7 +61,7 @@
     <![endif]-->
     <script type="text/javascript">
         function AddFicha(idDiv, Texto) {
-            document.getElementById(idDiv).innerHTML += "<br>" + Texto;
+            document.getElementById(idDiv).innerHTML += Texto;
         }
     </script>
 
@@ -75,17 +75,30 @@
         <?php $this->load->view('menuj_view');?>
         <div role="main" class="main">       
             <div class="container">
-
+               
                 <!-- Errores de inserción. -->
-                <?php if($this->session->flashdata('juego_ok')) { ?>
-                    <div class="alert alert-success">
-                        <?php echo $this->session->flashdata('juego_ok');?>
+
+
+
+                <?php if($this->session->flashdata('respuesta_ok')) { ?>
+                     <div class="modal">
+                        <div class="ventana">
+                            <div class="alert alert-success">
+                                <?php echo $this->session->flashdata('respuesta_ok');?>
+                            </div>
+                            <span class="cerrar">Cerrar</span>
+                        </div>
                     </div>
                 <?php } ?>
 
-                <?php if($this->session->flashdata('juego_ko')) { ?>
-                    <div class="alert alert-danger">
-                        <?php echo $this->session->flashdata('juego_ko'); ?>
+                <?php if($this->session->flashdata('respuesta_ko')) { ?>
+                    <div class="modal">
+                        <div class="ventana">
+                            <div class="alert alert-danger">
+                                <?php echo $this->session->flashdata('respuesta_ko'); ?>
+                                <span class="cerrar">Cerrar</span>
+                            </div>
+                        </div>
                     </div>
                 <?php } ?>
                 <!-- Fin errores -->
@@ -97,6 +110,7 @@
                             $iId_Partida = $jugador->iId;
                             $iTurno = $jugador->iTurno;
                             $iId_Panel = $jugador->iId_Panel;
+                            $bFinalizada = $jugador->bFinalizada;
                         }
                 ?>
                 <div class="featured-box featured-box-primary">
@@ -115,7 +129,26 @@
                             if ($equipo->iCasilla == 0)
                                 echo "Inicio";
                             else {
-                                echo $equipo->iCasilla;
+                                // Comprobamos si hay que poner las medallas y regalos.
+                                echo "<div style='padding-top:5px;''>";
+                                switch ($equipo->iPosJuego) {
+                                    case '1':
+                                        echo "<img src='".base_url()."/assets/img/gold.png' aling='center'><br>";
+                                        break;
+                                    case '2':
+                                        echo "<img src='".base_url()."/assets/img/silver.png' aling='center'><br>";
+                                        break;
+                                    case '3':
+                                        echo "<img src='".base_url()."/assets/img/bronze.png' aling='center'><br>";
+                                        break;
+                                    default:
+                                        if ($equipo->iPosJuego != 0)
+                                            echo "<img src='".base_url()."/assets/img/gift.png' aling='center'><br>";
+                                        break;
+                                }
+                                echo "</div>";
+                                if ($equipo->iPosJuego == 0)
+                                    echo $equipo->iCasilla;
                             }
                             echo "</div>";
                         }
@@ -174,11 +207,13 @@
                     <ul>
                         <li><img src="<?=base_url()?>assets/img/6.png" align="middle">&nbsp;&nbsp;Indica, según tu color, la posición en la que estás en el juego.</li>
                         <li><img src="<?=base_url()?>assets/img/syringe.png" align="middle">&nbsp;&nbsp;Si aciertas la pregunta, guardas la posición, si no la aciertas vuelves a la casilla de <b>inicio</b></li>
-                        <li><img src="<?=base_url()?>assets/img/wind.png" align="middle">&nbsp;&nbsp;Si aciertas la pregunta, vas a la siguiente casilla de <b>viento</b>. Si no aciertas, no avanzas.</li>
+                        <li><img src="<?=base_url()?>assets/img/wind.png" align="middle">&nbsp;&nbsp;Si aciertas la pregunta, vas a la siguiente casilla de <b>viento</b>. Si no aciertas, vuelves a la casilla anterior.</li>
                     </ul>
                 </blockquote>
 
                 <!-- Resumen de la partida -->
+
+                <?php if ($bFinalizada == 0) { ?>
                 <input type="hidden" data-bb="pregunta">
                 <input type="button" class="btn btn-warning" 
                         data-bb="confirm" 
@@ -188,8 +223,13 @@
                         value="Tirar Dado">
                 <input type="button" class="btn btn-warning" value="Salir" 
                         onclick="location.href='<?=base_url()?>index.php/jugar/salir/<?=$iId_Partida?>'">
+                <?php } else { ?>
+                <input type="button" class="btn btn-warning" value="Listado de partidas" 
+                        onclick="location.href='<?=base_url()?>index.php/partidas'">
+                <?php } ?>
                    
             </div>
+                
         </div>
         <?php $this->load->view('footer');?>
     </div>
@@ -198,6 +238,17 @@
     <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
     <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
     <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
+
+    <?php if ($this->session->flashdata('respuesta_ok') || $this->session->flashdata('respuesta_ko')) { 
+        echo "<script type='text/javascript'>";
+        echo "$(document).ready(function(){";
+        echo "$('.modal').fadeIn();";
+        echo "$('.cerrar').click(function(){";
+        echo "$('.modal').fadeOut(300);";
+        echo "});});";
+        echo "</script>";
+    }
+    ?>
         
     <script type="text/javascript">
         $(window).load(function() {
@@ -239,7 +290,6 @@
             cajas.confirm = function(id, gr, pn) {
                 var tirada = aleatorio(1,6);
                 var innerTxt = "<h4>Grupo " + gr + ", has obtenido un ... "+ tirada + "</h4>";
-                var imagen = 1;
 
                 innerTxt = innerTxt + '<div style="float:left; padding-left:5px;"><img src="'
                         + '<?=base_url()?>' + 'assets/img/dado.gif' + '"></div>';

@@ -98,7 +98,8 @@ class Partidas_model extends CI_Model{
     public function eliminar($iId){
       // Primero tenemos que eliminar el contenido de la tabla 'cursopartida'
       $consulta1 = $this->db->query("DELETE FROM cursopartida WHERE iId_Partida = $iId");
-      if ($consulta1 == true) {
+      $consulta2 = $this->db->query("DELETE FROM resumen WHERE iId_Partida = $iId");
+      if ($consulta1 == true && $consulta2 == true) {
         // Borramos la partida.
         $consulta2 = $this->db->query("DELETE FROM partida WHERE iId = $iId");
         if ($consulta2 == true) return true; else return false;
