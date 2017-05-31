@@ -1,10 +1,9 @@
 <?php
-class Jugar extends CI_Controller{
+class Visualizar extends CI_Controller{
     public function __construct() {
         parent::__construct();
-        $this->load->model("Jugar_model");
+        $this->load->model("Visualizar_model");
         $this->load->library("session");
-        $this->load->library('pagination');
     }
 
     public function _remap($method, $params = array())
@@ -34,8 +33,8 @@ class Jugar extends CI_Controller{
         }
 
         // Comprobar que no sea una partida acabada.
-        //if ($this->Jugar_model->partida_acabada($iId_Partida) == true)
-        //    redirect(base_url().'index.php/partidas'); 
+        if ($this->Visualizar_model->partida_acabada($iId_Partida) == true)
+            redirect(base_url().'index.php/partidas'); 
 
         // Comprobamos si se va a continuar con una jugada o lo que quiere hacerse en cargar una partida
         // de primeras.
@@ -49,26 +48,16 @@ class Jugar extends CI_Controller{
             $data["iTurno"] = $iTurno;
         }
 
-        // Tenemos que preparar la partida, rellenando la tabla resumen.
-        $this->Jugar_model->preparar_partida($iId_Partida);
-
-        $data["partida"] = $this->Jugar_model->get_partida($iId_Partida);
-        $data["panel"] = $this->Jugar_model->get_panel($iId_Panel[0]);      
-        $data["casillas"] = $this->Jugar_model->get_casillas($iId_Panel[0]);
-        $data["resumen"] = $this->Jugar_model->get_resumen_partida($iId_Partida); 
-        $iId_Profesor = $this->Jugar_model->get_profesor_id($iId_Partida); 
+       
+        $data["partida"] = $this->Visualizar_model->get_partida($iId_Partida);
+        $data["panel"] = $this->Visualizar_model->get_panel($iId_Panel[0]);      
+        $data["casillas"] = $this->Visualizar_model->get_casillas($iId_Panel[0]);
+        $data["resumen"] = $this->Visualizar_model->get_resumen_partida($iId_Partida); 
+        $iId_Profesor = $this->Visualizar_model->get_profesor_id($iId_Partida); 
 
         // Decidimos si vamos a mostrar el tablero, o una pregunta o el tablero en curso.
-        if ($iId_Profesor != $this->session->userdata('id_usuario')) {
-            // Cargamos la vista de visualización del tablero para seguir la partida.
-            redirect(base_url()."index.php/visualizar", "refresh");
-        } else {
-            // Caragamos el tablero de juego, o la vista de pregunta.
-            if ($this->session->userdata('pregunta') == 1) 
-                redirect(base_url()."index.php/cuestion", "refresh");
-            else
-                $this->load->view("jugar",$data);
-        }
+        $this->load->view("visualizar", $data);
+        
     }
 
     public function correccion() {

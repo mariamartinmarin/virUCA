@@ -10,6 +10,7 @@ class Jugar_model extends CI_Model{
       if (is_numeric($iId_Partida)) {
         // Hay que liberar la partida, tenemos que poner el valor 'bAbierta' a falso.
         $this->db->set('bAbierta','0');
+        $this->db->set('iId_Profesor_Act',0);
         $this->db->where('iId', $iId_Partida);
         $this->db->update('partida');
         return true;
@@ -84,10 +85,17 @@ class Jugar_model extends CI_Model{
 
     public function preparar_partida($iId_Partida) {
       if (is_numeric($iId_Partida)) {
+
+        $iId_Profesor = $this->session->userdata('id_usuario');
+        $update_partida = $this->db->query("UPDATE partida SET
+            iId_Profesor_Act = $iId_Profesor,
+            bAbierta = 1
+            WHERE iId = $iId_Partida AND iId_Profesor_Act = 0");
+
         $consulta = $this->db->query("SELECT iId FROM resumen WHERE iId_Partida = $iId_Partida");
         if ($consulta->num_rows() <= 0) {
           // La partida no se ha iniciado nunca, así que la damos por empezada y rellenamos resumen.
-          $query_nGrupos = $this->db->query("SELECT nGrupos FROM partida WHERE iId = $iId_Partida");
+          $query_nGrupos = $this->db->query("SELECT nGrupos, bAbierta FROM partida WHERE iId = $iId_Partida");
           $nGrupos = $query_nGrupos->row();
           $query_update_partida = $this->db->query("UPDATE partida SET 
             bEmpezada = 1, 
@@ -349,13 +357,46 @@ class Jugar_model extends CI_Model{
           WHERE iId = $iId_Partida");
         }
 
-        
-
         $this->session->set_userdata('pregunta', 0);
         $this->session->set_userdata('eFuncion', '');
         $this->session->set_userdata('iCasillaFuncion', '');
       }
     }
+
+    public function finalizar($iId_Partida) {
+      if (is_numeric($iId_Partida)) {
+        $query_finalizar = $this->db->query("UPDATE partida SET 
+              bFinalizada = 1,
+              bAbierta = 0,
+              iId_Profesor_Act = 0
+              WHERE iId = $iId_Partida");
+        if ($query_finalizar == true)
+          return true;
+        else
+          return false;
+      }
+    }
+
+    public function partida_acabada($iId_Partida) {
+      $query_finalizada = $this->db->query("SELECT bFinalizada FROM partida where iId = $iId_Partida");
+        if ($query_finalizada->num_rows() > 0 && $this->session->userdata('iTurno') != "") {
+            $datos_finalizada = $query_finalizada->row();
+            if ($datos_finalizada->bFinalizada == 1)
+                return true;
+            else
+              return false;
+    }
+  }
+
+  public function get_profesor_id($iId_Partida) {
+    $iId_Profesor = 0;
+    $consulta_profesor = $this->db->query("SELECT iId_Profesor_Act FROM partida WHERE iId = $iId_Partida");
+    if ($consulta_profesor->result() > 0) {
+      $datos_profesor = $consulta_profesor->row();
+      $iId_Profesor = $datos_profesor->iId_Profesor_Act;   
+    }
+    return $iId_Profesor;
+  }
 
 }
 ?>

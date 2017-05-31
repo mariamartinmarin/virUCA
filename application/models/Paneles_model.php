@@ -49,7 +49,7 @@ class Paneles_model extends CI_Model{
         $this->db->from('partida');
         $this->db->where('iId_Panel', $iId);
         $this->db->where('bEmpezada', 1);
-
+        $this->db->where('bFinalizada', 0);
 
         $consulta = $this->db->get();
         return $consulta->num_rows();
@@ -114,30 +114,69 @@ class Paneles_model extends CI_Model{
       }
     }
 
+    public function reorganiza_casillas($iId_Panel) {
+      $query_celdas = $this->db->query("SELECT iId FROM panelcasillas WHERE iId_Panel = $iId_Panel");
+        if ($query_celdas->num_rows() > 0) {
+          $orden_casilla = 1;
+          foreach ($query_celdas->result() as $casilla) {
+            $query_actualiza_pos = $this->db->query("UPDATE panelcasillas SET
+              iNumCasilla = $orden_casilla WHERE iId = $casilla->iId");
+            $orden_casilla++;
+          }
+        }
+    }
+
     public function eliminar_casilla($iId){
       // Obtengo antes el número de casillas del panel actual.
       $panel_query = $this->db->query("SELECT iId, iId_Panel FROM panelcasillas where iId=$iId");
       if($panel_query->num_rows()>0) {
-        foreach($panel_query->result() as $fila) {
-          $iId_Panel[] = htmlspecialchars($fila->iId_Panel, ENT_QUOTES);
-        }
+        $datos_panel = $panel_query->row();
+        $iId_Panel = $datos_panel->iId_Panel;
       }
-      
-      $casillas_query = $this->db->query("SELECT iCasillas FROM panel where iId=$iId_Panel[0]");
+
+      $casillas_query = $this->db->query("SELECT iCasillas FROM panel where iId=$iId_Panel");
       if($casillas_query->num_rows()>0) {
-        foreach($casillas_query->result() as $fila) {
-          $nCasillas[] = htmlspecialchars($fila->iCasillas, ENT_QUOTES);
-        }
+        $datos_casillas = $casillas_query->row();
+        $nCasillas = $datos_casillas->iCasillas;
       }
 
       $consulta=$this->db->query("DELETE FROM panelcasillas WHERE iId=$iId");
       if ($consulta == true){
         // Decrementamos en 1 el campo iCasillas de la tabla panel.
-        $newiCasillas = $nCasillas[0] - 1;
-        $consulta = $this->db->query("UPDATE panel set iCasillas = $newiCasillas where iId = $iId_Panel[0]");
+        $newiCasillas = $nCasillas - 1;
+        $consulta = $this->db->query("UPDATE panel set iCasillas = $newiCasillas where iId = $iId_Panel");
+
+        // Reorganizamos los índices.
+        reorganiza_casillas($iId_Panel);
+        
+
+        // Devolvemos el estatus.
+
         return true;
       } else {
         return false;
+      }
+    }
+
+    public function add($iId_Panel, $eFuncion, $iId_Categoria) {
+      echo $iId_Panel."/".$eFuncion."/".$iId_Categoria;
+      if ($eFuncion != "" && $iId_Categoria != "") {
+
+        $data = array('iId_Categoria' => $iId_Categoria,
+        'iId_Panel' => $iId_Panel,
+        'eFuncion' => $eFuncion);
+
+        if ($this->db->insert('panelcasillas', $data)) {
+          $this->Paneles_model->reorganiza_casillas($iId_Panel);
+          // Actualizar el número de casillas de la tabla PANEL.
+          $obtener_casillas = $this->db->query("SELECT iCasillas FROM panel where iId = $iId_Panel");
+          $datos_casillas = $obtener_casillas->row();
+          $iCasillas_new = $datos_casillas->iCasillas + 1;
+          $actualiza_panel = $this->db->query("UPDATE panel SET iCasillas = $iCasillas_new WHERE iId = $iId_Panel");
+          return true;
+        } else { 
+          return false;
+        }
       }
     }
 

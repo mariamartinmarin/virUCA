@@ -25,7 +25,63 @@ class Cuestion_model extends CI_Model{
         } else return false;
       } else return false;
      } else return false;    
-    }
+  }
+
+  public function get_categoria() {
+      $iId_Partida = $this->session->userdata('iId_Partida');
+      $iId_Grupo = $this->session->userdata('iTurno');
+      $iId_Panel = $this->session->userdata('iId_Panel');
+      $categoria = "";
+
+      $query_resumen = $this->db->query("SELECT iCasilla FROM resumen WHERE
+        iId_Partida = $iId_Partida AND iGrupo = $iId_Grupo");
+      $datos_resumen = $query_resumen->row();
+      $iCasilla = $datos_resumen->iCasilla;
+
+      // Ahora busco la categoría de esa celda.
+
+      $this->db->select('c.sNombre');
+      $this->db->from('categoria c');
+      $this->db->join('panelcasillas pc', 'c.iId = pc.iId_Categoria');
+      $this->db->where('pc.iNumCasilla', $iCasilla);
+      $this->db->where('pc.iId_Panel', $iId_Panel); 
+
+      $consulta = $this->db->get();
+
+      if($consulta->num_rows()>0) {
+        $datos = $consulta->row();
+        $categoria = $datos->sNombre;
+      }
+      return $categoria;
+  }
+
+  public function get_tipocasilla() {
+      $iId_Partida = $this->session->userdata('iId_Partida');
+      $iId_Grupo = $this->session->userdata('iTurno');
+      $iId_Panel = $this->session->userdata('iId_Panel');
+      $tipocasilla = "";
+
+      $query_resumen = $this->db->query("SELECT iCasilla FROM resumen WHERE
+        iId_Partida = $iId_Partida AND iGrupo = $iId_Grupo");
+      $datos_resumen = $query_resumen->row();
+      $iCasilla = $datos_resumen->iCasilla;
+
+      // Ahora busco la categoría de esa celda.
+
+      $this->db->select('eFuncion');
+      $this->db->from('panelcasillas');
+      $this->db->where('iNumCasilla', $iCasilla);
+      $this->db->where('iId_Panel', $iId_Panel); 
+
+      $consulta = $this->db->get();
+
+      if($consulta->num_rows()>0) {
+        $datos = $consulta->row();
+        $tipocasilla = $datos->eFuncion;
+      }
+      return $tipocasilla;
+  }
+
 
   public function obtener_pregunta() {
 
@@ -62,12 +118,16 @@ class Cuestion_model extends CI_Model{
             $datos_especial = $query_especial->row();
             $this->session->set_userdata('iCasillaFuncion', $datos_especial->iNumCasilla );
           } else {
-            $this->session->set_userdata('iCasillaFuncion', 0);
+            $query_especial = $this->db->query("SELECT iNumCasilla FROM panelcasillas where iId_Panel = $iId_Panel  
+              AND iNumCasilla = $iCasilla
+              LIMIT 1");
+              $datos_especial = $query_especial->row();
+            $this->session->set_userdata('iCasillaFuncion', $datos_especial->iNumCasilla);
           }
         }
 
         // Finalmente, seleccionamos un iId aleatorio de pregunta.
-        $this->db->where('bActiva', 1);
+        //$this->db->where('bActiva', 1);
         $this->db->order_by('iId', 'RANDOM');
         $this->db->limit(1);
         $query_iId_Pregunta = $this->db->get('pregunta');
@@ -79,6 +139,7 @@ class Cuestion_model extends CI_Model{
         $this->db->from('pregunta p');
         $this->db->join('respuesta r', 'p.iId = r.iId_Pregunta');
         $this->db->where('p.iId', $iId_Pregunta);
+        //$this->db->where('p.iId_Categoria', $iId_Categoria);
 
         $pregunta = $this->db->get();
         if($pregunta->num_rows()>0) {

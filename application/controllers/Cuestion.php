@@ -18,6 +18,8 @@ class Cuestion extends CI_Controller{
         }
         $data["pregunta"] = $this->Cuestion_model->obtener_pregunta();
         $data["resumen"] = $this->Cuestion_model->get_resumen_partida();
+        $data["categoria"] = $this->Cuestion_model->get_categoria();
+        $data["tipocasilla"] = $this->Cuestion_model->get_tipocasilla();
         
         $this->load->view("cuestion",$data);
     }

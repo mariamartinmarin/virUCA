@@ -148,12 +148,14 @@
                                 </td>
 
                                 <?php 
-                                if ($fila->bActiva == 1) { ?>
+                                if ($fila->bActiva || $iEdicion == 0) { ?>
+                                    <!-- No puede editar la pregunta. Sólo visualizarla. -->
                                     <td>
                                     <a href="<?=base_url("index.php/pregunta/mod/$fila->iId/$npag")?>" 
                                     class="btn-group-xs"><i class="icon icon-eye"></i></a>
                                     </td>
                                 <?php } else { ?>
+                                    <!-- Si puede modificar la pregunta. -->
                                     <td>
                                     <a href="#" 
                                         data-bb="confirm" 
@@ -165,11 +167,9 @@
                                     <a href="<?=base_url("index.php/pregunta/mod/$fila->iId/$npag")?>" 
                                     class="btn-group-xs"><i class="icon icon-pencil"></i></a>
                                     </td>
-                                <?php } ?>
-                                
-                                <?php
-                                }
-                                ?>
+                                <?php }
+                                } ?>
+
                             </tbody>
                         </table>
 
@@ -200,11 +200,14 @@
 
                      
                     <!-- Formulario de alta -->
-                    <?=form_open(base_url().'index.php/pregunta/nueva');
-                   $activa = 0;
-                   echo form_hidden('bActiva',$activa);
-                   echo form_hidden('iId_Usuario', $this->session->userdata('id_usuario'));
-                   echo form_hidden('nPuntuacion', 0);
+                    <?=form_fieldset('Añadir nueva pregunta.');?>
+                    <?php if ($iEdicion == 1) {
+
+                    echo form_open(base_url().'index.php/pregunta/nueva');
+                    $activa = 0;
+                    echo form_hidden('bActiva',$activa);
+                    echo form_hidden('iId_Usuario', $this->session->userdata('id_usuario'));
+                    echo form_hidden('nPuntuacion', 0);
 
                     $sPregunta = array(
                     'name' => 'sPregunta',
@@ -281,8 +284,6 @@
                     );
                     ?>
 
-                    <?=form_fieldset('Añadir nueva pregunta.');?>
-
                     <!--- formulario organizado con validación -->
                     <?php if ($categorias != "") { ?>
 
@@ -356,9 +357,10 @@
 
                     <?=form_close()?>
 
-                    <!-- Fin del formulario organizado -->
-                    
-                    
+                    <?php } else {
+                        echo "<blockquote>El periodo para poder introducir nuevas preguntas finalizó. Sólo podrás visualizar (y no modificar) las preguntas que hayas introducido con anterioridad.
+                        </blockquote>";
+                        } ?>
                     <?=form_fieldset_close();?>
 
                     <hr class="short">

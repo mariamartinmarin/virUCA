@@ -199,7 +199,7 @@
                                         href="<?=base_url("index.php/jugar/$fila->iId/$fila->iId_Partida")?>" 
                                         class="btn-group-xs"><i class="icon icon-play"></i></a>
                                     <?php } else { ?>
-                                    <a title="Visualizar" 
+                                    <a title="Ver clasificación" 
                                         href="<?=base_url("index.php/jugar/$fila->iId/$fila->iId_Partida")?>" 
                                         class="btn-group-xs"><i class="icon icon-eye"></i></a>
                                     <?php } ?>

@@ -128,6 +128,7 @@ $route['datosprofesor'] = 'DatosProfesor';
 
 $route['paneles'] = 'Paneles';
 $route['paneles/mod/(:any)'] = 'Paneles/mod/$1';
+$route['paneles/nueva/(:any)'] = 'Paneles/nueva/$1';
 $route['paneles/pagina/(:num)'] = 'Paneles';//cuando no sea la primera página
 $route['paneles/pagina'] = 'Paneles';//cuando sea la primera página
 
@@ -141,6 +142,8 @@ $route['partidas/pagina'] = 'Partidas';//cuando sea la primera página
 // Jugar
 
 $route['jugar'] = 'Jugar';
+$route['jugar/finalizar'] = 'Jugar/finalizar/$1';
+
 //$route['jugar/(:num)'] = 'Jugar/$1';
 //$route['jugar/(:num)/(:num)'] = 'Jugar/$1/$2';
 $route['jugar/(:num)/(:num)/(:num)/(:num)'] = 'Jugar/$1/$2/$3/$4';
@@ -151,3 +154,7 @@ $route['jugar/(:any)'] = 'Jugar/$1/$2/$3/$4';
 // Cuestión
 
 $route['cuestion'] = 'Cuestion';
+
+// Visualizar partida
+
+$route['visualizar'] = 'Visualizar';

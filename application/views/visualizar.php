@@ -18,11 +18,6 @@
     <!-- Libs CSS -->
     <link rel="stylesheet" href="<?=base_url()?>vendor/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="<?=base_url()?>vendor/font-awesome/css/font-awesome.css">
-    <link rel="stylesheet" href="<?=base_url()?>vendor/owl-carousel/owl.carousel.css" media="screen">
-    <link rel="stylesheet" href="<?=base_url()?>vendor/owl-carousel/owl.theme.css" media="screen">
-    <link rel="stylesheet" href="<?=base_url()?>vendor/magnific-popup/magnific-popup.css" media="screen">
-    <link rel="stylesheet" href="<?=base_url()?>vendor/isotope/jquery.isotope.css" media="screen">
-    <link rel="stylesheet" href="<?=base_url()?>vendor/mediaelement/mediaelementplayer.css" media="screen">
     <!-- Theme CSS -->
     <link rel="stylesheet" href="<?=base_url()?>css/theme.css">
     <link rel="stylesheet" href="<?=base_url()?>css/theme-elements.css">
@@ -31,6 +26,8 @@
     <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
     <link rel="stylesheet" href="<?=base_url()?>css/panel.css?id=124">
     <link rel="stylesheet" href="<?=base_url()?>css/tooltip.css">
+    <link rel="stylesheet" href="<?=base_url()?>css/timecircles/TimeCircles.css" />
+
 
     <!-- Responsive CSS -->
     <link rel="stylesheet" href="<?=base_url()?>css/theme-responsive.css" />
@@ -61,6 +58,11 @@
         <script src="vendor/respond.js"></script>
     <![endif]-->
     <script type="text/javascript">
+        $(document).ready(function(){
+            var refreshId = setInterval(cargarPagina, 30000);
+        });
+        function cargarPagina() {location.reload();}
+
         function AddFicha(idDiv, Texto) {
             document.getElementById(idDiv).innerHTML += Texto;
         }
@@ -74,33 +76,6 @@
         <?php $this->load->view('menuj_view');?>
         <div role="main" class="main">       
             <div class="container">
-               
-                <!-- Errores de inserción. -->
-
-
-
-                <?php if($this->session->flashdata('respuesta_ok')) { ?>
-                     <div class="modal">
-                        <div class="ventana">
-                            <div class="alert alert-success">
-                                <?php echo $this->session->flashdata('respuesta_ok');?>
-                            </div>
-                            <span class="cerrar">Cerrar</span>
-                        </div>
-                    </div>
-                <?php } ?>
-
-                <?php if($this->session->flashdata('respuesta_ko')) { ?>
-                    <div class="modal">
-                        <div class="ventana">
-                            <div class="alert alert-danger">
-                                <?php echo $this->session->flashdata('respuesta_ko'); ?>
-                                <span class="cerrar">Cerrar</span>
-                            </div>
-                        </div>
-                    </div>
-                <?php } ?>
-                <!-- Fin errores -->
                     
                 <!-- Información de la partida -->
                 <?php 
@@ -110,6 +85,7 @@
                             $iTurno = $jugador->iTurno;
                             $iId_Panel = $jugador->iId_Panel;
                             $bFinalizada = $jugador->bFinalizada;
+                            $bAbierta = $jugador->bAbierta;
                         }
                 ?>
 
@@ -166,9 +142,12 @@
                 <!-- panel -->
                  
                 <?php
-                    if (!$bFinalizada) {
+                    if (!$bFinalizada && $bAbierta) {
 
                     // Pintamos el panel     
+                    echo "<div style='float:left;'><blockquote>La partida se está jugando en estos momentos, por lo que sólo puede visualizar el estado de la misma. <b>La página se refrescará cada 30 segundos</b>.</blockquote></div>";
+                    echo "<div class='demo' data-date='00:00:30' style='float:left;width: 130px;'></div>";
+                    echo "<br class='clear'>";
                     $contCasilla = 1;
                     echo "<div data-toggle='tooltip' title='Inicio' class='test fade' style='float:left;'>
                         <img src='".base_url()."/assets/img/inicio.png' aling='center'></div>";
@@ -224,28 +203,13 @@
                 <!-- Resumen de la partida -->
 
                 <?php 
-                }   // Cierra el if de la partida finalizada.
+                } else {
+                    echo "<blockquote>La partida ha finalizado o se ha cerrado, ya no puedes seguir viendo el progreso de la partida.</blockquote>";
+                }
+                ?>
 
-                if ($bFinalizada == 0) { ?>
-                <input type="hidden" data-bb="pregunta">
-                <input type="button" class="btn btn-warning" 
-                        data-bb="confirm" 
-                        data-pn="<?=$iId_Panel;?>"
-                        data-id="<?=$iId_Partida;?>"
-                        data-gr="<?=$iTurno;?>"
-                        value="Tirar Dado">
-
-                <input type="button" class="btn btn-warning" 
-                        data-bb="confirm2" 
-                        data-id="<?=$iId_Partida;?>"
-                        value="Finalizar partida">
-
-                <input type="button" class="btn btn-warning" value="Salir" 
-                        onclick="location.href='<?=base_url()?>index.php/jugar/salir/<?=$iId_Partida?>'">
-                <?php } else { ?>
                 <input type="button" class="btn btn-warning" value="Listado de partidas" 
                         onclick="location.href='<?=base_url()?>index.php/partidas'">
-                <?php } ?>
                    
             </div>
                 
@@ -257,6 +221,7 @@
     <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
     <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
     <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="<?=base_url()?>js/timecircles/TimeCircles.js"></script>
 
     <?php if ($this->session->flashdata('respuesta_ok') || $this->session->flashdata('respuesta_ko')) { 
         echo "<script type='text/javascript'>";
@@ -275,7 +240,38 @@
             $('body').css({'overflow':'visible'});
         });
         $(document).ready(function(){
-            $('[data-toggle="tooltip"]').tooltip();   
+            $('[data-toggle="tooltip"]').tooltip(); 
+            //$(".demo").TimeCircles();
+            // Inicio reloj
+            $(".demo").TimeCircles({
+                "animation": "smooth",
+                "bg_width": 1.2,
+                "fg_width": 0.1,
+                "total_duration": 30,
+                "circle_bg_color": "#60686F",
+                "time": {
+                    "Days": {
+                        "text": "Days",
+                        "color": "#FFCC66",
+                        "show": false
+                    },
+                    "Hours": {
+                        "text": "Hours",
+                        "color": "#99CCFF",
+                        "show": false
+                    },
+                    "Minutes": {
+                        "text": "Minutes",
+                        "color": "#BBFFBB",
+                        "show": false
+                    },
+                    "Seconds": {
+                        "text": "Seconds",
+                        "color": "#FF9999",
+                        "show": true
+                    }
+                }
+            })
         });
     </script>
 
@@ -315,12 +311,10 @@
 
             cajas.confirm = function(id, gr, pn) {
                 var tirada = aleatorio(1,6);
-                //var tirada = 1;
-                var innerTxt = "";
+                var innerTxt = "<h4>Grupo " + gr + ", has obtenido un ... "+ tirada + "</h4>";
 
-                innerTxt = innerTxt + '<div style="float:left; padding-left:5px; width:150px;"><img src="'
-                        + '<?=base_url()?>' + 'assets/img/dado'+tirada+'.png' + '"></div>';
-                innerTxt = innerTxt + '<div style="float:left; padding-left:10px; width:300px;"><blockquote><b>Grupo '+ gr +'</b>, has avanzado <b>'+tirada+'</b> posicion/es, a continuación vamos a formularte una pregunta ... ¿Preparado? </blockquote></div>';
+                innerTxt = innerTxt + '<div style="float:left; padding-left:5px;"><img src="'
+                        + '<?=base_url()?>' + 'assets/img/dado.gif' + '"></div>';
             
                 innerTxt += "<br class='clear'>";
                 // Si confirma la tirada de dado, vamos a la página de preguntas.

@@ -34,11 +34,13 @@ class Pregunta extends CI_Controller{
             $this->uri->segment(3),
             $pages);          
         $data["num_filas"] = $config['total_rows'];
+        $data["iEdicion"] = $this->pregunta_model->get_edicion();
         $this->load->view("pregunta",$data);
     }
 
     public function mod_view($iId){
        $usuarios["verPregunta"]=$this->pregunta_model->verPregunta($iId);
+       $usuarios["iEdicion"] = $this->pregunta_model->get_edicion();
        $this->load->view("preguntamod_view",$usuarios);
     }
     

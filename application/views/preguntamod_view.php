@@ -210,16 +210,18 @@
 
                             </div>
                     </div>  
+
                     <?php 
-                    if ($fila->nPuntuacion == 0)
-                        echo form_submit($submit);
-                    else { ?>
+                    if ($fila->bActiva || $iEdicion == 0) { ?>
                         <div class="alert alert-success">
-                        La pregunta <b>ya ha sido calificada por tu profesor</b>, por lo que no puedes modificar el contenido
-                        de la misma.
+                        No puedes modificar la pregunta, ya que o bien tu profesor la ha evaluado o ha dado el visto bueno para que aparezca en el juego. Suerte!
                         </div>
-                    <?php } ?>
-                
+                    <?php } else { 
+                        echo form_submit($submit);
+                     } ?>
+
+
+                    
                     <!-- Fin campos formulario -->
                    
                 <?php } ?>

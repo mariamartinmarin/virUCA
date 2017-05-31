@@ -94,30 +94,20 @@
                 <!-- Fin errores -->
 
                 <?php echo form_fieldset('Modificar panel en curso');?>
-                
-
-                
                     <!-- Listado -->
                     <?php if ($categorias != "") { ?>
 
                     <blockquote>
                         En el siguiente listado, se muestran las características asociadas a cada casilla del panel escogido. Podrás cambiar la <b>Categoría</b> y la <b>Función Especial</b> de la casilla. Una vez que hagas todos los cambios, haz clic en el botón <b>Guardar</b> ubicado en la parte baja de este formulario.
                     </blockquote>
-
-                    
-
                     
                     <?php 
                     $atributos = array('id' => 'confpanel');
                     echo form_open(base_url().'index.php/paneles/eliminar_casillas/'.$this->uri->segment(3), $atributos);?>
                     <div class="panel panel-default">
-                        <!-- Default panel contents -->
-                        <div class="panel-heading">
-                            Configuración de Panel
-                        </div>
+                        <div class="panel-heading">Configuración de Panel</div>
 
-                        
-                        <table class="table table-bordered table-striped" id="table_preguntas">
+                        <table class="table table-bordered table-striped">
                             <thead>
                                 <th>&nbsp;</th>
                                 <th>Número</th>
@@ -210,14 +200,43 @@
                     </div>
                     <?php } ?>
 
-
                     <input type="button" class="btn btn-warning" value="Nuevo Panel" onclick="location.href='<?=base_url()?>index.php/panelesalta'">
                     <hr class="short">
-                    
-                    
-
                     <?=form_close();?>
                     
+                    <!-- Ahora vamos a dar la posibilidad de añadir una celda -->
+                    <br>
+                    <?=form_fieldset('Añadir una nueva casilla');?>
+                    <?=form_open(base_url().'index.php/paneles/nueva/'.$this->uri->segment(3));?>
+                    <table class="table table-bordered table-striped" id="table_preguntas">
+                    <thead>
+                        <th>Función</th>
+                        <th>Categoría</th>
+                    </thead>
+                    <tbody class="buscar">       
+                        <tr><td>
+                            <select name="eFuncion" class="form-control">
+                                <option value="Ninguno" selected>Ninguno</option>
+                                <option value="Viento">Viento</option>
+                                <option value="Retroceder">Retroceder</option>
+                            </select>
+                            </td>
+
+                            <td>
+                                <select name="iId_Categoria" class="form-control">
+                                    <?php
+                                        foreach ($categorias as $i => $categoria) 
+                                            echo "<option value='".$i."'>".$categoria."</option>";
+                                        ?>
+                                </select>   
+                            </td>
+                        </tr>
+                    </tbody>
+                    </table>
+                    <input type="submit" class="btn btn-warning" value="Añadir casilla">
+                    
+                    <?=form_close();?>
+
                     <?php
 
                     } else {
@@ -231,8 +250,8 @@
                     <!-- Fin del listado -->
                 
                 <?=form_fieldset_close();?>
-
-                <a href="<?=base_url()."index.php/paneles"?>" class="btn btn-warning">Listado</a>
+                <hr>
+                <br><a href="<?=base_url()."index.php/paneles"?>" class="btn btn-warning">Paneles</a>
             </div>
         </div>
         <?php $this->load->view('footer');?>

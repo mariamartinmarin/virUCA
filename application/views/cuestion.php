@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
     <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
     <link rel="stylesheet" href="<?=base_url()?>css/panel.css?id=107">
+    <link rel="stylesheet" href="<?=base_url()?>css/timecircles/TimeCircles.css" />
 
     <!-- Responsive CSS -->
     <link rel="stylesheet" href="<?=base_url()?>css/theme-responsive.css" />
@@ -106,7 +107,22 @@
 
                 <!-- pregunta -->
                 <div class="featured-box featured-box-primary"><div class="box-content">
-                        
+                <div style="float:left; width: 600px;">
+                    <blockquote><h5>Te vamos a hacer una pregunta sobre <b><?=$categoria;?></b>.
+                    <?php
+                        switch ($tipocasilla) {
+                            case 'Viento':
+                                echo "Además, has caído en una casilla de 'Viento', por lo que si aciertas esta pregunta, irás a la siguiente casilla de viento, si la hubiere. De lo contrario, volverás a la posición anterior.";
+                                break;
+                            case 'Retroceder':
+                                echo "Oops! has caído en una casilla con una 'jeringuilla', por lo que si no aciertas la pregunta, volverás a la posición inicial ... ¡Suerte! :)";
+                                break;
+                            default:
+                                break;
+                        }
+                    ?>
+                    </h5></blockquote>
+                
                 <?php
                 if ($pregunta != NULL) {
                     $preguntaTxt = 0;
@@ -120,7 +136,7 @@
                     foreach ($pregunta as $respuesta) {
                         if ($preguntaTxt == 0) {
                             $iId_Pregunta = $respuesta->iId;
-                            echo "<h3><b>¿".$respuesta->sPregunta."?</b></h3>";
+                            echo "<h4><b>¿".$respuesta->sPregunta."?</b></h4>";
                             $preguntaTxt = 1;
                         }
                         echo "<b>".$arrayRespuestas[$cont].")</b> ".$respuesta->sRespuesta."<br><br>";
@@ -136,11 +152,23 @@
                         echo "<input type='button' class='btn btn-default' value='Respuesta B' name='B' onclick='javascript:enviar(2)' style='margin-left:10px;'>";
                         echo "<input type='button' class='btn btn-default' value='Respuesta C' name='C' onclick='javascript:enviar(3)' style='margin-left:10px;'>";
                         echo "<input type='button' class='btn btn-default' value='Respuesta D' name='D' onclick='javascript:enviar(4)' style='margin-left:10px;'>";
+                        echo "<input type='button' class='btn btn-warning' value='Error' name='D' onclick='javascript:enviar(4)' style='margin-left:10px;'>";
                     form_close();
                 } else {
                     echo "<blockquote>Lo sentimos, hubo un problema al intentar recuperar la pregunta</blockquote>";
                 }
                 ?>
+                </div>
+                <div style="float:left; margin-left: 20px;">
+                    <blockquote>
+                        <div class="example stopwatch" data-date='00:00:60'></div>
+                        <button type="button" class="btn btn-success start">Empezar</button>
+                        <button type="button" class="btn btn-danger stop">Parar</button>
+                        <button type="button" class="btn btn-info restart">Iniciar</button>
+                    </blockquote>
+                </div>
+                <br class="clear">
+
                 </div></div>
                 <!-- Fin de pregunta -->
                 <br class="clear">
@@ -170,8 +198,46 @@
     <!-- BOOT BOX -->
     <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
     <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+    <script src="<?=base_url()?>js/timecircles/TimeCircles.js"></script>
         
     <script type="text/javascript">
+        
+        $(document).ready(function(){
+            $(".start").click(function(){ $(".example.stopwatch").TimeCircles().start(); });
+            $(".stop").click(function(){ $(".example.stopwatch").TimeCircles().stop(); });
+            $(".restart").click(function(){ $(".example.stopwatch").TimeCircles().restart(); }); 
+
+            $(".example.stopwatch").TimeCircles({
+                "animation": "smooth",
+                "bg_width": 1.2,
+                "fg_width": 0.1,
+                "total_duration": 60,
+                "circle_bg_color": "#60686F",
+                "time": {
+                    "Days": {
+                        "text": "Days",
+                        "color": "#FFCC66",
+                        "show": false
+                    },
+                    "Hours": {
+                        "text": "Hours",
+                        "color": "#99CCFF",
+                        "show": false
+                    },
+                    "Minutes": {
+                        "text": "Minutes",
+                        "color": "#BBFFBB",
+                        "show": false
+                    },
+                    "Seconds": {
+                        "text": "Segundos",
+                        "color": "#FF9999",
+                        "show": true
+                    }
+                }
+            });
+            $(".example.stopwatch").TimeCircles().stop();
+        });
 
         function aleatorio(a,b) {return Math.round(Math.random()*(b-a)+parseInt(a));}
 

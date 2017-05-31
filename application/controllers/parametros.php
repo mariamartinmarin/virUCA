@@ -22,19 +22,21 @@ class Parametros extends CI_Controller{
     }
      
     public function mod(){
-        //$datos["parametros"]=$this->parametros_model->mod();
-        //$this->load->view("parametros",$datos);
         
         $activa = 1;
         if ($this->input->post("iActiva")[0] == "") $activa = 0;
+
+        $edicion = 1;
+        if ($this->input->post("iEdicion")[0] == "") $edicion = 0;
                   
-        $mod = $this->parametros_model->mod($activa);
+        $mod = $this->parametros_model->mod($activa, $edicion);
+
         if ($mod == true){
             $this->session->set_flashdata('parametros_ok', '<strong>Bien!</strong> cambios efectuados.');
         }else{
-            $this->session->set_flashdata('parametros_ko', '<strong>Oops!</strong> los cambios no se llevaron a cabo.');
+            $this->session->set_flashdata('parametros_ko', 
+                '<strong>Oops!</strong> los cambios no se llevaron a cabo.');
         }
-
         redirect(base_url()."index.php/parametros/");   
     }
 }

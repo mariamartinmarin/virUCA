@@ -123,5 +123,16 @@ class Paneles extends CI_Controller{
         } 
         redirect(base_url()."index.php/paneles/mod/".$this->input->post('iId'));
     }
+
+    public function nueva($iId) {
+        
+        $add = $this->Paneles_model->add($iId, $this->input->post("eFuncion"), $this->input->post("iId_Categoria"));
+        if ($add == true) {
+            $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong> celda añadida.');
+        } else {
+            $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong> no se pudo añadir la celda.');
+        }
+        redirect(base_url()."index.php/paneles/mod/".$iId);
+    }
 }
 ?>

@@ -93,7 +93,6 @@
                 <?php } ?>
                 <!-- Fin errores -->
 
-                <?php echo form_fieldset('Activar / Desactivar aplicación');?>
                 <?=form_open(base_url().'index.php/parametros/mod');?>
                 <?php foreach ($parametros as $fila){ 
                     $iActiva = array(
@@ -114,26 +113,49 @@
                     ?>
 
                     <!-- Campos del formulario -->
+                    <?php echo form_fieldset('Activar / Desactivar aplicación');?>
+                
                     <div class="row">
                         <div class="col-md-12">
                             <span class="show-grid-block">
                             <?php if ($fila->iActiva == 1) { ?>
-                                <div class="alert alert-success">
-                                    <p>En estos momentos la aplicación se encuentra <b>ACTIVA</b>, esto quiere decir
+                                <blockquote>
+                                    En estos momentos la aplicación se encuentra <b>ACTIVA</b>, esto quiere decir
                                     que los alumnos podrán introducir preguntas y trabajar con la plataforma con
-                                    total normalidad.</p>
-                                    <p>Para hacer la aplicación <b>INACCESIBLE TEMPORALMENTE</b> para los alumnos, 
-                                    desmarque el <i>checkbox</i> y guarde los cambios.</p>
-                                </div>
+                                    total normalidad.
+                                    Para hacer la aplicación <b>INACCESIBLE TEMPORALMENTE</b> para los alumnos, 
+                                    desmarque el <i>checkbox</i> y guarde los cambios.                        
+                                </blockquote>
                                 <input type="checkbox" checked="true" name="iActiva[]" value="1">
                             <?php } else { ?>
-                                <div class="alert alert-danger">
-                                    <p>En estos momentos la aplicación se encuentra <b>INACTIVA</b>, esto quiere decir que los alumnos no podrán introducir preguntas ni registrarse en la 
-                                    plataforma.</p>
-                                    <p>Para cambiar esta situación y que la aplicación sea accesible para todo el
-                                    mundo, marque el <i>checkbox</i> y guarde los cambios.</p>
-                                </div>
+                                <blockquote>
+                                    En estos momentos la aplicación se encuentra <b>INACTIVA</b>, esto quiere decir que los alumnos no podrán introducir preguntas ni registrarse en la 
+                                    plataforma.
+                                    Para cambiar esta situación y que la aplicación sea accesible para todo el
+                                    mundo, marque el <i>checkbox</i> y guarde los cambios.
+                                </blockquote>
+                                
                                 <input type="checkbox" name="iActiva[]" value="0">
+                            <?php } ?>
+                            </span>
+                        </div>
+                    </div>
+                    <hr>
+                    <?php echo form_fieldset('Activar / Desactivar edición de preguntas (alumnos)');?>
+                
+                    <div class="row">
+                        <div class="col-md-12">
+                            <span class="show-grid-block">
+                            <?php if ($fila->iEdicion == 1) { ?>
+                                <blockquote>
+                                    En estos momentos, los alumnos pueden modificar las preguntas que han introducido en el sistema con total normalidad. Para deshacer esta eventualidad y que los alumnos <b>NO PUEDAN MODIFICA LAS PREGUNTAS</b>, desmarque el <i>checkbox</i> y guarde los cambios.
+                                </blockquote>
+                                <input type="checkbox" checked="true" name="iEdicion[]" value="1">
+                            <?php } else { ?>
+                                <blockquote>
+                                    En estos momentos, los alumnos no pueden modificar las preguntas que han introducido. Para deshacerlo y que puedan volver a hacerlo, marque el <i>checkbox</i> y guarde los cambios.
+                                </blockquote>
+                                <input type="checkbox" name="iEdicion[]" value="0">
                             <?php } ?>
                             </span>
                         </div>

@@ -221,6 +221,12 @@ class Pregunta_model extends CI_Model{
       }
     }
 
+    public function get_edicion() {
+      $query = $this->db->query("select iEdicion from parametros");
+      $datos_query = $query->row();
+      return $datos_query->iEdicion;
+    }
+
 
 }
 ?>
