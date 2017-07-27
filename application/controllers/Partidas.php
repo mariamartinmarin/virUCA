@@ -102,6 +102,23 @@ class Partidas extends CI_Controller{
         }
     }
 
+    public function desbloquear($iId, $npag = "NULL") {
+        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
+        if (is_numeric($iId)) {
+            $desbloquear = $this->Partidas_model->desbloquear($iId);
+            if ($desbloquear == true) {
+                $this->session->set_flashdata('correcto', 
+                    '<strong>Bien!</strong> la partida se ha desbloqueado con éxito, puede reanudarla cuando lo desee.');
+            } else {
+                $this->session->set_flashdata('incorrecto', 
+                    '<strong>Bien!</strong> la partida no se puede desbloquear, pruebe en unos instantes de nuevo, y si el problema persiste, consulte con el administrador del sitio.');
+            }
+            redirect(base_url()."index.php/partidas/pagina/$npag");
+        } else {
+           redirect(base_url()."index.php/partidas/pagina/$npag"); 
+        }
+    }
+
     //Controlador para eliminar
     public function eliminar_todos($npag = "NULL"){
         if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";

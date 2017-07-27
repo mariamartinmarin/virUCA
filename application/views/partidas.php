@@ -155,6 +155,7 @@
                                 <th>Curso</th>
                                 <th>Profesor</th>
                                 <th>Finalizada</th>
+                                <th>En juego</th>
                                 <th>&nbsp;</th>
                             </thead>
                             <tbody class="buscar">
@@ -178,7 +179,14 @@
                                         echo "<span class='glyphicon glyphicon-remove' aria-hidden='true'></span>";
                                 ?>    
                                 </td>
-                                
+                                <td>
+                                    <?php
+                                    if ($fila->bAbierta)
+                                        echo "<span class='glyphicon glyphicon-ok' aria-hidden='true'></span>";
+                                    else
+                                        echo "<span class='glyphicon glyphicon-remove' aria-hidden='true'></span>";
+                                ?>
+                                </td>
                                 <td>
 
                                     <a href="#" 
@@ -194,7 +202,18 @@
                                     class="btn-group-xs"><i class="icon icon-pencil"></i></a>
                                     <?php } ?>
 
-                                    <?php if (!$fila->bFinalizada) { ?>
+                                    <?php
+                                    if ($fila->bAbierta  && $fila->iId_Profesor == $this->session->userdata('id_usuario')) { ?>
+                                    <a href="#"
+                                        title="Desbloquear"
+                                        data-bb = "confirm2"
+                                        data-id =  "<?=$fila->iId?>"
+                                        data-pg = "<?=$npag?>"
+                                        class="btn-group-xs"><i class="icon icon-lock"></i>
+                                    </a>
+                                    <?php } ?>
+                                    
+                                    <?php if (!$fila->bFinalizada && $fila->iId_Profesor == $this->session->userdata('id_usuario')) { ?>
                                     <a title="Empezar/Reanudar" 
                                         href="<?=base_url("index.php/jugar/$fila->iId/$fila->iId_Partida")?>" 
                                         class="btn-group-xs"><i class="icon icon-play"></i></a>
@@ -277,6 +296,22 @@
                 bootbox.confirm("Si eliminamos la partida, se eliminará el progreso de la misma, así como cualquier rastro de esta en el sistema. ¿Estás seguro que quieres borrar la partida?", function(result) {
                     if (result == true) {
                         location.href = '<?=base_url()?>index.php/partidas/eliminar/'+id+'/'+pg;
+                    }
+            });
+            };
+
+            cajas.confirm2 = function(id, pg) {
+                bootbox.confirm("La partida se está jugando en este momento, si la desbloquea puede incidir negativamente en el curso de la partida. ¿Está seguro de querer desbloquear la partida?", function(result) {
+                    if (result == true) {
+                        location.href = '<?=base_url()?>index.php/partidas/desbloquear/'+id+'/'+pg;
+                    }
+            });
+            };
+
+            cajas.confirm3 = function() {
+                bootbox.confirm("No puedes iniciar o reanudar esta partida hasta que sea desbloqueada. Una partida sólo puede ser desbloqueada por el profesor que la creó, así que, si aparece el icono del 'candado' en la lista de opciones, tienes privilegios para hacerlo.", function(result) {
+                    if (result == true) {
+                        return true;
                     }
             });
             };

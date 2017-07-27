@@ -1,16 +1,20 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
 class Titulacion extends CI_Controller{
-    public function __construct() {
-        //llamamos al constructor de la clase padre
-        parent::__construct(); 
-        $this->load->model("titulacion_model");
+
+    /* Constructor */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model("Titulacion_model");
         $this->load->library("session");
-         $this->load->library('pagination');
     }
-     
-    //controlador por defecto
-    public function index(){
-        if($this->session->userdata('perfil') != 0)
+
+    /* Función que se utilizará para llamar a la vista y comprobar condiciones previas. */
+    public function index()
+    {
+         if($this->session->userdata('admin') != 1)
         {
             redirect(base_url().'index.php/login');
         }
@@ -18,121 +22,154 @@ class Titulacion extends CI_Controller{
             $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
             redirect(base_url().'index.php/login');
         }
-        $pages=5; //Número de registros mostrados por páginas
-        $config['base_url'] = base_url().'index.php/titulacion/pagina/';
-        $config['total_rows'] = $this->titulacion_model->filas();//calcula el número de filas  
-        $config['per_page'] = $pages; //Número de registros mostrados por páginas
-        $config['num_links'] = 5; //Número de links mostrados en la paginación
-        $config['first_link'] = 'Primera';//primer link
-        $config['last_link'] = 'Última';//último link
-        $config["uri_segment"] = 3;//el segmento de la paginación
-        $config['next_link'] = 'Siguiente';//siguiente link
-        $config['prev_link'] = 'Anterior';//anterior link
-        $data["num_filas"] = $config['total_rows'];           
-        
-        $this->pagination->initialize($config); //inicializamos la paginación       
-        $data["titulacion"] = $this->titulacion_model->total_paginados(
-            $config['per_page'],
-            $this->uri->segment(3),
-            $pages);          
-        
-        $this->load->view("titulacion",$data);
+
+        $data["universidades"] = $this->Titulacion_model->get_universidades();
+
+        $this->load->helper('url');
+        $this->load->view('titulacion', $data);
     }
-     
-    //controlador para añadir
-    public function nueva(){
-        // Primero vamos a hacer las validaciones.
-        $this->form_validation->set_rules('sTitulacion', 'Titulación', 'trim|required|max_length[32]|min_length[2]');
+
+    /* 
+        Función que "montará" la lista según los datos que se mostrarán en la vista y que obtendremos a través del 
+        modelo.
+    */
+    public function ajax_list()
+    {
+        $list = $this->Titulacion_model->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $titulacion) {
+            $no++;
+            $row = array();
+            $row[] = '<input type="checkbox" id="titulacion" class="titulacion" name="titulacion[]" value="'.$titulacion->iId.'">';
+            $row[] = $titulacion->sTitulacion;
+            $row[] = $titulacion->sUniversidad;
             
-        // Una vez establecidas las reglas, validamos los campos.
-        $this->form_validation->set_message('required', '<b>%s</b> es obligatorio.');
-        $this->form_validation->set_message('min_length', '<b>%s</b> debe tener al menos <b>%s</b> caracteres.');
-        $this->form_validation->set_message('max_length', '<b>%s</b> no puede tener más de <b>%s</b> caracteres.');
-
-        if ($this->form_validation->run() == FALSE) {
-            // Si la validación no se pasa, volvemos al directorio raiz.
-            $this->index();
-        } else {
-            // Hacemos la inserción.
-            $add=$this->titulacion_model->nueva(
-                $this->input->post("sTitulacion"));
-            if ($add == true){
-                //Sesion de una sola ejecución
-                $this->session->set_flashdata('correcto', '<strong>Bien!</strong> la titulación se registró con éxito.');
-            }else{
-                $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, parece que hubo un problema y no hemos podido añadir la nueva titulación.');
-            }       
-            redirect(base_url()."index.php/titulacion", "refresh");
+            // Añadimos HTML para las acciones de la tabla.
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="editar_titulacion('."'".$titulacion->iId."'".')"><i class="glyphicon glyphicon-pencil"></i> Editar</a>
+                <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="borrar_titulacion('."'".$titulacion->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Borrar</a>';
+        
+            $data[] = $row;
         }
-    }     
-     
-    //controlador para modificar al que 
-    //le paso por la url un parametro
-    public function mod($iId){
-        if(is_numeric($iId)){
-            $datos["mod"]=$this->titulacion_model->mod($iId);
-            $this->load->view("titulacionmod_view",$datos);
-            
-            if($this->input->post("submit")){
-                // Hay que volver a validar los datos.
-                $this->form_validation->set_rules('sTitulacion', 'Titulación', 'trim|required|max_length[32]|min_length[2]');
-                
-                // Una vez establecidas las reglas, validamos los campos.
-                $this->form_validation->set_message('required', '%s es obligatorio.');
-                $this->form_validation->set_message('min_length', '%s debe tener al menos %s caracteres.');
-                $this->form_validation->set_message('max_length', '%s no puede tener más de %s caracteres.');
-                
-                if ($this->form_validation->run() == FALSE) {   
-                    $this->session->set_flashdata('titulacion_ko', '<strong>Oops!</strong> no hemos podido modificar los datos de la titulación.');               
-                    redirect(base_url()."index.php/titulacion/mod/".$iId, "refresh");
-                } else {
-                    $mod=$this->titulacion_model->mod(
-                        $iId,
-                        $this->input->post("submit"),
-                        $this->input->post("sTitulacion"));
-                    if($mod==true){
-                        $this->session->set_flashdata('titulacion_ok', '<strong>Bien!</strong> la titulacion se modificó correctamente.');
-                    }else{
-                        $this->session->set_flashdata('titulacion_ko', '<strong>Oops!</strong> no hemos podido modificar la titulacion.');
-                    }
 
-                    redirect(base_url()."index.php/titulacion/mod/".$iId, "refresh");
-
-                }
-            }
-        } else {
-            redirect(base_url()."index.php/titulacion"); 
-        }
-    }
-     
-    //Controlador para eliminar
-    public function eliminar($iId, $npag="NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
-        if(is_numeric($iId)){
-          $eliminar=$this->titulacion_model->eliminar($iId);
-          if($eliminar==true){
-              $this->session->set_flashdata('correcto', '<strong>Bien!</strong> la titulación se eliminó con éxito.');
-          }else{
-              $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudo eliminar la titulación. Sepa que si la <b>Titulacion</b> está vinculada a una o más asignaturas (o alumnos), no es posible el borrado de la misma.');
-          }
-          redirect(base_url()."index.php/titulacion");
-        }else{
-          redirect(base_url()."index.php/titulacion");
-        }
+        $output = array(
+            "draw" => $_POST['draw'],
+            "recordsTotal" => $this->Titulacion_model->count_all(),
+            "recordsFiltered" => $this->Titulacion_model->count_filtered(),
+            "data" => $data,
+        );
+        // Salida JSON.
+        echo json_encode($output);
     }
 
-    //Controlador para eliminar
-    public function eliminar_todos($npag="NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
+    /*
+        Función AJAX que se ejecutará cuando editemos un registro de la tabla de la BBDD "titulacion" 
+    */
+    public function ajax_edit($iId)
+    {
+        $data = $this->Titulacion_model->get_by_id($iId);
+        echo json_encode($data);
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando añadimos un registro de la tabla de la BBDD "titulacion" 
+    */
+    public function ajax_add()
+    {
+        $this->_validate();
+        $data = array(
+                'sTitulacion' => $this->input->post('sTitulacion'),
+                'iId_Universidad' => $this->input->post('iId_Universidad'),
+            );
+        $insert = $this->Titulacion_model->save($data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando actualizamos un registro de la tabla de la BBDD "titulacion" 
+    */
+    public function ajax_update()
+    {
+        $this->_validate();
+        $data = array(
+                'sTitulacion' => $this->input->post('sTitulacion'),
+                'iId_Universidad' => $this->input->post('iId_Universidad'),
+            );
+        $this->Titulacion_model->update(array('iId' => $this->input->post('iId')), $data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "titulacion" 
+    */
+    public function ajax_delete($iId)
+    {
+        $this->_validate_delete($iId);
+        $this->Titulacion_model->delete_by_id($iId);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos registros de forma masiva. 
+    */
+    public function ajax_delete_todos()
+    {
         foreach ($_POST["titulacion"] as $item){
-            $eliminar=$this->titulacion_model->eliminar($item);
+            $eliminar = $this->Titulacion_model->delete_by_id($item);
         }
-        if($eliminar==true){
-            $this->session->set_flashdata('correcto', '<strong>Bien!</strong> se eliminaron los datos.');
-        }else{
-            $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro. Sepa que si la <b>Titulacion</b> está vinculada a una o más asignaturas, no es posible el borrado de la misma.');
-        } 
-        redirect(base_url()."index.php/titulacion");
+        echo json_encode(array("status" => TRUE));
     }
+
+    /*
+        Función privada para comprobar si una titulación puede eliminarse del sistema sin provocar errores de integridad.
+        ENTRADA: $iId (Identificador de la titulación que se desea eliminar) 
+    */
+    private function _validate_delete($iId) {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;  
+
+        if ($this->Titulacion_model->titulacion_curso($iId) > 0) {
+            $data['inputerror'][] = 'sTitulacion';
+            $data['error_string'][] = 'No puedes borrar la titulación, ya que está asignada a un curso académico.';
+            $data['status'] = FALSE;
+        }
+        
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
+        }
+    }
+    /*
+        Función auxiliar para validar los campos del formulario antes de darlo de alta como nuevo registro o
+        para la modificación del mismo. En ambas acciones se utilizará la validación. 
+    */
+    private function _validate()
+    {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;
+
+        // Comprobar que no haya ya un sTitulacion con el mismo nombre en la base de datos.
+
+        if($this->input->post('sTitulacion') == '')
+        {
+            $data['inputerror'][] = 'sTitulacion';
+            $data['error_string'][] = 'El nombre de la titulación es obligatorio';
+            $data['status'] = FALSE;
+        }
+        
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
+        }
+    }
+
+    // FIN AJAX
+    
 }
 ?>

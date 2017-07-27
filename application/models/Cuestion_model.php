@@ -127,7 +127,7 @@ class Cuestion_model extends CI_Model{
         }
 
         // Finalmente, seleccionamos un iId aleatorio de pregunta.
-        //$this->db->where('bActiva', 1);
+        $this->db->where('bActiva', 1);
         $this->db->order_by('iId', 'RANDOM');
         $this->db->limit(1);
         $query_iId_Pregunta = $this->db->get('pregunta');

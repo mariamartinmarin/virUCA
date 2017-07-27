@@ -64,7 +64,24 @@
 	?>
 	<div class="body">
 		<?php $this->load->view('menul_view');?>
-		<div role="main" class="main shop">
+		<div role="main" class="main">
+			<section class="page-top">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <ul class="breadcrumb">
+                                    <li><a href="#">Login</a></li>
+                                    <li class="active">Acceder al sistema</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2>Acceder al sistema</h2>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 			<div class="container">
 				<div class="row">
 					<div class="col-md-12">

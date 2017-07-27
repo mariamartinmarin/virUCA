@@ -2,42 +2,78 @@
 class Usuarios extends CI_Controller{
     public function __construct() {
         parent::__construct();
-        $this->load->model("usuarios_model");
+        $this->load->model("Usuarios_model");
         $this->load->library("session");
-        $this->load->library('pagination');
     }
      
     //controlador por defecto
-    public function index($iId="NULL"){  
-        // Controles para cargar la página.
-        if($this->session->userdata('perfil') != 0)
+    public function index(){  
+        if($this->session->userdata('perfil') == 1)
         {
             redirect(base_url().'index.php/login');
         }
-
         if ($this->session->userdata('is_logued_in') == FALSE)  {
             $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
             redirect(base_url().'index.php/login');
         }
-        
-        $pages=5; //Número de registros mostrados por páginas
-        $config['base_url'] = base_url().'index.php/usuarios/pagina/';
-        $config['total_rows'] = $this->usuarios_model->filas();//calcula el número de filas  
-        $config['per_page'] = $pages; //Número de registros mostrados por páginas
-        $config['num_links'] = 5; //Número de links mostrados en la paginación
-        $config['first_link'] = 'Primera';//primer link
-        $config['last_link'] = 'Última';//último link
-        $config["uri_segment"] = 3;//el segmento de la paginación
-        $config['next_link'] = 'Siguiente';//siguiente link
-        $config['prev_link'] = 'Anterior';//anterior link
-        $this->pagination->initialize($config); //inicializamos la paginación   
 
-        $data["num_filas"] = $config['total_rows'];           
-        $data["usuario"] = $this->usuarios_model->total_paginados($config['per_page'],
-            $this->uri->segment(3),
-            $pages);          
+        $data["universidades"] = $this->Usuarios_model->get_universidades();
+        $data["titulaciones"] = $this->Usuarios_model->get_titulaciones();
+        $data["asignaturas"] = $this->Usuarios_model->get_asignaturas();
+
+        $this->load->helper('url'); 
+        $this->load->view("usuarios");
+    }
+
+    /* 
+        Función que "montará" la lista según los datos que se mostrarán en la vista y que obtendremos a través del 
+        modelo.
+    */
+    public function ajax_list()
+    {
+        $list = $this->Usuarios_model->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $usuario) {
+            $no++;
+            $row = array();
+            $row[] = '<input type="checkbox" id="usuario" class="usuario" name="usuario[]" value="'.$usuario->iId.'">';
+            $row[] = $usuario->sNombre;
+            $row[] = $usuario->sApellidos;
+
+            switch ($usuario->iAdmin) {
+                case '1':
+                    $row_content = '<span class="label label-danger">Admin</span>';
+                    break;
+                case '0':
+                    if ($usuario->iPerfil == 0)
+                        $row_content = '<span class="label label-info">Profesor</span>';
+                    else 
+                        $row_content = '<span class="label label-success">Alumno</span>';
+                    break;
+                default:
+                    break;
+            }
+            $row[] = $row_content;
+            $row[] = $usuario->sEmail;
+
+            // Añadimos HTML para las acciones de la tabla.
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="editar_usuario('."'".$usuario->iId."'".')"><i class="glyphicon glyphicon-pencil"></i> Editar</a>
+            <a class="btn btn-sm btn-success" href="javascript:void(0)" title="Curso" onclick="editar_cursos('."'".$usuario->iId."'".')"><i class="glyphicon glyphicon-plus"></i> Curso</a>
+                <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="borrar_usuario('."'".$usuario->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Borrar</a>
+                ';
         
-        $this->load->view("usuarios",$data);
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => $_POST['draw'],
+            "recordsTotal" => $this->Usuarios_model->count_all(),
+            "recordsFiltered" => $this->Usuarios_model->count_filtered(),
+            "data" => $data,
+        );
+        // Salida JSON.
+        echo json_encode($output);
     }
 
     public function mod_view($iId){
@@ -71,11 +107,13 @@ class Usuarios extends CI_Controller{
                     $this->input->post("sApellidos"),
                     $this->input->post("sEmail"),
                     $this->input->post("sUsuario"),
-                    $this->input->post("sPassword")
+                    $this->input->post("sPassword"),
+                    $this->input->post("sTitulaciones"),
+                    $this->input->post("sAsignaturas")
                     );
                 if($add==true){
                     //Sesion de una sola ejecución
-                    $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, El usuario se registró con éxito.');
+                    $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, El profesor se registró con éxito.');
                 }else{
                     $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, parece que hubo un problema y no hemos podido añadir el nuevo profesor.');
                 }       
@@ -113,7 +151,9 @@ class Usuarios extends CI_Controller{
                         $this->input->post("sApellidos"),
                         $this->input->post("sEmail"),
                         $this->input->post("sUsuario"),
-                        $this->input->post("iPerfil"));
+                        $this->input->post("iPerfil"),
+                        $this->input->post("iTitulacion"),
+                        $this->input->post("iAsignatura"));
                     if($mod==true){
                         $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong>, el profesor se modificó correctamente.');
                     }else{

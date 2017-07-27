@@ -20,31 +20,28 @@
 					<li><?=anchor(base_url().'index.php/profesor', 'Inicio')?></li>
 
 					<li class="dropdown">
-						<a class="dropdown-toggle" href="#">Profesores<i class="icon icon-angle-down"></i></a>
+						<a class="dropdown-toggle" href="#">Usuarios<i class="icon icon-angle-down"></i></a>
 						<ul class="dropdown-menu">
+							<?php if ($this->session->userdata('admin') == 1) { ?>
 							<li><?=anchor(base_url().'index.php/usuarios', 'Gestión de Profesores')?></li>
-						</ul>
-					</li>
-
-					<li class="dropdown">
-						<a class="dropdown-toggle" href="#">Alumnos
-							<i class="icon icon-angle-down"></i>
-						</a>
-						<ul class="dropdown-menu">
+							<?php } ?>
 							<li><?=anchor(base_url().'index.php/alumnos', 'Gestión de Alumnos')?></li>
 						</ul>
 					</li>
 
+					<?php if ($this->session->userdata('admin') == 1) { ?>
 					<li class="dropdown">
 						<a class="dropdown-toggle" href="#">Curso
 							<i class="icon icon-angle-down"></i>
 						</a>
 						<ul class="dropdown-menu">
+							<li><?=anchor(base_url().'index.php/universidad', 'Gestión de Universidades')?></li>
 							<li><?=anchor(base_url().'index.php/titulacion', 'Gestión de Titulaciones')?></li>
 							<li><?=anchor(base_url().'index.php/asignatura', 'Gestión de Asignaturas')?></li>
 							<li><?=anchor(base_url().'index.php/curso', 'Gestión de curso académico')?></li>
 						</ul>
 					</li>
+					<?php } ?>
 
 					<li class="dropdown">
 						<a class="dropdown-toggle" href="#">
@@ -52,8 +49,7 @@
 						</a>
 						<ul class="dropdown-menu">
 							<li><?=anchor(base_url().'index.php/categorias', 'Gestionar categorías')?></li>
-							<li><?=anchor(base_url().'index.php/preguntas', 'Listado de preguntas')?></li>
-							<li><?=anchor(base_url().'index.php/preguntasalta', 'Alta de pregunta')?></li>
+							<li><?=anchor(base_url().'index.php/preguntas', 'Gestionar preguntas')?></li>
 						</ul>
 					</li>
 					
@@ -80,11 +76,48 @@
 						<a class="dropdown-toggle" href="#">Configuración<i class="icon icon-angle-down"></i></a>
 						<ul class="dropdown-menu">
 							<li><?=anchor(base_url().'index.php/parametros', 'Parametros')?></li>
+							<?php if ($this->session->userdata('admin') == 1) { ?>
 							<li><?=anchor(base_url().'index.php/accesos', 'Accesos')?></li>
+							<?php } ?>
 						</ul>
 					</li>
 
-					<li><?=anchor(base_url().'index.php/login/logout_ci', 'Salir')?></li>
+					<?php if ($this->session->userdata('admin') == 1) { ?>
+					<li class="dropdown">
+						<a class="dropdown-toggle" href="#">Peticiones
+							<i class="icon icon-angle-down"></i>
+						</a>
+						<ul class="dropdown-menu">
+							<li><?=anchor(base_url().'index.php/gestionarpeticiones', 'Gestionar Peticiones')?></li>
+						</ul>
+					</li>
+					<?php } else { ?>
+					<li class="dropdown">
+						<a class="dropdown-toggle" href="#">Peticiones
+							<i class="icon icon-angle-down"></i>
+						</a>
+						<ul class="dropdown-menu">
+							<li><?=anchor(base_url().'index.php/enviarpeticion', 'Enviar petición')?></li>
+							<li><?=anchor(base_url().'index.php/mispeticiones', 'Mis peticiones')?></li>
+						</ul>
+					</li>
+					<?php } ?>
+
+					<li class="dropdown">
+						<a class="dropdown-toggle" href="#">Ayuda
+							<i class="icon icon-angle-down"></i>
+						</a>
+						<ul class="dropdown-menu">
+							<li><?=anchor(base_url().'index.php/contacto', 'Contacto')?></li>
+							<li><?=anchor(base_url().'index.php/faqs', 'FAQS')?></li>
+							<li><?=anchor(base_url().'index.php/ayuda', 'Ayuda')?></li>
+							<?php if ($this->session->userdata('admin') != 1) { ?>
+							<li><?=anchor(base_url().'index.php/peticiones', 'Peticiones')?></li>
+							<?php } ?>
+							<li><?=anchor(base_url().'index.php/login/logout_ci', 'Salir')?></li>
+						</ul>
+					</li>
+
 								
 					<li class="dropdown mega-menu-item mega-menu-shop">
 						<a class="dropdown-toggle mobile-redirect" href="#">

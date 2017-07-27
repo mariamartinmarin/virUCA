@@ -27,8 +27,8 @@
 		<link rel="stylesheet" href="<?=base_url()?>vendor/mediaelement/mediaelementplayer.css" media="screen">
 
 		<!-- Theme CSS -->
-		<link rel="stylesheet" href="<?=base_url()?>css/theme.css">
-		<link rel="stylesheet" href="<?=base_url()?>css/theme-elements.css">
+		<link rel="stylesheet" href="<?=base_url()?>css/theme.css?id=11">
+		<link rel="stylesheet" href="<?=base_url()?>css/theme-elements.css?id=1">
 		<link rel="stylesheet" href="<?=base_url()?>css/theme-blog.css">
 		<link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
 		<link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
@@ -37,7 +37,7 @@
 		<link rel="stylesheet" href="<?=base_url()?>css/theme-responsive.css" />
 
 		<!-- Skin CSS -->
-		<link rel="stylesheet" href="<?=base_url()?>css/skins/default.css">
+		<link rel="stylesheet" href="<?=base_url()?>css/skins/default.css?id=22">
 
 		<!-- Custom CSS -->
 		<link rel="stylesheet" href="<?=base_url()?>css/custom.css">

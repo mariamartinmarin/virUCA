@@ -1,15 +1,16 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
 class Preguntas extends CI_Controller{
     public function __construct() {
         parent::__construct();
-        $this->load->model("preguntas_model");
+        $this->load->model("Preguntas_model");
         $this->load->library("session");
-        $this->load->library('pagination');
     }
      
     //controlador por defecto
     public function index($iId="NULL"){  
-        if($this->session->userdata('perfil') != 0)
+        if($this->session->userdata('perfil') == 1)
         {
             redirect(base_url().'index.php/login');
         }
@@ -17,117 +18,231 @@ class Preguntas extends CI_Controller{
             $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
             redirect(base_url().'index.php/login');
         }
-        $pages=20; //Número de registros mostrados por páginas
-        $config['base_url'] = base_url().'index.php/preguntas/pagina/';
-        $config['total_rows'] = $this->preguntas_model->filas();//calcula el número de filas  
-        $config['per_page'] = $pages; //Número de registros mostrados por páginas
-        $config['num_links'] = 5; //Número de links mostrados en la paginación
-        $config['first_link'] = 'Primera';//primer link
-        $config['last_link'] = 'Última';//último link
-        $config["uri_segment"] = 3;//el segmento de la paginación
-        $config['next_link'] = 'Siguiente';//siguiente link
-        $config['prev_link'] = 'Anterior';//anterior link
-        $this->pagination->initialize($config); //inicializamos la paginación 
-        $data["categorias"] = $this->preguntas_model->get_categorias();      
-        $data["pregunta"] = $this->preguntas_model->total_paginados(
-            $config['per_page'],
-            $this->uri->segment(3),
-            $pages);          
-        $data["num_filas"] = $config['total_rows'];
-        $this->load->view("preguntas",$data);
-    }
-     
-    public function mod($iId){
-        if(is_numeric($iId)){
-            $datos["mod"]=$this->preguntas_model->mod($iId);
-            $datos["respuestas"] = $this->preguntas_model->respuestas($iId);
-            $datos["categorias"] = $this->preguntas_model->get_categorias();
-            $this->load->view("preguntasmod_view",$datos);
-            
-            if($this->input->post("submit")){
-            
-            // Primero vamos a hacer las validaciones.
-            $this->form_validation->set_rules('sPregunta','Pregunta','trim|required|max_length[512]|min_length[10]');
-            $this->form_validation->set_rules('sResp1','Respuesta A','trim|required|max_length[512]');
-            $this->form_validation->set_rules('sResp2','Respuesta B','trim|required|max_length[512]');
-            $this->form_validation->set_rules('sResp3','Respuesta C','trim|required|max_length[512]');
-            $this->form_validation->set_rules('sResp4','Respuesta D','trim|required|max_length[512]');
-            
-            // Una vez establecidas las reglas, validamos los campos.
-            $this->form_validation->set_message('required', '%s es obligatorio.');
-            $this->form_validation->set_message('valid_email', 'El %s no es válido.');
-            $this->form_validation->set_message('min_length', '%s debe tener al menos %s caracteres.');
-            $this->form_validation->set_message('max_length', '%s no puede tener más de %s caracteres.');
+        $data["categorias"] = $this->Preguntas_model->get_categorias();
+        $data["titulaciones"] = $this->Preguntas_model->get_titulaciones();
+        $data["asignaturas"] = $this->Preguntas_model->get_asignaturas();
 
-            if ($this->form_validation->run() == FALSE) {   
-                $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong> no hemos podido modificar la pregunta.');               
-                redirect(base_url()."index.php/preguntas/mod/".$iId, "refresh");
-            } else {
-                $activa = 1;
-                if ($this->input->post("bActiva")[0] == "") $activa = 0;
-                $mod=$this->preguntas_model->mod(
-                    $iId,
-                    $this->input->post("submit"),
-                    $this->input->post("sPregunta"),
-                    $this->input->post("sResp1"),
-                    $this->input->post("sResp2"),
-                    $this->input->post("sResp3"),
-                    $this->input->post("sResp4"),
-                    $this->input->post("iCategoria"),
-                    $activa, 
-                    $this->input->post("iId_Usuario"), 
-                    $this->input->post("nPuntuacion"),
-                    $this->input->post("verdadera"),
-                    $this->input->post("sObservaciones"));
-
-                if ($mod == true) {
-                    $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong> la pregunta se modificó con éxito.');
-                } else {
-                    $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong> no hemos podido modificar la pregunta.');
-                    }
-
-                    redirect(base_url()."index.php/preguntas/mod/".$iId, "refresh");
-                }
-            }
-        } else {
-            redirect(base_url()."index.php/preguntas"); 
-        }
+        $this->load->helper('url'); 
+        $this->load->view("preguntas", $data);
     }
 
-     
-    //Controlador para eliminar
-    public function eliminar($iId, $npag = "NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
+    /* 
+        Función que "montará" la lista según los datos que se mostrarán en la vista y que obtendremos a través del 
+        modelo.
+    */
+    public function ajax_list()
+    {
+        $list = $this->Preguntas_model->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $pregunta) {
+            $no++;
+            $row = array();
+            $row[] = '<input type="checkbox" id="pregunta" class="pregunta" name="pregunta[]" value="'.$pregunta->iId.'">';
+            $row[] = $pregunta->sPregunta;
+            $row[] = $pregunta->sNombre;
+            $row[] = $pregunta->sApellidos;
+            $row[] = $pregunta->sCategoria;
+            $row[] = $pregunta->nPuntuacion;
+
+            // Añadimos HTML para las acciones de la tabla.
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="editar_pregunta('."'".$pregunta->iId."'".')"><i class="glyphicon glyphicon-pencil"></i> Editar</a>
+                <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="borrar_pregunta('."'".$pregunta->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Borrar</a>';
         
-        if(is_numeric($iId)){
-            $eliminar = $this->preguntas_model->eliminar($iId);
-            if ($eliminar == true){
-                $this->session->set_flashdata('correcto', 
-                    '<strong>Bien!</strong> la pregunta se eliminó con éxito.');
-            } else {
-                $this->session->set_flashdata('incorrecto',
-                    '<strong>Oops!</strong> no se pudo eliminar la pregunta.');
-            }
-            redirect(base_url()."index.php/preguntas/pagina/$npag");
-        } else {
-          redirect(base_url()."index.php/preguntas/pagina/$npag");
+            $data[] = $row;
         }
+
+        $output = array(
+            "draw" => $_POST['draw'],
+            "recordsTotal" => $this->Preguntas_model->count_all(),
+            "recordsFiltered" => $this->Preguntas_model->count_filtered(),
+            "data" => $data,
+        );
+        // Salida JSON.
+        echo json_encode($output);
     }
 
-    //Controlador para eliminar
-    public function eliminar_todos($npag = "NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
+    /*
+        Funciones AJAX que se ejecutarán cuando editemos un registro de la tabla de la BBDD "pregunta" 
+    */
+    public function ajax_edit($iId)
+    {
+        $data = $this->Preguntas_model->get_by_id($iId);
+        echo json_encode($data);
+    }
+
+     public function ajax_editA($iId)
+    {
+        $data = $this->Preguntas_model->get_respuesta_A($iId);
+        echo json_encode($data);
+    }
+
+    public function ajax_editB($iId)
+    {
+        $data = $this->Preguntas_model->get_respuesta_B($iId);
+        echo json_encode($data);
+    }
+
+    public function ajax_editC($iId)
+    {
+        $data = $this->Preguntas_model->get_respuesta_C($iId);
+        echo json_encode($data);
+    }
+
+    public function ajax_editD($iId)
+    {
+        $data = $this->Preguntas_model->get_respuesta_D($iId);
+        echo json_encode($data);
+    }
+
+    public function obtener_verdadera($iId) {
+        $data = $this->Preguntas_model->get_verdadera($iId);
+        echo json_encode($data);
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando añadimos un registro de la tabla de la BBDD "pregunta" 
+    */
+    public function ajax_add()
+    {
+        $this->_validate();
+        $data_pregunta = array(
+            'sPregunta' => $this->input->post('sPregunta'),
+            'iId_Usuario' => $this->session->userdata('id_usuario'),
+            'iId_Titulacion' => $this->input->post('iId_Titulacion'),
+            'iId_Asignatura' => $this->input->post('iId_Asignatura'),
+            'iId_Categoria' => $this->input->post('iId_Categoria'),
+            'sObservaciones' => $this->input->post('sObservaciones'),
+            'nPuntuacion' => $this->input->post('nPuntuacion'),
+        );
+
+        $data_respuesta = array(
+            'sResp1' => $this->input->post('sResp1'),
+            'sResp2' => $this->input->post('sResp2'),
+            'sResp3' => $this->input->post('sResp3'),
+            'sResp4' => $this->input->post('sResp4'),
+            'bVerdadera' => $this->input->post('bVerdadera'),
+        );
         
+        $insert = $this->Preguntas_model->save($data_pregunta, $data_respuesta);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando actualizamos un registro de la tabla de la BBDD "pregunta" 
+    */
+    public function ajax_update()
+    {
+        $this->_validate();
+        $data_pregunta = array(
+            'sPregunta' => $this->input->post('sPregunta'),
+            'iId_Categoria' => $this->input->post('iId_Categoria'),
+            'iId_Titulacion' => $this->input->post('iId_Titulacion'),
+            'iId_Asignatura' => $this->input->post('iId_Asignatura'),
+            'sObservaciones' => $this->input->post('sObservaciones'),
+            'nPuntuacion' => $this->input->post('nPuntuacion'),
+        );
+        
+        $data_respuesta = array(
+            'sResp1' => $this->input->post('sResp1'),
+            'sResp2' => $this->input->post('sResp2'),
+            'sResp3' => $this->input->post('sResp3'),
+            'sResp4' => $this->input->post('sResp4'),
+            'bVerdadera' => $this->input->post('bVerdadera'),
+        );
+
+        $this->Preguntas_model->update(array('iId' => $this->input->post('iId')), $data_pregunta, $data_respuesta);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "pregunta" 
+    */
+    public function ajax_delete($iId)
+    {
+        $this->Preguntas_model->delete_by_id($iId);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "pregunta" de forma masiva. 
+    */
+    public function ajax_delete_todos()
+    {
         foreach ($_POST["pregunta"] as $item){
-            $eliminar = $this->preguntas_model->eliminar($item);
+            $eliminar = $this->Preguntas_model->delete_by_id($item);
         }
-        if ($eliminar == true){
-            $this->session->set_flashdata('correcto', '<strong>Bien!</strong> se eliminaron los datos.');
-        } else {
-            $this->session->set_flashdata('incorrecto', 
-                '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
-        } 
-        redirect(base_url()."index.php/preguntas/pagina/$npag");
+        echo json_encode(array("status" => TRUE));
+    }
+
+
+    /*
+        Función auxiliar para validar los campos del formulario antes de darlo de alta como nuevo registro o
+        para la modificación del mismo. En ambas acciones se utilizará la validación. 
+    */
+    private function _validate()
+    {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;
+
+        // Comprobar que no haya ya un sTitulacion con el mismo nombre en la base de datos.
+
+        if($this->input->post('sPregunta') == '')
+        {
+            $data['inputerror'][] = 'sPregunta';
+            $data['error_string'][] = 'El texto de la pregunta es obligatorio';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('iId_Categoria') == '')
+        {
+            $data['inputerror'][] = 'iId_Categoria';
+            $data['error_string'][] = 'Categoría obligatoria';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('sResp1') == '')
+        {
+            $data['inputerror'][] = 'sResp1';
+            $data['error_string'][] = 'Respuesta obligatoria';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('sResp2') == '')
+        {
+            $data['inputerror'][] = 'sResp2';
+            $data['error_string'][] = 'Respuesta obligatoria';
+            $data['status'] = FALSE;
+        }
+        
+        if($this->input->post('sResp3') == '')
+        {
+            $data['inputerror'][] = 'sResp3';
+            $data['error_string'][] = 'Respuesta obligatoria';
+            $data['status'] = FALSE;
+        }
+        
+        if($this->input->post('sResp4') == '')
+        {
+            $data['inputerror'][] = 'sResp4';
+            $data['error_string'][] = 'Respuesta obligatoria';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('nPuntuacion') != '' and !is_numeric($this->input->post('nPuntuacion')))
+        {
+            $data['inputerror'][] = 'nPuntuacion';
+            $data['error_string'][] = 'Dato incorrecto';
+            $data['status'] = FALSE;
+        }
+        
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
+        }
     }
 }
 ?>

@@ -166,16 +166,40 @@
                 <!-- panel -->
                  
                 <?php
+                    // Botones
+                    if ($bFinalizada == 0) { ?>
+                    <input type="hidden" data-bb="pregunta">
+                    <input type="button" class="btn btn-warning" 
+                        data-bb="confirm" 
+                        data-pn="<?=$iId_Panel;?>"
+                        data-id="<?=$iId_Partida;?>"
+                        data-gr="<?=$iTurno;?>"
+                        value="Tirar Dado">
+
+                    <input type="button" class="btn btn-warning" 
+                        data-bb="confirm2" 
+                        data-id="<?=$iId_Partida;?>"
+                        value="Finalizar partida">
+
+                    <input type="button" class="btn btn-warning" value="Salir" 
+                        onclick="location.href='<?=base_url()?>index.php/jugar/salir/<?=$iId_Partida?>'">
+                    <?php } else { ?>
+                    <input type="button" class="btn btn-warning" value="Listado de partidas" 
+                        onclick="location.href='<?=base_url()?>index.php/partidas'">
+                    <?php } 
+
                     if (!$bFinalizada) {
 
                     // Pintamos el panel     
                     $contCasilla = 1;
-                    echo "<div data-toggle='tooltip' title='Inicio' class='test fade' style='float:left;'>
+                    echo "<br class='clear'><br><div data-toggle='tooltip' title='Inicio' class='test fade' style='float:left;'>
                         <img src='".base_url()."/assets/img/inicio.png' aling='center'></div>";
+                    
                     foreach ($casillas as $casilla) {
                         // Pinto la casilla.
                         echo "<div data-toggle='tooltip' title='".$casilla->sNombre."' id='casilla".$contCasilla."' class='test circulo fade' style='background:".$casilla->sColor."; border: 1px dotted black;'>";
-                         echo "<h4 style='margin:0 !important;' class='fuego'><b>".$contCasilla."</b></h4>";
+                        echo "<h4 style='margin:0 !important;' class='fuego'><b>".$contCasilla."</b></h4>";
+                        
                         // Dependiendo de la función de la casilla, pintaremos esa función.
 
                         switch ($casilla->eFuncion) {
@@ -189,14 +213,20 @@
                                 # code...
                                 break;
                         }
+
                         echo "</div>";
                         $contCasilla++;
                     } 
+
                     echo "<div data-toggle='tooltip' title='Meta!' class='test fade' style='float:left;'>
                         <img src='".base_url()."/assets/img/meta.png' aling='center'></div>";
+                    
                     // Ahora colocamos las fichas en sus celdas.
+                    
                     echo "<div>";
+                    
                     // Hay que restablecer la partida.
+                    
                     foreach ($resumen as $equipo) {
                         if ($equipo->iCasilla != 0) {
                             // Hay que colocar la ficha en la celda.
@@ -206,12 +236,15 @@
                             echo "</script>";
                         }
                     }
+                    
                     // Fin de colocación de fichas.
                 ?>
+                
                 <br class="clear">
-
                 <hr class="short">
+                
                 <!-- Leyenda -->
+                
                 <blockquote>
                     <h4>Leyenda.</h4>
                     <ul>

@@ -21,12 +21,15 @@ class Login extends CI_Controller
 				$data['token'] = $this->token();
 				$this->load->view('login_view',$data);
 				break;
-			case '0':
+			case '0': // Administrador único
 				redirect(base_url().'index.php/profesor');
 				break;
 			case '1':
 				redirect(base_url().'index.php/alumno');
-				break;	
+				break;
+			case '2':
+				redirect(base_url().'index.php/profesor');
+				break;
 			default:		
 				$this->load->view('login_view',$data);
 				break;		
@@ -75,6 +78,7 @@ class Login extends CI_Controller
 	                'id_usuario' 	=> 		$check_user->iId,
 	                'perfil'		=>		$check_user->iPerfil,
 	                'username' 		=> 		$check_user->sUsuario,
+	                'admin'			=>		$check_user->iAdmin,
 	                'iId_Partida'	=>		'',
 	                'iId_Panel'		=>		'',
 	                'iTurno'		=>		'',

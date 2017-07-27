@@ -1,92 +1,148 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Titulacion_model extends CI_Model{
+    var $table = 'titulacion';
+    var $column_order = array('sTitulacion', 'sUniversidad', null);
+    var $column_search = array('sTitulacion', 'sUniversidad');
+    var $order = array('iId' => 'desc');
+    
     public function __construct() {
-        parent::__construct(); 
-        $this->load->database();
+      parent::__construct(); 
+      $this->load->database();
     }
 
-    public function filas()
-    {
-      $consulta = $this->db->get('titulacion');
-      return  $consulta->num_rows() ;
-    }
+    /* Función privada que obtiene los datos de la BBDD necesarios para construir la vista.
+    */
+    private function _get_datatables_query() {
+      $this->db->select('t.*, u.sUniversidad');
+      $this->db->from('titulacion t');
+      $this->db->join('universidad u', 'u.iId = t.iId_Universidad');
+      $i = 0;
 
-    function total_paginados($por_pagina, $segmento, $pages) 
-    {
-      $consulta = $this->db->get('titulacion', $por_pagina, $segmento);
-      if($consulta->num_rows()>0)
-      {
-        foreach($consulta->result() as $fila)
-        {
-          $data[] = $fila;
-        }
-        return $data;
-      } else {
-        //$consulta = $this->db->get('titulacion', $por_pagina, $segmento);
-        $segmento_anterior = $segmento - $pages;
-        if ($segmento_anterior < 0) $segmento_anterior = "";
-          $consulta = $this->db->get('titulacion', $por_pagina, $segmento_anterior);
-          if($consulta->num_rows()>0) {
-            foreach($consulta->result() as $fila) {
-              $data[] = $fila;
-            }
-            return $data;
+      foreach ($this->column_search as $item) {
+        if($_POST['search']['value']) {
+          if($i===0) {
+            $this->db->group_start();
+            $this->db->like($item, $_POST['search']['value']);
           }
-        }
-    }
-     
-    public function ver(){
-        //Hacemos una consulta
-        $consulta=$this->db->query("SELECT * FROM titulacion;");
-         
-        //Devolvemos el resultado de la consulta
-        return $consulta->result();
-    }
-     
-    public function nueva($sTitulacion){
-        $data = array('sTitulacion' => $sTitulacion);
-        if ($this->db->insert('titulacion', $data)) {
-            return true;
-        } else { 
-          return false;
-        }	
-    }
-     
-    public function mod($iId,$modificar="NULL",$sTitulacion="NULL"){
-        if($modificar=="NULL"){
-            $consulta=$this->db->query("SELECT * FROM titulacion WHERE iId=$iId");
-            return $consulta->result();
-        }else{
-          $consulta=$this->db->query("UPDATE titulacion SET sTitulacion='$sTitulacion' WHERE iId=$iId;");
-          if($consulta==true){
-              return true;
-          }else{
-              return false;
+          else {
+            $this->db->or_like($item, $_POST['search']['value']);
           }
-        }
-    }
-     
-    public function eliminar($iId){
-      $this->db->select('a.iId');
-      $this->db->from('asignatura a');
-      $this->db->where('a.iId_Titulacion', $iId);
-      $consulta = $this->db->get();
-      
-      $this->db->select('c.iId');
-      $this->db->from('curso c');
-      $this->db->where('c.iId_Titulacion', $iId);
-      $consulta2 = $this->db->get();
 
-      if (($consulta->num_rows() >= 1) || ($consulta2->num_rows() >= 1)) {
-        return false;
-      } else {
-        $consulta=$this->db->query("DELETE FROM titulacion WHERE iId=$iId");
-        if($consulta==true){
-           return true;
-        }else{
-           return false;
+          if(count($this->column_search) - 1 == $i) 
+            $this->db->group_end();
         }
+        $i++;
+      }
+
+      if(isset($_POST['order'])) {
+        $this->db->order_by($this->column_order[$_POST['order']['0']['column']], $_POST['order']['0']['dir']);
+      } 
+      else if(isset($this->order)) {
+        $order = $this->order;
+        $this->db->order_by(key($order), $order[key($order)]);
+      }
+    }
+
+
+    /* Función que se utilizará para devolver a la vista los datos que ésta mostrará. Utiliza la función _get_datatables_query()
+      como soporte
+    */
+    function get_datatables() {
+      $this->_get_datatables_query();
+      if ($_POST['length'] != -1)
+        $this->db->limit($_POST['length'], $_POST['start']);
+      $query = $this->db->get();
+      return $query->result();
+    }
+
+    /* Función que devuelve el número de resultados de una consulta filtrada. */
+    function count_filtered() {
+      $this->_get_datatables_query();
+      $query = $this->db->get();
+      return $query->num_rows();
+    }
+
+    /* Función que devuelve el número total de registros de una consulta */
+    public function count_all() {
+      $this->db->from($this->table);
+      return $this->db->count_all_results();
+    }
+
+    /* 
+      Función que obtiene un registro de la tabla de 'titulacion' según un $iId que obtiene como entrada.
+      ENTRADA: $iId (Identificador único del registro que queremos obtener de la base de datos)
+      SALIDA:  Registro [titulacion].
+    */
+    public function get_by_id($iId) {
+      $this->db->from($this->table);
+      $this->db->where('iId',$iId);
+      $query = $this->db->get();
+      return $query->row();
+    }
+
+    /* 
+      Función que guarda un nuevo registro en la base de datos, que toma como parámetro de entrada.
+      ENTRADA: $data (Array con el registro a insertar.)
+      SALIDA:  Último ID insertado.
+    */
+    public function save($data) {
+      $this->db->insert($this->table, $data);
+      return $this->db->insert_id();
+    }
+
+    /*
+      Función que actualiza un registro de la base de datos según una condición.
+      ENTRADA:
+        $where: Condición que cumplirá el registro que se quiere modificar.
+        $data:  Array con los nuevos datos.
+      SALIDA: Número de filas afectadas por la modificación.
+    */
+    public function update($where, $data)
+    {
+      $this->db->update($this->table, $data, $where);
+      return $this->db->affected_rows();
+    }
+
+    /* 
+      Función que elimina un registro cuyo $iId se toma como entrada
+      ENTRADA: $iId (Identificador del registro que se quiere eliminar).
+      SALIDA: -
+    */
+    public function delete_by_id($iId) {
+      $this->db->where('iId', $iId);
+      $this->db->delete($this->table);
+    }
+
+    /* 
+      Función que comprueba que una titulación puede ser eliminada.
+      ENTRADA: $iId (Identificador del registro que se quiere eliminar).
+      SALIDA: Booleano.
+    */
+    public function titulacion_curso($iId) {
+      $this->db->from('curso');
+      $this->db->where('iId_Titulacion', $iId);
+      $query = $this->db->get();
+
+      if ($query->num_rows() == 0)
+        return 0;
+      else 
+        return 1;
+    }
+
+    /*
+      Función que devuelve todas las universidades del sistema para ser utilizadas en la SELECT de modificación
+      y/o inserción de titulación.
+    */
+    public function get_universidades() {
+      $query = $this->db->query("select * from universidad");
+      if ($query->num_rows() > 0) {
+        // Almacenamos el resultado en una matriz.
+        foreach($query->result() as $row)
+          $universidad[htmlspecialchars($row->iId, ENT_QUOTES)] = htmlspecialchars($row->sUniversidad, ENT_QUOTES);
+        $query->free_result();
+        return $universidad;
       }
     }
 }

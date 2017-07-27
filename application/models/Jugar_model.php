@@ -88,9 +88,12 @@ class Jugar_model extends CI_Model{
 
         $iId_Profesor = $this->session->userdata('id_usuario');
         $update_partida = $this->db->query("UPDATE partida SET
-            iId_Profesor_Act = $iId_Profesor,
-            bAbierta = 1
+            iId_Profesor_Act = $iId_Profesor
             WHERE iId = $iId_Partida AND iId_Profesor_Act = 0");
+
+        $update_partida_abierta = $this->db->query("UPDATE partida SET
+            bAbierta = 1
+            WHERE iId = $iId_Partida");
 
         $consulta = $this->db->query("SELECT iId FROM resumen WHERE iId_Partida = $iId_Partida");
         if ($consulta->num_rows() <= 0) {

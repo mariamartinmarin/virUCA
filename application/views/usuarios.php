@@ -14,47 +14,37 @@
         <!-- Mobile Metas -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- Web Fonts  -->
+        <!-- Fuente  -->
         <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800%7CShadows+Into+Light" rel="stylesheet" type="text/css">
 
         <!-- Libs CSS -->
         <link rel="stylesheet" href="<?=base_url()?>vendor/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" href="<?=base_url()?>vendor/font-awesome/css/font-awesome.css">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/magnific-popup/magnific-popup.css" media="screen">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/isotope/jquery.isotope.css" media="screen">
-        
+       
+        <link rel="stylesheet" href="<?=base_url('js/datatables/css/dataTables.bootstrap.css')?>" rel="stylesheet">
+
         <!-- Theme CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-elements.css">
-        <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
+        <link rel="stylesheet" href="<?=base_url()?>css/theme-blog.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
+        <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
 
         <!-- Custom Loader -->
         <link rel="stylesheet" href="<?=base_url()?>css/loader.css">
-
         <!-- Responsive CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme-responsive.css" />
-
         <!-- Skin CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/skins/default.css">
-
         <!-- Custom CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/custom.css">
 
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
         <script src="<?=base_url()?>vendor/jquery.js"></script>
-        <script type="text/javascript" src="<?=base_url()?>js/tablesorter/jquery.tablesorter.js"></script>
-        <script type="text/javascript" src="<?=base_url()?>js/busquedasimple.js"></script>
         <script type="text/javascript">
-            $(document).ready(function() 
-            { 
-                $("#table_usuarios").tablesorter({sortList: [[1,0], [2,0]]} ); 
-            } 
-            );
             $(window).load(function() { $(".loader").fadeOut("slow");}); 
         </script>
-
         <!--[if IE]>
             <link rel="stylesheet" href="css/ie.css">
         <![endif]-->
@@ -62,7 +52,7 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-        
+
     </head>
     <body>
         <div id="preloader">
@@ -92,228 +82,485 @@
                
                 <div class="container">
 
-                    <!-- Errores de inserción. -->
-                     <?php if($this->session->flashdata('correcto')) { ?>
-                        <div class="alert alert-success">
-                            <?php echo $this->session->flashdata('correcto');?>
-                        </div>
-                    <?php } ?>
+                    <button class="btn btn-success" onclick="add_profesor()">
+                        <i class="glyphicon glyphicon-plus"></i> Profesor
+                    </button>
+                    <button class="btn btn-warning" onclick="eliminar_todos($(usuario))">
+                        <i class="glyphicon glyphicon-trash"></i> Eliminar todos
+                    </button>
+                    <button class="btn btn-default" onclick="reload_table()">
+                        <i class="glyphicon glyphicon-refresh"></i> Refrescar
+                    </button>
 
-                    <?php if($this->session->flashdata('incorrecto')) { ?>
-                        <div class="alert alert-danger">
-                            <?php echo $this->session->flashdata('incorrecto'); ?>
-                        </div>
-                    <?php } ?>
-                    <!-- Fin errores -->
+                    <br />
+                    <br />
 
-                    <!-- Listado -->
-                    <?php if ($usuario != "") { 
-                    // Obtener página.
-                    $npag =  $this->uri->segment(3);
-                    ?>
+                    <table id="table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Rol</th>
+                        <th>E-mail</th>
+                        <th>Acción</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
 
-                    <?php echo form_fieldset('Listado de profesores');
-                    $atributos = array('class' => 'navbar-form', 'role' => 'search');
-                    ?>
-                    <blockquote>
-                        Administrar y crear usuarios <b>Profesores</b> en el sistema. En la parte inferior tiene el formulario para dar de alta nuevos usuarios.
-                    </blockquote>
-                    
-                    <?=form_open(base_url().'index.php/usuarios/eliminar_todos/'.$npag);?>
-                    <div class="input-group">
-                        <span class="input-group-addon">Buscar</span>
-                        <input id="filtrar" type="text" class="form-control" placeholder="Buscar en esta página">
-                    </div>
-                    <hr class="short">
-                    
-                    <div class="panel panel-default">
-                        <!-- Default panel contents -->
-                        <div class="panel-heading">
-                            Se están mostrando un total de <b><?=$num_filas;?> registros</b>
-                        </div>
-
-                        <table class="table table-bordered table-striped" id="table_usuarios">
-                            <thead><tr>
-                                <th>&nbsp;</th>
-                                <th>Nombre</th>
-                                <th>Apellidos</th>
-                                <th>Opciones</th>
-                            </tr></thead>
-                            <tbody class="buscar">
-                                <?php 
-                                foreach($usuario as $fila){ 
-                                ?>
-
-                                <tr><td>
-                                    <span class="show-grid-block">
-                                        <input type="checkbox" name="usuario[]" value="<?=$fila->iId;?>">
-                                    </span>
-                                </td>
-                   
-                                <td><?=$fila->sNombre;?></td>
-                                <td><?=$fila->sApellidos;?></td>   
-                                <td>
-                                    <?php if (($this->session->userdata('id_usuario') == $fila->iId) || 
-                                        ($this->session->userdata('id_usuario') == 44)) { ?>
-
-                                    <?php if ($fila->iId != 44)  { ?>
-                                    <a href="#" 
-                                        data-bb="confirm" 
-                                        data-id="<?=$fila->iId;?>"
-                                        data-pg="<?=$npag?>" 
-                                        class="btn-group-xs">
-                                            <i class="icon icon-trash-o"></i>
-                                    </a>
-                                    <?php } ?>
-                                    <a href="<?=base_url("index.php/usuarios/mod/$fila->iId/$npag")?>" 
-                                    class="btn-group-xs"><i class="icon icon-pencil"></i></a>
-                                    <?php } else { echo "---"; } ?>
-                                </td>
-                                </tr>
-                                <?php
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-
-                    </div>
-
-                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
-                    <br style="clear:both;">
-                    <?php echo $this->pagination->create_links() ?>
-                    <hr class="short">
-                    
-                    
-
-                    <?=form_close();?>
-                    
-                    <?php
-
-                    } else {
-                    ?>
-                    <div class="alert alert-success">
-                    Actualmente no hay ningún profesor en el sistema.
-                    </div>
-                    <?php 
-                    }
-                    ?>
-
-                    <!-- Fin del listado -->
-
-                   <?=form_open(base_url().'index.php/usuarios/nueva');
-                   $tipo_usuario = 0;
-                   echo form_hidden('iPerfil',$tipo_usuario);
-
-                    $sNombre = array(
-                    'name' => 'sNombre',
-                    'id' => 'sNombre',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sNombre'),
-                    'maxlength' => '100'
-                    );
-
-                    $sApellidos = array(
-                    'name' => 'sApellidos',
-                    'id' => 'sApellidos',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sApellidos')
-                    );
-
-                    $sEmail = array(
-                    'name' => 'sEmail',
-                    'id' => 'sEmail',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sEmail')
-                    );
-
-                    $sUsuario = array(
-                    'name' => 'sUsuario',
-                    'id' => 'sUsuario',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sUsuario')
-                    );
-                    $sPassword = array(
-                    'name' => 'sPassword',
-                    'id' => 'sPassword',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sPassword')
-                    );
-
-                    $submit = array(
-                    'name' => 'submit',
-                    'id' => 'submit',
-                    'value' => 'Enviar',
-                    'title' => 'Enviar',
-                    'class' => 'btn btn-default' 
-                    );
-                    ?>
-                    
-                    <?=form_fieldset('Añadir nuevo profesor.');?>
-
-                    <!--- formulario organizado con validación -->
-        
-                   <div class="row">
-                        <div class="form-group">
-                            <div class="col-md-6">
-                                <label>Nombre *</label>
-                                <?=form_input($sNombre)?>
-                                <?=form_error('sNombre','<br><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Apellidos *</label>
-                                <?=form_input($sApellidos)?>
-                                <?=form_error('sApellidos', '<br><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="form-group">
-                            <div class="col-md-6">
-                                <label>Usuario *</label>
-                                <?=form_input($sUsuario)?>
-                                <?=form_error('sUsuario','<br><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Contraseña *</label>
-                                <?=form_input($sPassword)?>
-                                <?=form_error('sPassword','<br><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="form-group">
-                            <div class="col-md-12">
-                                <label>E-mail *</label>
-                                <?=form_input($sEmail)?>
-                                <?=form_error('sEmail','<br><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
-                            </div>
-                        </div>
-                    </div>                      
-                    <?=form_submit($submit)?>
-                    <?=form_close()?>
-
-                    <!-- Fin del formulario organizado -->
-        
-                    <?=form_fieldset_close();?>
-                    <hr class="short">
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th>Nombre</th>
+                            <th>Apellidos</th>
+                            <th>Rol</th>
+                            <th>E-mail</th>
+                            <th>Acción</th>
+                        </tr>
+                    </tfoot>
+                    </table> 
                 </div>
             </div>
             <?php $this->load->view('footer');?>
         </div>
 
-        <!-- Libs -->
+        <script src="<?=base_url('vendor/bootstrap/js/bootstrap.min.js')?>"></script>
+        <script src="<?=base_url('js/datatables/js/jquery.dataTables.min.js')?>"></script>
+        <script src="<?=base_url('js/datatables/js/dataTables.bootstrap.js')?>"></script>
+        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
+        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+
+        <script type="text/javascript">
+            bootbox.setDefaults({
+                locale: "es"
+            });
+
+            var save_method; // Para el uso del método save.
+            var table;
+
+            $(document).ready(function() {
+
+                //datatables
+                table = $('#table').DataTable({ 
+                    "language": {
+                        "paginate": {
+                            "first": "Primero",
+                            "last": "Último",
+                            "next": "Siguiente",
+                            "previous": "Anterior"
+                        },
+                        "search": "Buscar profesor: ",
+                        "lengthMenu": "Mostrando _MENU_ profesores por página.",
+                        "loadingRecords": "Cargando profesores",
+                        "processing": "Cargando profesores",
+                        "zeroRecords": "No se han encontrado profesores",
+                        "emptyTable": "No hay profesores disponibles",
+                        "info": "Mostrando profesores desde el _START_ hasta el _END_, de un total de _TOTAL_",
+                        "infoEmpty": "Mostrando 0 de 0 profesores",
+                        "aria": {
+                            "sortAscending": ": ordenar columna ascendentemente",
+                            "sortDescending": ": ordenar columna descendentemente"
+                        }
+                    },
+                    "processing": true, //Feature control the processing indicator.
+                    "serverSide": true, //Feature control DataTables' server-side processing mode.
+                    "order": [], //Initial no order.
+
+                    // Load data for the table's content from an Ajax source
+                    "ajax": {
+                        "url": "<?php echo site_url('index.php/Usuarios/ajax_list')?>",
+                        "type": "POST"
+                    },
+
+                    //Set column definition initialisation properties.
+                    "columnDefs": [
+                    { 
+                        "targets": [ -1,0,3 ], //last column
+                        "orderable": false, //set not orderable
+                    },
+                    ],
+
+                });
+
+                //set input/textarea/select event when change value, remove class error and remove text help block 
+                //$("input").change(function(){
+                //    $(this).parent().parent().removeClass('has-error');
+                //    $(this).next().empty();
+                //});
+                //$("select").change(function(){
+                //    $(this).parent().parent().removeClass('has-error');
+                //    $(this).next().empty();
+                //});
+
+            });
+
+            function add_profesor()
+            {
+                save_method = 'add';
+                $('#form')[0].reset(); // reset form on modals
+                $('.form-group').removeClass('has-error'); // clear error class
+                $('.help-block').empty(); // clear error string
+                $('#modal_form').modal('show'); // show bootstrap modal
+                $('.modal-title').text('Añadir profesor'); // Set Title to Bootstrap modal title
+            }
+
+            function editar_pregunta(iId)
+            {
+                save_method = 'update';
+                $('#form')[0].reset(); // reset form on modals
+                $('.form-group').removeClass('has-error'); // clear error class
+                $('.help-block').empty(); // clear error string
+                //Ajax Load data from ajax
+                $.ajax({
+                    url : "<?php echo site_url('index.php/Preguntas/ajax_edit/')?>" + iId,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        $('[name="iId"]').val(data.iId);
+                        $('[name="sPregunta"]').val(data.sPregunta); 
+                        $('[name="iId_Categoria"]').val(data.iId_Categoria);
+                        $('[name="iId_Asignatura"]').val(data.iId_Asignatura);
+                        $('[name="iId_Titulacion"]').val(data.iId_Titulacion); 
+                        $('[name="sObservaciones"]').val(data.sObservaciones);
+                        $('[name="nPuntuacion"]').val(data.nPuntuacion);                           
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Ocurrió un error mientras se intentaba editar la pregunta.');
+                    }
+                });
+
+                $.ajax({
+                    url : "<?php echo site_url('index.php/Preguntas/ajax_editA/')?>" + iId,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        $('[name="sResp1"]').val(data.sRespuesta);                                
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Ocurrió un error mientras se intentaban recuperar las respuestas.');
+                    }
+                });
+
+                $.ajax({
+                    url : "<?php echo site_url('index.php/Preguntas/ajax_editB/')?>" + iId,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        $('[name="sResp2"]').val(data.sRespuesta);                                
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Ocurrió un error mientras se intentaban recuperar las respuestas.');
+                    }
+                });
+
+                $.ajax({
+                    url : "<?php echo site_url('index.php/Preguntas/ajax_editC/')?>" + iId,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        $('[name="sResp3"]').val(data.sRespuesta);                                
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Ocurrió un error mientras se intentaban recuperar las respuestas.');
+                    }
+                });
+
+                 $.ajax({
+                    url : "<?php echo site_url('index.php/Preguntas/ajax_editD/')?>" + iId,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        $('[name="sResp4"]').val(data.sRespuesta);                                
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Ocurrió un error mientras se intentaban recuperar las respuestas.');
+                    }
+                });
+
+                $.ajax({
+                    url : "<?php echo site_url('index.php/Preguntas/obtener_verdadera/')?>" + iId,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        switch (data.iOrden) {
+                            case '1':  $("#bVerdadera1").prop("checked", true); break;
+                            case '2':  $("#bVerdadera2").prop("checked", true); break;
+                            case '3':  $("#bVerdadera3").prop("checked", true); break;
+                            case '4':  $("#bVerdadera4").prop("checked", true); break;
+                            default:  $("#bVerdadera1").prop("checked", true); break;
+                        }
+                        $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
+                        $('.modal-title').text('Editar pregunta'); // Set title to Bootstrap modal title
+                                            
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Ocurrió un error mientras se intentaban recuperar las respuestas.');
+                    }
+                });
+            }
+
+            function reload_table()
+            {
+                table.ajax.reload(null,false); //reload datatable ajax 
+            }
+
+            function eliminar_todos(pregunta) {
+                bootbox.confirm("¿Estás seguro/a que quieres eliminar las preguntas? Recuerde que si existen dependencias, no podrá eliminarse el registro.",
+
+                function(result) {
+                    if (result == true) {
+                        $.ajax({
+                            url : "<?php echo site_url('index.php/Preguntas/ajax_delete_todos')?>/",
+                            type : "POST",
+                            dataType : "JSON",
+                            data : $('.pregunta:checked').serialize(),
+                            success: function(data) {
+
+                                if(data.status) //if success close modal and reload ajax table
+                                {
+                                    $('#modal_form').modal('hide');
+                                    bootbox.alert("Operación realizada con éxito.");
+                                    reload_table();
+
+                                } else {
+                                    bootbox.alert({
+                                        message: data.error_string
+                                    });
+                                } 
+                            },
+                            error: function (jqXHR, textStatus, errorThrown)
+                            {
+                                bootbox.alert('Error al eliminar el registro. Asegúrese que ha señalado algún registro.');
+                            }
+                        });
+                    }
+                });
+            }
+
+            function save()
+            {
+                $('#btnSave').text('guardando ...'); // Cambiar valor del texto
+                $('#btnSave').attr('disabled',true); // Desactivar botón.
+                var url;
+
+                if(save_method == 'add') {
+                    url = "<?php echo site_url('index.php/Preguntas/ajax_add')?>";
+                } else {
+                    url = "<?php echo site_url('index.php/Preguntas/ajax_update')?>";
+                }
+
+                // AJAX añade datos a la base de datos.
+                $.ajax({
+                    url : url,
+                    type: "POST",
+                    data: $('#form').serialize(),
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        if(data.status) //if success close modal and reload ajax table
+                        {
+                            $('#modal_form').modal('hide');
+                            bootbox.alert("Operación realizada con éxito.");
+                            reload_table();
+                        }
+                        else
+                        {
+                            for (var i = 0; i < data.inputerror.length; i++) 
+                            {
+                                $('[name="'+data.inputerror[i]+'"]').parent().parent().addClass('has-error'); //select parent twice to select div form-group class and add has-error class
+                                $('[name="'+data.inputerror[i]+'"]').next().text(data.error_string[i]); //select span help-block class set text error string
+                            }
+                        }
+                        $('#btnSave').text('Guardar');
+                        $('#btnSave').attr('disabled',false); 
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Se ha producido un error al intentar añadir/modificar el registro.');
+                        $('#btnSave').text('Guardar');
+                        $('#btnSave').attr('disabled',false); 
+                    }
+                });
+            }
+
+            function borrar_pregunta(iId)
+            {
+                bootbox.confirm("¿Estás seguro/a que desea eliminar esta pregunta? Debe saber, que si lo hace, se eliminará la pregunta del seguimiento de las partidas y no podrá ser recuperada de nuevo.", 
+                function(result){ 
+                    if (result == true) {
+                        // AJAX borra los datos de la base de datos.
+                        $.ajax({
+                            url : "<?php echo site_url('index.php/Pregunta/ajax_delete')?>/"+iId,
+                            type: "POST",
+                            dataType: "JSON",
+                            success: function(data)
+                            {
+                                if(data.status) //if success close modal and reload ajax table
+                                {
+                                    $('#modal_form').modal('hide');
+                                    bootbox.alert("Operación realizada con éxito.");
+                                    reload_table();
+                                } else {
+                                    bootbox.alert({
+                                        message: data.error_string
+                                    });
+                                }
+                            },
+                            error: function (jqXHR, textStatus, errorThrown)
+                            {
+                                bootbox.alert('Error al eliminar la pregunta. Inténtelo más tarde.');
+                            }
+                        });
+                    } 
+                });
+            }
+        </script>
+
+        <!-- Bootstrap modal -->
+      <div class="modal fade" id="modal_form" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h3 class="modal-title">Alta de profesor</h3>
+                    </div>
+                    <div class="modal-body form">
+                        <form action="#" id="form" class="form-horizontal">
+                            <input type="hidden" value="" name="iId"/> 
+                            <div class="form-body">
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?=form_label('Nombre * '); ?>
+                                        <input name="sNombre" placeholder="Nombre" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?=form_label('Apellidos * '); ?>
+                                        <input name="sApellidos" placeholder="Apellidos" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?=form_label('Usuario * '); ?>
+                                        <input name="sNombre" placeholder="Nombre" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?=form_label('Contraseña * '); ?>
+                                        <input name="sPassword" placeholder="Contraseña" class="form-control" type="password">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <?=form_label('E-mail * '); ?>
+                                        <input name="sEmail" placeholder="Correo Electrónico" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <?=form_label('E-mail * '); ?>
+                                        <?=form_dropdown('iId_Titulacion', $titulaciones, '', 'class=form-control'); ?>
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?=form_label('Asignatura * '); ?>
+                                        <?=form_dropdown('iId_Asignatura', $asignaturas, '', 'class=form-control'); ?>
+                                        <span class="help-block"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?=form_label('Categorías * '); ?>
+                                        <?=form_dropdown('iId_Categoria', $categorias, '', 'class=form-control'); ?>
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+                                
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <?=form_label('Respuesta A * '); ?>
+                                        <input name="sResp1" placeholder="" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                        <?=form_label('Respuesta B * '); ?>
+                                        <input name="sResp2" placeholder="" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                        <?=form_label('Respuesta C * '); ?>
+                                        <input name="sResp3" placeholder="" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                        <?=form_label('Respuesta D * '); ?>
+                                        <input name="sResp4" placeholder="" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?=form_label('¿Cuál es la respuesta verdadera? '); ?><br> 
+                                        <input type="radio" id="bVerdadera1" name="bVerdadera" value="1" checked="">&nbsp;A
+                                        <input type="radio" id="bVerdadera2" name="bVerdadera" value="2" 
+                                                                        style="margin-left:15px;">&nbsp;B
+                                        <input type="radio" id="bVerdadera3" name="bVerdadera" value="3" 
+                                                                        style="margin-left:15px;">&nbsp;C
+                                        <input type="radio" id="bVerdadera4" name="bVerdadera" value="4" 
+                                                                        style="margin-left:15px;">&nbsp;D
+                                        
+                                    </div>
+                                </div>  
+                                
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?=form_label('Observaciones '); ?>
+                                        <textarea name="sObservaciones" placeholder="Observaciones" 
+                                            class="form-control" type="text" rows="4"></textarea>
+                                        <span class="help-block"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?=form_label('Puntuación '); ?>
+                                        <input name="nPuntuacion" placeholder="" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <sub><b>*</b> Datos obligatorios.</sub>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="btnSave" onclick="save()" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        <!-- End Bootstrap modal -->
+
+
         <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
         <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
         <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
@@ -325,46 +572,6 @@
             $('body').css({'overflow':'visible'});
         })
         </script>
-        <!-- Theme Initializer -->
-        <script src="<?=base_url()?>js/theme.plugins.js"></script>
-        <script src="<?=base_url()?>js/theme.js"></script>
-
-        
-        <!-- Custom JS -->
-        <script src="<?=base_url()?>js/custom.js"></script>
-
-        <!-- BOOT BOX -->
-        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
-        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
-        
-        <script type="text/javascript">
-        bootbox.setDefaults({ locale: "es"});
-
-        $(function() {
-            var cajas = {};
-
-            $(document).on("click", "a[data-bb]", function(e) {
-                e.preventDefault();
-                var type = $(this).data("bb");
-                var id = $(this).data("id");
-                var pg = $(this).data("pg");
-                if (typeof cajas[type] === 'function') {
-                    cajas[type](id, pg);
-                }
-            });
-
-            cajas.confirm = function(id, pg) {
-                bootbox.confirm("¿Estás seguro que quieres eliminar a este profesor?", function(result) {
-                    if (result == true) {
-                        location.href = 'usuarios/eliminar/'+id+'/'+pg;
-                    }
-            });
-            };
-  
-        });
-
-        </script>
-        <!-- FIN BOOT -->
 
     </body>
 </html>

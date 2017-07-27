@@ -58,68 +58,27 @@ $route['translate_uri_dashes'] = FALSE;
 // Curso
 
 $route['curso'] = 'Curso';
-$route['curso/nueva'] = 'Curso/nueva';
-$route['curso/mod/(:any)'] = 'Curso/mod/$1';
-$route['curso/pagina/(:num)'] = 'Curso';//cuando no sea la primera página
-$route['curso/pagina'] = 'Curso';//cuando sea la primera página
 
 
 // Titulaciones
 
 $route['titulacion'] = 'Titulacion';
-$route['titulacion/nueva'] = 'Titulacion/nueva';
-$route['titulacion/mod/(:any)'] = 'Titulacion/mod/$1';
-$route['titulacion/pagina/(:num)'] = 'Titulacion';//cuando no sea la primera página
-$route['titulacion/pagina'] = 'Titulacion';//cuando sea la primera página
 
 // Asignaturas
 
 $route['asignatura'] = 'Asignatura';
-$route['asignatura/nueva'] = 'Asignatura/nueva';
-$route['asignatura/mod/(:any)'] = 'Asignatura/mod/$1';
-$route['asignatura/pagina/(:num)'] = 'Asignatura';//cuando no sea la primera página
-$route['asignatura/pagina'] = 'Asignatura';//cuando sea la primera página
-
 
 // Categorías
 
 $route['categorias'] = 'Categorias';
-$route['categorias/nueva'] = 'Categorias/nueva';
-$route['categorias/mod/(:any)'] = 'Categorias/mod/$1';
-$route['categorias/pagina/(:num)'] = 'Categorias';//cuando no sea la primera página
-$route['categorias/pagina'] = 'Categorias';//cuando sea la primera página
-
-
-// Paginación de ACCESOS.
-
-$route['accesos/pagina/(:num)'] = 'Accesos';//cuando no sea la primera página
-$route['accesos/pagina'] = 'Accesos';//cuando sea la primera página
-
-// Alumnos
-
-$route['alumnos/pagina/(:num)'] = 'Alumnos';//cuando no sea la primera página
-$route['alumnos/pagina'] = 'Alumnos';//cuando sea la primera página
-
-// Profesores
-
-$route['usuarios/pagina/(:num)'] = 'Usuarios';//cuando no sea la primera página
-$route['usuarios/pagina'] = 'Usuarios';//cuando sea la primera página
 
 // Preguntas (alumno)
 
 $route['pregunta'] = 'Pregunta';
-$route['pregunta/nueva'] = 'Pregunta/nueva';
-$route['pregunta/mod/(:any)'] = 'Pregunta/mod/$1';
-$route['pregunta/pagina/(:num)'] = 'Pregunta';//cuando no sea la primera página
-$route['pregunta/pagina'] = 'Pregunta';//cuando sea la primera página
 
 // Preguntas (profesor)
 
 $route['preguntas'] = 'Preguntas';
-$route['preguntas/nueva'] = 'Preguntas/nueva';
-$route['preguntas/mod/(:any)'] = 'Preguntas/mod/$1';
-$route['preguntas/pagina/(:num)'] = 'Preguntas';//cuando no sea la primera página
-$route['preguntas/pagina'] = 'Preguntas';//cuando sea la primera página
 
 $route['datosalumno'] = 'DatosAlumno';
 $route['datosprofesor'] = 'DatosProfesor';
@@ -158,3 +117,5 @@ $route['cuestion'] = 'Cuestion';
 // Visualizar partida
 
 $route['visualizar'] = 'Visualizar';
+
+$route['universidad'] = 'Universidad';

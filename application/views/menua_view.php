@@ -37,6 +37,16 @@
 					</ul>
 				</li>
 
+				<li class="dropdown">
+						<a class="dropdown-toggle" href="#">Ayuda
+							<i class="icon icon-angle-down"></i>
+						</a>
+						<ul class="dropdown-menu">
+							<li><?=anchor(base_url().'index.php/contacto', 'Contacto')?></li>
+							<li><?=anchor(base_url().'index.php/faqs', 'Ayuda')?></li>
+						</ul>
+					</li>
+
 				
 
 				<li><?=anchor(base_url().'index.php/login/logout_ci', 'Salir')?></li>

@@ -3,7 +3,6 @@
 <!--[if IE 9]>          <html class="ie ie9"> <![endif]-->
 <!--[if gt IE 9]><!-->  <html> <!--<![endif]-->
     <head>
-
         <!-- Basic -->
         <meta charset="utf-8">
         <title>VirUCA</title>       
@@ -14,17 +13,14 @@
         <!-- Mobile Metas -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- Web Fonts  -->
+        <!-- Fuente  -->
         <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800%7CShadows+Into+Light" rel="stylesheet" type="text/css">
 
         <!-- Libs CSS -->
         <link rel="stylesheet" href="<?=base_url()?>vendor/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" href="<?=base_url()?>vendor/font-awesome/css/font-awesome.css">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/owl-carousel/owl.carousel.css" media="screen">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/owl-carousel/owl.theme.css" media="screen">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/magnific-popup/magnific-popup.css" media="screen">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/isotope/jquery.isotope.css" media="screen">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/mediaelement/mediaelementplayer.css" media="screen">
+       
+        <link rel="stylesheet" href="<?=base_url('js/datatables/css/dataTables.bootstrap.css')?>" rel="stylesheet">
 
         <!-- Theme CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme.css">
@@ -35,30 +31,23 @@
 
         <!-- Custom Loader -->
         <link rel="stylesheet" href="<?=base_url()?>css/loader.css">
-
-
         <!-- Responsive CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme-responsive.css" />
-
         <!-- Skin CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/skins/default.css">
-
         <!-- Custom CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/custom.css">
 
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
-
+        <script src="<?=base_url()?>vendor/jquery.js"></script>
         <link href="http://cdnjs.cloudflare.com/ajax/libs/octicons/3.5.0/octicons.min.css" rel="stylesheet">
         <link href="<?=base_url()?>js/colorpicker/dist/css/bootstrap-colorpicker.min.css" rel="stylesheet">
-        <script src="<?=base_url()?>vendor/jquery.js"></script>
         <script src="<?=base_url()?>js/colorpicker/dist/js/bootstrap-colorpicker.js"></script>
-
-        <!-- Head Libs -->
+        
         <script type="text/javascript">
             $(window).load(function() { $(".loader").fadeOut("slow");}); 
         </script>
-
         <!--[if IE]>
             <link rel="stylesheet" href="css/ie.css">
         <![endif]-->
@@ -66,7 +55,6 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-    
 
     </head>
 
@@ -98,236 +86,378 @@
         </section>
 
         <div class="container">
+            <button class="btn btn-success" onclick="add_categoria()">
+                <i class="glyphicon glyphicon-plus"></i> Categoría
+            </button>
+            <button class="btn btn-warning" onclick="eliminar_todos($(categoria))">
+                        <i class="glyphicon glyphicon-trash"></i> Eliminar todos
+                    </button>
+            <button class="btn btn-default" onclick="reload_table()">
+                <i class="glyphicon glyphicon-refresh"></i> Refrescar
+            </button>
 
-            <!-- Errores de inserción. -->
-            <?php if($this->session->flashdata('categoria_ok')) { ?>
-                <div class="alert alert-success">
-                    <?php echo $this->session->flashdata('categoria_ok');?>
-                </div>
-            <?php } ?>
+            <br />
+            <br />
 
-            <?php if($this->session->flashdata('categoria_ko')) { ?>
-                <div class="alert alert-danger">
-                    <?php echo $this->session->flashdata('categoria_ko'); ?>
-                </div>
-            <?php } ?>
-            <!-- Fin errores -->
+            <table id="table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+            <tr>
+                <th></th>
+                <th>Color</th>
+                <th>Categoría</th>
+                <th>Descripción</th>
+                <th>Asignatura</th>
+                <th style="width:200px;">Acción</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th>Color</th>
+                    <th>Categoría</th>
+                    <th>Descripción</th>
+                    <th>Asignatura</th>
+                    <th>Acción</th>
+                </tr>
+            </tfoot>
+            </table>
 
-            <!-- Listado -->
-            <?php if ($categoria != "") { 
-            // Obtener página.
-            $npag =  $this->uri->segment(3);
-            ?>
-
-            <?php echo form_fieldset('Listado de categorías');
-            $atributos = array('class' => 'navbar-form', 'role' => 'search');
-            ?>
-
-            <?=form_open(base_url().'index.php/categorias/eliminar_todos/'.$npag);?>
-                    
-            <div class="panel panel-default">
-                <!-- Default panel contents -->
-                <div class="panel-heading">
-                    Se están mostrando un total de <b><?=$num_filas;?> registros</b>
-                </div>
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <th>&nbsp;</th>
-                        <th>Color</th>
-                        <th>Categoría</th>
-                        <th>Descripción</th>
-                        <th>Opciones</th>
-                    </thead>
-                    <tbody>
-                        <?php 
-                        foreach($categoria as $fila){ 
-                        $cont = 0; 
-                        ?>
-
-                        <tr><th>
-                        <span class="show-grid-block">
-                            <input type="checkbox" name="categoria[]" value="<?=$fila->iId;?>">
-                        </span>
-                        </th>
-                                    
-                                <td style="background-color:<?=$fila->sColor;?> ">&nbsp;</td>
-                                <td><?=$fila->sNombre;?></td>
-                                <td>
-                                    <?php 
-                                    if ($fila->sDescripcion == "")
-                                        echo "---";
-                                    else echo substr($fila->sDescripcion,0,75)." ...";
-                                ?>
-                                </td>
-                                <td>
-                                    <a href="#" 
-                                        data-bb="confirm" 
-                                        data-id="<?=$fila->iId;?>"
-                                        data-pg="<?=$npag?>" 
-                                        class="btn-group-xs">
-                                            <i class="icon icon-trash-o"></i>
-                                    </a>
-                                    <a href="<?=base_url("index.php/categorias/mod/$fila->iId/$npag")?>" 
-                                    class="btn-group-xs"><i class="icon icon-pencil"></i></a>
-                                </td>
-                                <?php
-                                $cont++;
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-
-                    </div>
-
-                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
-                    <br style="clear:both;">
-                    <?php echo $this->pagination->create_links() ?>
-                    <hr class="short">
-                    
-                    
-
-                    <?=form_close();?>
-                    
-                    <?php
-
-                    } else {
-                    ?>
-                    <div class="alert alert-success">
-                    Actualmente no hay ninguna categoría en el sistema.
-                    </div>
-                    <?php 
-                    }
-                    ?>
-
-                    <!-- Fin del listado -->
-
-                    <?=form_open(base_url().'index.php/categorias/nueva');
-                    $sNombre = array(
-                    'name' => 'sNombre',
-                    'id' => 'sNombre',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sNombre'),
-                    'style' => 'width:400px;'
-                    );
-                    $sDescripcion = array(
-                    'name' => 'sDescripcion',
-                    'id' => 'sDescripcion',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sDescripcion'),
-                    'style' => 'width:400px; height:80px;'
-                    );
-                    $sColor = array(
-                    'name' => 'sColor',
-                    'class' => 'form-control',
-                    'value' => '#FF0000',
-                    'type' => 'text'
-                    );
-                    $submit = array(
-                    'name' => 'submit',
-                    'id' => 'submit',
-                    'value' => 'Enviar',
-                    'title' => 'Enviar',
-                    'class' => 'btn btn-default' 
-                    );
-                    ?>
-
-                    <?=form_fieldset('Añadir una nueva categoría');?>
-
-                    <label for="sNombre">Categoría:</label>
-                    <?=form_input($sNombre)?>
-                    <p>
-                        <?=form_error('sNombre','<div class="alert alert-danger" role="alert">
-                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>',
-                            '</div>');
-                        ?>    
-                    </p>
-                    <label for="sDescripcion">Descripción:</label>
-                    <?=form_textarea($sDescripcion)?><p><?=form_error('sDescripcion')?></p>
-                    <div id="cp8" data-format="alias" class="input-group colorpicker-component" style="width:150px;">
-                        <?=form_input($sColor)?>
-                        <span class="input-group-addon"><i></i></span>
-                    </div>
-                    <script>
-                        $(function () {
-                            $('#cp8').colorpicker({
-                                colorSelectors: {
-                                '#f44336': '#f44336',
-                                '#e91e63': '#e91e63',
-                                '#9c27b0': '#9c27b0',
-                                '#673ab7': '#673ab7',
-                                '#3f51b5': '#3f51b5',
-                                '#2196f3': '#2196f3',
-                                '#00bcd4': '#00bcd4',
-                                '#009688': '#009688',
-                                '#4caf50': '#4caf50',
-                                '#cddc39': '#cddc39',
-                                '#ff9800': '#ff9800'
-                                }
-                            });
-                        });
-                    </script>
-                    <br>
-                    <?=form_submit($submit)?>
-                    <?=form_close()?>
-
-                    
-                    <?=form_fieldset_close();?>
-
-                    <hr class="short">
-                    
-                </div>
-            </div>
-            <?php $this->load->view('footer');?>
         </div>
 
-        <!-- Libs -->
-        <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
-        <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
-        
+        <script src="<?=base_url('vendor/bootstrap/js/bootstrap.min.js')?>"></script>
+        <script src="<?=base_url('js/datatables/js/jquery.dataTables.min.js')?>"></script>
+        <script src="<?=base_url('js/datatables/js/dataTables.bootstrap.js')?>"></script>
+        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
+        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+
         <script type="text/javascript">
+            bootbox.setDefaults({
+                locale: "es"
+            });
+
+            var save_method; // Para el uso del método save.
+            var table;
+            $(document).ready(function() {
+
+                //datatables
+                table = $('#table').DataTable({ 
+                    "language": {
+                        "paginate": {
+                            "first": "Primero",
+                            "last": "Último",
+                            "next": "Siguiente",
+                            "previous": "Anterior"
+                        },
+                        "search": "Buscar categoria: ",
+                        "lengthMenu": "Mostrando _MENU_ catgorías por página.",
+                        "loadingRecords": "Cargando categorías",
+                        "processing": "Cargando categorías",
+                        "zeroRecords": "No se han encontrado registros",
+                        "emptyTable": "No hay asignaturas disponibles",
+                        "info": "Mostrando _START_ de _END_ categorías, de un total de _TOTAL_",
+                        "infoEmpty": "Mostrando 0 de 0 categorías",
+                        "aria": {
+                            "sortAscending": ": ordenar columna ascendentemente",
+                            "sortDescending": ": ordenar columna descendentemente"
+                        }
+                    },
+                    "processing": true, //Feature control the processing indicator.
+                    "serverSide": true, //Feature control DataTables' server-side processing mode.
+                    "order": [], //Initial no order
+                            // Load data for the table's content from an Ajax source
+                    "ajax": {
+                        "url": "<?php echo site_url('index.php/Categorias/ajax_list')?>",
+                        "type": "POST"
+                    },
+                    //Set column definition initialisation properties.
+                    "columnDefs": [
+                    { 
+                        "targets": [ -1 ], //last column
+                        "orderable": false, //set not orderable
+                    },
+                    ],
+
+                });
+
+                //set input/textarea/select event when change value, remove class error and remove text help block 
+                $("input").change(function(){
+                    $(this).parent().parent().removeClass('has-error');
+                    $(this).next().empty();
+                });
+                $("select").change(function(){
+                    $(this).parent().parent().removeClass('has-error');
+                    $(this).next().empty();
+                });
+
+            });
+
+            function add_categoria()
+            {
+                save_method = 'add';
+                $('#form')[0].reset(); // reset form on modals
+                $('.form-group').removeClass('has-error'); // clear error class
+                $('.help-block').empty(); // clear error string
+                $('#modal_form').modal('show'); // show bootstrap modal
+                $('.modal-title').text('Añadir categoría'); // Set Title to Bootstrap modal title
+            }
+
+            function editar_categoria(iId)
+            {
+                save_method = 'update';
+                $('#form')[0].reset(); // reset form on modals
+                $('.form-group').removeClass('has-error'); // clear error class
+                $('.help-block').empty(); // clear error string
+                //Ajax Load data from ajax
+                $.ajax({
+                    url : "<?php echo site_url('index.php/Categorias/ajax_edit/')?>/" + iId,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        $('[name="iId"]').val(data.iId);
+                        $('[name="sColor"]').val(data.sColor);
+                        $('[name="sCategoria"]').val(data.sCategoria);
+                        $('[name="sDescripcion"]').val(data.sDescripcion);                                
+                        $('[name="iId_Asignatura"]').val(data.iId_Asignatura);
+                        $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
+                        $('.modal-title').text('Editar categoría'); // Set title to Bootstrap modal title
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Ocurrió un error mientras se intentaba editar la categoría.');
+                    }
+                });
+            }
+
+            function reload_table()
+            {
+                table.ajax.reload(null,false); //reload datatable ajax 
+            }
+
+            function eliminar_todos(asignatura) {
+                bootbox.confirm("¿Estás seguro/a que quieres eliminar las categorías? Recuerde que si existen dependencias, no podrá eliminarse el registro.",
+
+                function(result) {
+                    if (result == true) {
+                        $.ajax({
+                            url : "<?php echo site_url('index.php/Categorias/ajax_delete_todos')?>/",
+                            type : "POST",
+                            dataType : "JSON",
+                            data : $('.categoria:checked').serialize(),
+                            success: function(data) {
+                                if(data.status) //if success close modal and reload ajax table
+                                {
+                                    $('#modal_form').modal('hide');
+                                    bootbox.alert("Operación realizada con éxito.");
+                                    reload_table();
+                                } else {
+                                    bootbox.alert({
+                                        message: data.error_string
+                                    });
+                                } 
+                            },
+                            error: function (jqXHR, textStatus, errorThrown)
+                            {
+                                bootbox.alert('Error al eliminar el registro. Asegúrese que ha señalado algún registro.');
+                            }
+                        });
+                    }
+                });
+            }
+
+            function save()
+            {
+                $('#btnSave').text('guardando ...'); // Cambiar valor del texto
+                $('#btnSave').attr('disabled',true); // Desactivar botón.
+                var url;                        
+
+                if(save_method == 'add') {
+                    url = "<?php echo site_url('index.php/Categorias/ajax_add')?>";
+                } else {
+                    url = "<?php echo site_url('index.php/Categorias/ajax_update')?>";
+                }
+
+                // AJAX añade datos a la base de datos.
+
+                $.ajax({
+                    url : url,
+                    type: "POST",
+                    data: $('#form').serialize(),
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        if(data.status) //if success close modal and reload ajax table
+                        {
+                            $('#modal_form').modal('hide');
+                            bootbox.alert("Operación realizada con éxito.");
+                            reload_table();
+                        }
+                        else
+                        {
+                            for (var i = 0; i < data.inputerror.length; i++) 
+                            {
+                                $('[name="'+data.inputerror[i]+'"]').parent().parent().addClass('has-error'); //select parent twice to select div form-group class and add has-error class
+                                $('[name="'+data.inputerror[i]+'"]').next().text(data.error_string[i]); //select span help-block class set text error string
+                            }
+                        }
+                        $('#btnSave').text('Guardar');
+                        $('#btnSave').attr('disabled',false); 
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Se ha producido un error al intentar añadir/modificar el registro.');
+                        $('#btnSave').text('Guardar');
+                        $('#btnSave').attr('disabled',false); 
+                    }
+                });
+            }
+
+            function borrar_categoria(iId)
+            {
+                bootbox.confirm("¿Estás seguro/a que desea eliminar esta categoría?", 
+                function(result){ 
+                    if (result == true) {
+                        // AJAX borra los datos de la base de datos.
+                        $.ajax({
+                            url : "<?php echo site_url('index.php/Categorias/ajax_delete')?>/"+iId,
+                            type: "POST",
+                            dataType: "JSON",
+                            success: function(data)
+                            {
+                                if(data.status) //if success close modal and reload ajax table
+                                {
+                                    $('#modal_form').modal('hide');
+                                    bootbox.alert("Operación realizada con éxito.");
+                                    reload_table();
+                                } else {
+                                    bootbox.alert({
+                                        message: data.error_string
+                                    });
+                                }
+                            },
+                            error: function (jqXHR, textStatus, errorThrown)
+                            {
+                                bootbox.alert('Error al eliminar la categoría. Inténtelo más tarde.');
+                            }
+                        });
+                    } 
+                });
+            }
+        </script>
+           
+        <!-- Bootstrap modal -->
+        <div class="modal fade" id="modal_form" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h3 class="modal-title">Alta de categoría</h3>
+                    </div>
+
+                    <div class="modal-body form">
+                        <form action="#" id="form" class="form-horizontal">
+                            <input type="hidden" value="" name="iId"/> 
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3">Categoría *</label>
+                                        <div class="col-md-9">
+                                            <input name="sCategoria" placeholder="Categoría" class="form-control" type="text">
+                                            <span class="help-block"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3">Descripción</label>
+                                        <div class="col-md-9">
+                                            <input name="sDescripcion" placeholder="Descripción" class="form-control" type="text">
+                                            <span class="help-block"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3">Asignatura</label>
+                                        <div class="col-md-9">
+                                            <?=form_dropdown('iId_Asignatura', $asignaturas, '', 'class=form-control'); ?>
+                                            <span class="help-block"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-3">Color * </label>
+                                        <div class="col-md-9">
+                                            <div id="cp8" data-format="alias" class="input-group colorpicker-component" style="width: 130px;">
+                                                <input name="sColor" placeholder="" class="form-control" type="text">
+                                                <br><span class="help-block"></span>
+                                                <span class="input-group-addon"><i></i></span>
+                                            </div>
+
+                                            <script>
+                                                $(function () {
+                                                    $('#cp8').colorpicker({
+                                                        colorSelectors: {
+                                                        '#f44336': '#f44336',
+                                                        '#e91e63': '#e91e63',
+                                                        '#9c27b0': '#9c27b0',
+                                                        '#673ab7': '#673ab7',
+                                                        '#3f51b5': '#3f51b5',
+                                                        '#2196f3': '#2196f3',
+                                                        '#00bcd4': '#00bcd4',
+                                                        '#009688': '#009688',
+                                                        '#4caf50': '#4caf50',
+                                                        '#cddc39': '#cddc39',
+                                                        '#ff9800': '#ff9800'
+                                                        }
+                                                    });
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-9">
+                                            <sub><b>*</b> Datos obligatorios.</sub>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" id="btnSave" onclick="save()" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->             
+        <hr class="short">
+                    
+    </div>
+    <?php $this->load->view('footer');?>
+    </div>
+
+    <!-- Libs -->
+    <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
+    <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
+        
+    <script type="text/javascript">
         $(window).load(function() {
             $('#preloader').fadeOut('slow');
             $('body').css({'overflow':'visible'});
         })
-        </script>    
-
-        <!-- BOOT BOX -->
-        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
-        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+    </script>
         
-        <script type="text/javascript">
-        bootbox.setDefaults({
-          locale: "es"
-        });
-        $(function() {
-            var cajas = {};
-
-            $(document).on("click", "a[data-bb]", function(e) {
-                e.preventDefault();
-                var type = $(this).data("bb");
-                var id = $(this).data("id");
-                var pg = $(this).data("pg");
-                if (typeof cajas[type] === 'function') {
-                    cajas[type](id, pg);
-                }
-            });
-
-            cajas.confirm = function(id, pg) {
-                bootbox.confirm("¿Estás seguro que quieres borrar esta categoría?", function(result) {
-                    if (result == true) {
-                        location.href = '<?=base_url()?>index.php/categorias/eliminar/'+id+'/'+pg;
-                    }
-            });
-            };
-  
-        });
-
-        </script>
-        <!-- FIN BOOT -->
+    <!-- Theme Initializer -->
+    <script src="<?=base_url()?>js/theme.plugins.js"></script>
+    <script src="<?=base_url()?>js/theme.js"></script>
         
-</body>
+    <!-- Custom JS -->
+    <script src="<?=base_url()?>js/custom.js"></script>
+
+
+
+    </body>
 </html>

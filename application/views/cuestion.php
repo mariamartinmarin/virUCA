@@ -107,6 +107,7 @@
 
                 <!-- pregunta -->
                 <div class="featured-box featured-box-primary"><div class="box-content">
+
                 <div style="float:left; width: 600px;">
                     <blockquote><h5>Te vamos a hacer una pregunta sobre <b><?=$categoria;?></b>.
                     <?php
@@ -152,13 +153,14 @@
                         echo "<input type='button' class='btn btn-default' value='Respuesta B' name='B' onclick='javascript:enviar(2)' style='margin-left:10px;'>";
                         echo "<input type='button' class='btn btn-default' value='Respuesta C' name='C' onclick='javascript:enviar(3)' style='margin-left:10px;'>";
                         echo "<input type='button' class='btn btn-default' value='Respuesta D' name='D' onclick='javascript:enviar(4)' style='margin-left:10px;'>";
-                        echo "<input type='button' class='btn btn-warning' value='Error' name='D' onclick='javascript:enviar(4)' style='margin-left:10px;'>";
+                        echo "<input type='button' class='btn btn-warning' value='Error' name='Error' onclick='javascript:enviar(5)' style='margin-left:10px;'>";
                     form_close();
                 } else {
                     echo "<blockquote>Lo sentimos, hubo un problema al intentar recuperar la pregunta</blockquote>";
                 }
                 ?>
                 </div>
+
                 <div style="float:left; margin-left: 20px;">
                     <blockquote>
                         <div class="example stopwatch" data-date='00:00:60'></div>
@@ -167,17 +169,16 @@
                         <button type="button" class="btn btn-info restart">Iniciar</button>
                     </blockquote>
                 </div>
+
                 <br class="clear">
 
                 </div></div>
+                
                 <!-- Fin de pregunta -->
+                
                 <br class="clear">
                 <input type="button" class="btn btn-warning" value="Intentar otra pregunta" 
-                        onclick="location.href='<?=base_url()?>index.php/cuestion'">
-                <input type="button" class="btn btn-warning" value="Guardar y salir" 
-                        onclick="location.href='<?=base_url()?>index.php/cuestion'">
-                
-                   
+                        onclick="location.href='<?=base_url()?>index.php/cuestion'">  
             </div>
         </div>
         <?php $this->load->view('footer');?>

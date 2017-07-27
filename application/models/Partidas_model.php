@@ -107,5 +107,11 @@ class Partidas_model extends CI_Model{
         return false;
       }
     }
+
+    public function desbloquear($iId) {
+      $query_desbloquear = $this->db->query("UPDATE partida SET
+        bAbierta = 0 WHERE iId = $iId");
+      if ($query_desbloquear == true) return true; else return false;
+    }
 }
 ?>

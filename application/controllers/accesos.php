@@ -1,15 +1,20 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
 class Accesos extends CI_Controller{
-    public function __construct() {
+
+    /* Construcción */
+    public function __construct() 
+    {
         parent::__construct();
-        $this->load->model("accesos_model");
+        $this->load->model("Accesos_model");
         $this->load->library("session");
-        $this->load->library('pagination');
     }
-     
-    //controlador por defecto
-    public function index($iId="NULL"){  
-        if($this->session->userdata('perfil') != 0)
+    
+    /* Función que se utilizará para llamar a la vista y comprobar condiciones previas. */
+    public function index()
+    {
+         if($this->session->userdata('admin') != 1)
         {
             redirect(base_url().'index.php/login');
         }
@@ -17,61 +22,63 @@ class Accesos extends CI_Controller{
             $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
             redirect(base_url().'index.php/login');
         }
-        // Para la paginación
 
-        $data['title'] = 'Paginacion_ci';
-        $pages=30; //Número de registros mostrados por páginas
-         //Cargamos la librería de paginación
-        $config['base_url'] = base_url().'index.php/accesos/pagina/'; // parametro base de la aplicación, si tenemos un .htaccess nos evitamos el index.php
-        $config['total_rows'] = $this->accesos_model->filas();//calcula el número de filas  
-        $config['per_page'] = $pages; //Número de registros mostrados por páginas
-        $config['num_links'] = 5; //Número de links mostrados en la paginación
-        $config['first_link'] = 'Primera';//primer link
-        $config['last_link'] = 'Última';//último link
-        $config["uri_segment"] = 3;//el segmento de la paginación
-        $config['next_link'] = 'Siguiente';//siguiente link
-        $config['prev_link'] = 'Anterior';//anterior link
-        $this->pagination->initialize($config); //inicializamos la paginación 
+        $this->load->helper('url');
+        $this->load->view('accesos');
+    }
 
-        $data["num_filas"] = $config['total_rows'];       
-        $data["acceso"] = $this->accesos_model->total_paginados($config['per_page'],$this->uri->segment(3));          
-                
+    /* 
+        Función que "montará" la lista según los datos que se mostrarán en la vista y que obtendremos a través del 
+        modelo.
+    */
+    public function ajax_list()
+    {
+        $list = $this->Accesos_model->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $acceso) {
+            $no++;
+            $row = array();
+            $row[] = '<input type="checkbox" id="acceso" class="acceso" name="acceso[]" value="'.$acceso->iId.'">';     
+            $row[] = $acceso->sNombreCompleto;
+            $row[] = $acceso->dFecha;
+            $row[] = $acceso->sIP;
+            
+            // Añadimos HTML para las acciones de la tabla.
+            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="borrar_acceso('."'".$acceso->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Borrar</a>';
+        
+            $data[] = $row;
+        }
 
-        //$accesos["ver"]=$this->accesos_model->ver();
-        $this->load->view("accesos",$data);
+        $output = array(
+            "draw" => $_POST['draw'],
+            "recordsTotal" => $this->Accesos_model->count_all(),
+            "recordsFiltered" => $this->Accesos_model->count_filtered(),
+            "data" => $data,
+        );
+        // Salida JSON.
+        echo json_encode($output);
     }
 
     
-
-    //Controlador para eliminar
-    public function eliminar($iId="NULL",$npag="NULL"){
-        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
-        if(is_numeric($iId)){
-            $eliminar=$this->accesos_model->eliminar($iId);
-            if($eliminar==true){
-                $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, el acceso se eliminó con éxito.');
-          }else{
-              $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, no se pudo eliminar el acceso.');
-          }
-          redirect(base_url()."index.php/accesos/pagina/$npag");
-        }else{
-
-          redirect(base_url()."index.php/accesos/pagina/$npag");
-        }
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "acceso" 
+    */
+    public function ajax_delete($iId)
+    {
+        $this->Accesos_model->delete_by_id($iId);
+        echo json_encode(array("status" => TRUE));
     }
 
-    //Controlador para eliminar
-    public function eliminar_todos($npag="NULL"){
-        if (($npag == "NULL") or (is_numeric($npag) == FALSE)) $npag = 1;
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "acceso" de forma masiva. 
+    */
+    public function ajax_delete_todos()
+    {
         foreach ($_POST["acceso"] as $item){
-            $eliminar=$this->accesos_model->eliminar($item);
+            $eliminar = $this->Accesos_model->delete_by_id($item);
         }
-        if($eliminar==true){
-            $this->session->set_flashdata('correcto', '<strong>Bien!</strong> se eliminaron los datos.');
-        }else{
-            $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
-        } 
-        redirect(base_url()."index.php/accesos/pagina/$npag");
+        echo json_encode(array("status" => TRUE));
     }
 }
 ?>

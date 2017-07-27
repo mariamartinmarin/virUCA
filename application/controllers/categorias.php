@@ -1,153 +1,188 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
 class Categorias extends CI_Controller{
     public function __construct() {
         parent::__construct(); 
-        $this->load->helper("url");  
-        $this->load->model("categorias_model");
+        $this->load->model("Categorias_model");
         $this->load->library("session");
-        $this->load->library('pagination');
     }
-     
+
     //controlador por defecto
     public function index(){
-        if($this->session->userdata('perfil') != 0)
+        if($this->session->userdata('admin') != 1)
         {
             redirect(base_url().'index.php/login');
         }
         if ($this->session->userdata('is_logued_in') == FALSE)  {
             $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
             redirect(base_url().'index.php/login');
-        }
+        }           
+        $data["asignaturas"] = $this->Categorias_model->get_asignaturas();
+        $this->load->helper('url');
+        $this->load->view("categorias", $data);
+    }
+
+    /* 
+        Función que "montará" la lista según los datos que se mostrarán en la vista y que obtendremos a través del 
+        modelo.
+    */
+    public function ajax_list()
+    {
+        $list = $this->Categorias_model->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $categoria) {
+            $no++;
+            $row = array();
+            $row[] = '<input type="checkbox" id="categoria" class="categoria" name="categoria[]" value="'.$categoria->iId.'">'; 
+            $row[] = "<div style='background-color:".$categoria->sColor."'>&nbsp;</div>";
+            $row[] = $categoria->sCategoria;
+            $row[] = $categoria->sDescripcion;
+            $row[] = $categoria->sAsignatura;
+
+            // Añadimos HTML para las acciones de la tabla.
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="editar_categoria('."'".$categoria->iId."'".')"><i class="glyphicon glyphicon-pencil"></i> Editar</a>
+                <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="borrar_categoria('."'".$categoria->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Borrar</a>';
         
-        $pages=5; //Número de registros mostrados por páginas
-        $config['base_url'] = base_url().'index.php/categorias/pagina/';
-        $config['total_rows'] = $this->categorias_model->filas();//calcula el número de filas  
-        $config['per_page'] = $pages; //Número de registros mostrados por páginas
-        $config['num_links'] = 5; //Número de links mostrados en la paginación
-        $config['first_link'] = 'Primera';//primer link
-        $config['last_link'] = 'Última';//último link
-        $config["uri_segment"] = 3;//el segmento de la paginación
-        $config['next_link'] = 'Siguiente';//siguiente link
-        $config['prev_link'] = 'Anterior';//anterior link
-        $this->pagination->initialize($config); //inicializamos la paginación  
-        $data["num_filas"] = $config['total_rows'];     
-        $data["categoria"] = $this->categorias_model->total_paginados(
-            $config['per_page'],
-            $this->uri->segment(3),
-            $pages);          
-        
-        $this->load->view("categorias",$data);
-    }
-    
-    public function _validHexColor($sColor) {
-        if (preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $sColor)) 
-            return TRUE;
-        else 
-            return FALSE;
-    }
-
-    public function nueva(){
-        if($this->input->post("submit")){
-            // Primero vamos a hacer las validaciones.
-            $this->form_validation->set_rules('sNombre', 'Categoría', 'trim|required|max_length[32]|min_length[2]');
-            $this->form_validation->set_rules('sColor', 'Color', 'trim|required|callback__validHexColor');
-            // Una vez establecidas las reglas, validamos los campos.
-            $this->form_validation->set_message('required', '<b>%s</b> es obligatorio.');
-            $this->form_validation->set_message('min_length', '<b>%s</b> debe tener al menos <b>%s</b> caracteres.');
-            $this->form_validation->set_message('max_length', 
-                '<b>%s</b> no puede tener más de <b>%s</b> caracteres.');
-            $this->form_validation->set_message('validHexColor', 'Color no válido.');
-
-            if ($this->form_validation->run() == FALSE) {
-                // Si la validación no se pasa, volvemos al directorio raiz.
-                $this->index();
-            } else {
-                // Hacemos la inserción.
-                 $add=$this->categorias_model->nueva(
-                    $this->input->post("sNombre"),
-                    $this->input->post("sDescripcion"),
-                    $this->input->post("sColor"));
-                if ($add == true){
-                    //Sesion de una sola ejecución
-                    $this->session->set_flashdata('categoria_ok', '<strong>Bien!</strong> la categoría se registró con éxito.');
-                }else{
-                    $this->session->set_flashdata('categoria_ko', '<strong>Oops!</strong> parece que hubo un problema y no hemos podido añadir la nueva categoría.');
-                }       
-                redirect(base_url()."index.php/categorias", "refresh");
-            }
-        }
-    }
-     
-    public function mod($iId){
-        if(is_numeric($iId)){
-            $datos["mod"]=$this->categorias_model->mod($iId);
-            $this->load->view("categoriasmod_view",$datos);
-            
-            if($this->input->post("submit")){
-                // Hay que volver a validar los datos.
-                $this->form_validation->set_rules('sNombre', 'Nombre', 'trim|required|max_length[32]|min_length[2]');
-                $this->form_validation->set_rules('sColor', 'Color', 'trim|required|callback__validHexColor');
-                // Una vez establecidas las reglas, validamos los campos.
-                $this->form_validation->set_message('required', '%s es obligatorio.');
-                $this->form_validation->set_message('min_length', '%s debe tener al menos %s caracteres.');
-                $this->form_validation->set_message('max_length', '%s no puede tener más de %s caracteres.');
-                $this->form_validation->set_message('validHexColor', 'Color no válido.');
-                
-                if ($this->form_validation->run() == FALSE) {   
-                    $this->session->set_flashdata('categoria_ko', '<strong>Oops!</strong> no hemos podido modificar los datos de la categoría.');               
-                    redirect(base_url()."index.php/categorias/mod/".$iId, "refresh");
-                } else {
-                    $mod = $this->categorias_model->mod(
-                        $iId,
-                        $this->input->post("submit"),
-                        $this->input->post("sNombre"),
-                        $this->input->post("sDescripcion"),
-                        $this->input->post("sColor"));
-                    if ($mod == true){
-                        $this->session->set_flashdata('categoria_ok', '<strong>Bien!</strong> la categoría se modificó correctamente.');
-                    }else{
-                        $this->session->set_flashdata('categoria_ko', '<strong>Oops!</strong> no hemos podido modificar la categoría.');
-                    }
-
-                    redirect(base_url()."index.php/categorias/mod/".$iId, "refresh");
-
-                }
-            }
-        } else {
-            redirect(base_url()."index.php/categorias"); 
+            $data[] = $row;
         }
 
-    }
-     
-    //Controlador para eliminar
-    public function eliminar($iId,$npag = "NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
-        if(is_numeric($iId)){
-            $eliminar=$this->categorias_model->eliminar($iId);
-            if($eliminar==true){
-                $this->session->set_flashdata('correcto', '<strong>Bien!</strong> la categoria se eliminó con éxito.');
-          }else{
-              $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudo eliminar la categoria.');
-          }
-          redirect(base_url()."index.php/categorias/pagina/$npag");
-        }else{
-          redirect(base_url()."index.php/categorias/pagina/$npag");
-        }
+        $output = array(
+            "draw" => $_POST['draw'],
+            "recordsTotal" => $this->Categorias_model->count_all(),
+            "recordsFiltered" => $this->Categorias_model->count_filtered(),
+            "data" => $data,
+        );
+        // Salida JSON.
+        echo json_encode($output);
     }
 
-    //Controlador para eliminar
-    public function eliminar_todos($npag = "NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
+    /*
+        Función AJAX que se ejecutará cuando editemos un registro de la tabla de la BBDD "aignatura" 
+    */
+    public function ajax_edit($iId)
+    {
+        $data = $this->Categorias_model->get_by_id($iId);
+        echo json_encode($data);
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando añadimos un registro de la tabla de la BBDD "titulacion" 
+    */
+    public function ajax_add()
+    {
+        $this->_validate();
+        $data = array(
+            'sCategoria' => $this->input->post('sCategoria'),
+            'sDescripcion' => $this->input->post('sDescripcion'),
+            'sColor' => $this->input->post('sColor'),
+            'iId_Asignatura' => $this->input->post('iId_Asignatura'),
+        );
+        $insert = $this->Categorias_model->save($data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando actualizamos un registro de la tabla de la BBDD "titulacion" 
+    */
+    public function ajax_update()
+    {
+        $this->_validate();
+        $data = array(
+            'sCategoria' => $this->input->post('sCategoria'),
+            'sDescripcion' => $this->input->post('sDescripcion'),
+            'sColor' => $this->input->post('sColor'),
+            'iId_Asignatura' => $this->input->post('iId_Asignatura'),
+        );
+        $this->Categorias_model->update(array('iId' => $this->input->post('iId')), $data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "titulacion" 
+    */
+    public function ajax_delete($iId)
+    {
+        $this->_validate_delete($iId);
+        $this->Categorias_model->delete_by_id($iId);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "categoria" de forma masiva. 
+    */
+    public function ajax_delete_todos()
+    {
         foreach ($_POST["categoria"] as $item){
-            $eliminar=$this->categorias_model->eliminar($item);
+            $eliminar = $this->Categorias_model->delete_by_id($item);
         }
-        if($eliminar==true){
-            $this->session->set_flashdata('categoria_ok', '<strong>Bien!</strong> se eliminaron los datos.');
-        }else{
-            $this->session->set_flashdata('categoria_ko', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
-        } 
-        redirect(base_url()."index.php/categorias/pagina/$npag");
+        echo json_encode(array("status" => TRUE));
     }
+
+    /*
+        Función privada para comprobar si una categoría puede eliminarse del sistema sin provocar errores de integridad.
+        ENTRADA: $iId (Identificador de la categoría que se desea eliminar) 
+    */
+    private function _validate_delete($iId) {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;  
+
+        if ($this->Categorias_model->categoria_partida($iId) > 0) {
+            $data['inputerror'][] = 'sCategoria';
+            $data['error_string'][] = 'No puedes borrar la categoría, ya que está asignada uno o más paneles de juego.';
+            $data['status'] = FALSE;
+        }
+        
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
+        }
+    }
+
+
+    /*
+        Función auxiliar para validar los campos del formulario antes de darlo de alta como nuevo registro o
+        para la modificación del mismo. En ambas acciones se utilizará la validación. 
+    */
+    private function _validate()
+    {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;
+
+        // Comprobar que no haya ya un sTitulacion con el mismo nombre en la base de datos.
+
+        if($this->input->post('sCategoria') == '')
+        {
+            $data['inputerror'][] = 'sCategoria';
+            $data['error_string'][] = 'El nombre de la categoría es obligatorio';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('sColor') == '')
+        {
+            $data['inputerror'][] = 'sColor';
+            $data['error_string'][] = 'El color es obligatorio';
+            $data['status'] = FALSE;
+        }
+
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
+        }
+    }
+
+
+
+
+
+
 
 }
 ?>
