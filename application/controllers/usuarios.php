@@ -22,7 +22,7 @@ class Usuarios extends CI_Controller{
         $data["asignaturas"] = $this->Usuarios_model->get_asignaturas();
 
         $this->load->helper('url'); 
-        $this->load->view("usuarios");
+        $this->load->view("usuarios", $data);
     }
 
     /* 
@@ -58,8 +58,9 @@ class Usuarios extends CI_Controller{
             $row[] = $usuario->sEmail;
 
             // Añadimos HTML para las acciones de la tabla.
-            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="editar_usuario('."'".$usuario->iId."'".')"><i class="glyphicon glyphicon-pencil"></i> Editar</a>
-            <a class="btn btn-sm btn-success" href="javascript:void(0)" title="Curso" onclick="editar_cursos('."'".$usuario->iId."'".')"><i class="glyphicon glyphicon-plus"></i> Curso</a>
+
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="editar_usuario('."'".$usuario->iId."'".')"><i class="glyphicon glyphicon-pencil"></i> Datos</a>
+                <a class="btn btn-sm btn-success" href="javascript:void(0)" title="Curso" onclick="editar_cursos('."'".$usuario->iId."'".')"><i class="glyphicon glyphicon-plus"></i> Curso</a>
                 <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="borrar_usuario('."'".$usuario->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Borrar</a>
                 ';
         
@@ -76,10 +77,260 @@ class Usuarios extends CI_Controller{
         echo json_encode($output);
     }
 
-    public function mod_view($iId){
-       $usuarios["verUsuario"]=$this->usuarios_model->verUsuario($iId);
-       $this->load->view("usuariomod_view",$usuarios);
+    /* 
+        Función que "montará" la lista según los datos que se mostrarán en la vista y que obtendremos a través del 
+        modelo.
+    */
+    public function ajax_list_cursos($iId)
+    {
+        $list = $this->Usuarios_model->get_datatables_cursos($iId);
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $curso) {
+            $no++;
+            $row = array();
+            $row[] = $curso->sUniversidad;
+            $row[] = $curso->sTitulacion;
+            $row[] = $curso->sNombre;
+
+            // Añadimos HTML para las acciones de la tabla.
+
+            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="borrar_curso('."'".$curso->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Borrar</a>
+                ';
+        
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => $_POST['draw'],
+            "recordsTotal" => $this->Usuarios_model->count_all_cursos($iId),
+            "recordsFiltered" => $this->Usuarios_model->count_filtered_cursos($iId),
+            "data" => $data,
+        );
+        // Salida JSON.
+        echo json_encode($output);
     }
+
+    /*
+        Función AJAX que se ejecutará cuando añadimos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_add()
+    {
+        $this->_validate();
+
+        $admin = 1;
+        if ($this->input->post("iAdmin")[0] == "") $admin = 0;
+
+        $activo = 1;
+        if ($this->input->post("bActivo")[0] == "") $activo = 0;
+
+        $bloqueado = 1;
+        if ($this->input->post("bBloqueado")[0] == "") $bloqueado = 0;
+
+        $data = array(
+            'iPerfil' => 0,
+            'sNombre' => $this->input->post('sNombre'),
+            'sApellidos' => $this->input->post('sApellidos'),
+            'sUsuario' => $this->input->post('sUsuario'),
+            'sPassword' => sha1($this->input->post('sPassword')),
+            'sEmail' => $this->input->post('sEmail'),
+            'iAdmin' => $admin,
+            'bActivo' => $activo,
+            'bBloqueado' => $bloqueado,
+        );
+
+        $insert = $this->Usuarios_model->save($data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+     /*
+        Función AJAX que se ejecutará cuando añadimos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_add_curso($iId_Usuario)
+    {
+        $data = array(
+            'iId_Asignatura' => $this->input->post('iId_Asignatura'),
+            'iId_Titulacion' => $this->input->post('iId_Titulacion'),
+            'iId_Universidad' => $this->input->post('iId_Universidad'),
+            'iId_Usuario' => $iId_Usuario,
+        );
+
+        $insert = $this->Usuarios_model->save_cursos($data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+     /*
+        Funciones AJAX que se ejecutarán cuando editemos un registro de la tabla de la BBDD "pregunta" 
+    */
+    public function ajax_edit($iId)
+    {
+        $data = $this->Usuarios_model->get_by_id($iId);
+        echo json_encode($data);
+    }
+
+     /*
+        Funciones AJAX que se ejecutarán cuando editemos un registro de la tabla de la BBDD "pregunta" 
+    */
+    public function ajax_edit_cursos($iId)
+    {
+        $data = $this->Usuarios_model->get_by_id_cursos($iId);
+        echo json_encode($data);
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando actualizamos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_update()
+    {
+        $this->_validate();
+
+        $admin = 1;
+        if ($this->input->post("iAdmin")[0] == "") $admin = 0;
+
+        $activo = 1;
+        if ($this->input->post("bActivo")[0] == "") $activo = 0;
+
+        $bloqueado = 1;
+        if ($this->input->post("bBloqueado")[0] == "") $bloqueado = 0;
+
+        $data = array(
+            'sNombre' => $this->input->post('sNombre'),
+            'sApellidos' => $this->input->post('sApellidos'),
+            'sUsuario' => $this->input->post('sUsuario'),
+            'sPassword' => sha1($this->input->post('sPassword')),
+            'sEmail' => $this->input->post('sEmail'),
+            'iAdmin' => $admin,
+            'bActivo' => $activo,
+            'bBloqueado' => $bloqueado,
+        );
+        
+        $this->Usuarios_model->update(array('iId' => $this->input->post('iId')), $data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_delete($iId)
+    {
+        $this->_validate_delete($iId);
+        $this->Usuarios_model->delete_by_id($iId);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_delete_curso($iId)
+    {
+        $this->Usuarios_model->delete_curso_by_id($iId);
+        echo json_encode(array("status" => TRUE));
+    }
+
+     /*
+        Función privada para comprobar si una titulación puede eliminarse del sistema sin provocar errores de integridad.
+        ENTRADA: $iId (Identificador de la titulación que se desea eliminar) 
+    */
+    private function _validate_delete($iId) {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;  
+
+        if ($this->Usuarios_model->tiene_partidas($iId) > 0) {
+            $data['inputerror'][] = '';
+            $data['error_string'][] = 'Este profesor no puede ser eliminado, ya que participa en una o más partidas.';
+            $data['status'] = FALSE;
+        }
+        
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
+        }
+    }
+
+
+    /*
+        Función auxiliar para validar los campos del formulario antes de darlo de alta como nuevo registro o
+        para la modificación del mismo. En ambas acciones se utilizará la validación. 
+    */
+    private function _validate()
+    {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;
+
+        if($this->input->post('sNombre') == '')
+        {
+            $data['inputerror'][] = 'sNombre';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('sApellidos') == '')
+        {
+            $data['inputerror'][] = 'sApellidos';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('sUsuario') == '')
+        {
+            $data['inputerror'][] = 'sUsuario';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('sPassword') == '')
+        {
+            $data['inputerror'][] = 'sPassword';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+        
+        if($this->input->post('sEmail') == '')
+        {
+            $data['inputerror'][] = 'sEmail';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+        
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
+        }
+    }
+
+    // Recarga de selectores
+
+    public function ajax_recarga_titulaciones()
+    {
+        if($this->input->is_ajax_request() && $this->input->get("universidad"))
+        {
+            $iId_Universidad = $this->input->get("universidad");
+            $titulaciones = $this->Usuarios_model->get_titulaciones_by_id($iId_Universidad);
+            $data = array("titulaciones" => $titulaciones);
+            echo json_encode($data);
+        }
+    }
+
+    public function ajax_recarga_asignaturas()
+    {
+        if($this->input->is_ajax_request() && $this->input->get("titulacion"))
+        {
+            $iId_Titulacion = $this->input->get("titulacion");
+            $asignaturas = $this->Usuarios_model->get_asignaturas_by_id($iId_Titulacion);
+            $data = array("asignaturas" => $asignaturas);
+            echo json_encode($data);
+        }
+    }
+
+
+
+    
     
     public function nueva(){
         if($this->input->post("submit")){
@@ -120,84 +371,6 @@ class Usuarios extends CI_Controller{
                 redirect(base_url()."index.php/usuarios", "refresh");
             }
         }
-    }
-     
-    public function mod($iId){
-        if(is_numeric($iId)){
-            $datos["mod"]=$this->usuarios_model->mod($iId);
-            $this->load->view("usuariomod_view",$datos);
-            
-            if($this->input->post("submit")){
-                // Hay que volver a validar los datos.
-                $this->form_validation->set_rules('sNombre', 'Nombre', 'trim|required|max_length[32]|min_length[2]');
-                $this->form_validation->set_rules('sApellidos', 'Apellidos', 'trim|required|max_length[128]|min_length[2]');
-                $this->form_validation->set_rules('sUsuario', 'Usuario', 'trim|required|max_length[32]|min_length[2]');
-                $this->form_validation->set_rules('sEmail', 'E-mail', 'trim|valid_email|required|max_length[128]|min_length[2]');
-
-                // Una vez establecidas las reglas, validamos los campos.
-                $this->form_validation->set_message('required', '%s es obligatorio.');
-                $this->form_validation->set_message('valid_email', 'El %s no es válido.');
-                $this->form_validation->set_message('min_length', '%s debe tener al menos %s caracteres.');
-                $this->form_validation->set_message('max_length', '%s no puede tener más de %s caracteres.');
-                
-                if ($this->form_validation->run() == FALSE) {   
-                    $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong>, no hemos podido modificar los datos del profesor.');               
-                    redirect(base_url()."index.php/usuarios/mod/".$iId, "refresh");
-                } else {
-                    $mod=$this->usuarios_model->mod(
-                        $iId,
-                        $this->input->post("submit"),
-                        $this->input->post("sNombre"),
-                        $this->input->post("sApellidos"),
-                        $this->input->post("sEmail"),
-                        $this->input->post("sUsuario"),
-                        $this->input->post("iPerfil"),
-                        $this->input->post("iTitulacion"),
-                        $this->input->post("iAsignatura"));
-                    if($mod==true){
-                        $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong>, el profesor se modificó correctamente.');
-                    }else{
-                        $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong>, no hemos podido modificar los datos del profesor.');
-                    }
-
-                    redirect(base_url()."index.php/usuarios/mod/".$iId, "refresh");
-
-                }
-            }
-        } else {
-            redirect(base_url()."index.php/usuarios"); 
-        }
-    }
-
-     
-    //Controlador para eliminar
-    public function eliminar($iId, $npag="NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
-        if(is_numeric($iId)){
-            $eliminar=$this->usuarios_model->eliminar($iId);
-            if($eliminar==true){
-                $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, el profesor se eliminó con éxito.');
-          }else{
-              $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, no se pudo eliminar el profesor.');
-          }
-          redirect(base_url()."index.php/usuarios/pagina/$npag");
-        }else{
-          redirect(base_url()."index.php/usuarios/pagina/$npag");
-        }
-    }
-
-    //Controlador para eliminar
-    public function eliminar_todos($npag="NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
-        foreach ($_POST["usuario"] as $item){
-            $eliminar=$this->usuarios_model->eliminar($item);
-        }
-        if($eliminar==true){
-            $this->session->set_flashdata('correcto', '<strong>Bien!</strong> se eliminaron los datos.');
-        }else{
-            $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro.');
-        } 
-        redirect(base_url()."index.php/usuarios/pagina/$npag");
     }
 }
 ?>

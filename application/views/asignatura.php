@@ -399,10 +399,22 @@
                                 }
                                 $('select#titulaciones').html(titulaciones);
                             });
-
-                        
-
                     }
+
+                     function cargar_asignaturas(iId)
+                    {  
+                        var iId_Titulacion = $("#titulaciones option:selected").attr("value");
+                        $.get("<?php echo site_url('index.php/Asignatura/ajax_recarga_asignaturas')?>",
+                            {"titulacion":iId_Titulacion}, function(data) {
+                                var asignaturas = "";
+                                var titulacion = JSON.parse(data);
+                                for (datos in titulacion.titulaciones) {
+                                    titulaciones += '<option value="'+titulacion.titulaciones[datos].iId+'">'+
+                                    titulacion.titulaciones[datos].sTitulacion+'</option>';
+                                }
+                                $('select#titulaciones').html(titulaciones);
+                            });
+                    } 
                         
                 </script>
 
