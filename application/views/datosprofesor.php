@@ -95,8 +95,35 @@
                     </div>
                 <?php } ?>
                 <!-- Fin errores -->
+                <?php echo form_fieldset('Cursos disponibles');?>
+                <blockquote>A continuación, se enumeran los cursos en los que está dado de alta. Si necesita alguna modificación sobre los mismos, deberá hacerlo <b>mediante petición al administrador</b> desde el menú de <b>PETICIONES</b></blockquote>
 
-                <?php echo form_fieldset('Modificar los datos de un profesor');?>
+                <?php
+                if ($cursos == "") {
+                    echo "<div class='alert alert-danger'>En estos momentos no está dado de alta en ninguna universidad. Deberá darse de alta mediante una <b>petición al administrador</b> a través del menú <b>PETICIONES</b>.</div>";
+                } else {
+                    echo '<table class="table table-bordered table-striped" id="table_preguntas">
+                        <thead>
+                            <th>Universidad</th>
+                            <th>Titulación</th>
+                            <th>Asignatura</th>
+                        </thead>
+                        <tbody>';
+                            foreach($cursos as $curso){                                 
+                                echo '
+                                <tr>
+                                    <td>'.$curso->sUniversidad.'</td>
+                                    <td>'.$curso->sTitulacion.'</td>
+                                    <td>'.$curso->sNombre.'</td>
+                                </tr>';
+                            }
+                            echo '   
+                        </tbody>
+                        </table>'; 
+                    }
+                ?>
+
+                <?php echo form_fieldset('Modificar mis datos');?>
                  <?=form_open(base_url().'index.php/DatosProfesor/mod');?>
                 <?php    
                     foreach ($verProfesor as $fila){ 

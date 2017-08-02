@@ -32,4 +32,43 @@ class Login_model extends CI_Model {
 			redirect(base_url().'index.php/login','refresh');
 		}
 	}
+
+	public function get_asignaturas_id($iId) {
+		$query = $this->db->query("select distinct iId_Asignatura from usuarioscurso where iId_Usuario = $iId");
+		if ($query->num_rows() > 0) {
+			$i = 0;
+      		foreach ($query->result() as $row) {
+        		$a[$i] = $row->iId_Asignatura;
+        		$i++;
+      		}
+      	$query->free_result();
+      	return $a;
+    	}
+	}
+
+	public function get_universidades_id($iId) {
+		$query = $this->db->query("select distinct iId_Universidad from usuarioscurso where iId_Usuario = $iId");
+		if ($query->num_rows() > 0) {
+			$i = 0;
+      		foreach ($query->result() as $row) {
+        		$a[$i] = $row->iId_Universidad;
+        		$i++;
+      		}
+      	$query->free_result();
+      	return $a;
+    	}
+	}
+
+	public function get_titulaciones_id($iId) {
+		$query = $this->db->query("select distinct iId_Titulacion from usuarioscurso where iId_Usuario = $iId");
+		if ($query->num_rows() > 0) {
+			$i = 0;
+      		foreach ($query->result() as $row) {
+        		$a[$i] = $row->iId_Titulacion;
+        		$i++;
+      		}
+      	$query->free_result();
+      	return $a;
+    	}
+	}
 }

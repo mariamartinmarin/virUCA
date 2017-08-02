@@ -11,6 +11,18 @@ class DatosProfesor_model extends CI_Model{
       return $consulta->result();
     }
 
+    public function verCursos($iId) {
+      $this->db->select('usuarioscurso.*, titulacion.sTitulacion, asignatura.sNombre, universidad.sUniversidad');
+      $this->db->from('usuarioscurso');
+      $this->db->join('titulacion', 'titulacion.iId = usuarioscurso.iId_Titulacion');
+      $this->db->join('asignatura', 'asignatura.iId = usuarioscurso.iId_Asignatura');
+      $this->db->join('universidad', 'universidad.iId = usuarioscurso.iId_Universidad');
+      $this->db->where('usuarioscurso.iId_Usuario', $iId);
+
+      $query = $this->db->get();
+      return $query->result();
+    }
+
     public function obtenerPassword($iId) {
       if (is_numeric($iId)) {
         $consulta = $this->db->query("SELECT sPassword FROM usuario WHERE iId=$iId");

@@ -212,10 +212,10 @@ class Usuarios_model extends CI_Model{
     SALIDA: -
   */
   public function delete_by_id($iId) {
-    // Borramos los cursos
+    //
     $this->db->where('iId_Usuario', $iId);
     $this->db->delete('usuarioscurso');
-    // Borramos al usuario
+
     $this->db->where('iId', $iId);
     $this->db->delete('usuario');
   }

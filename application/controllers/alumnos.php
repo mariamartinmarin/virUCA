@@ -2,166 +2,307 @@
 class Alumnos extends CI_Controller{
     public function __construct() {
         parent::__construct();
-        $this->load->model("alumnos_model");
+        $this->load->model("Alumnos_model");
         $this->load->library("session");
-        $this->load->library('pagination');
     }
      
     //controlador por defecto
-    public function index($iId="NULL"){  
-        if($this->session->userdata('perfil') != 0)
+    public function index(){  
+        if($this->session->userdata('perfil') == 1)
         {
             redirect(base_url().'index.php/login');
         }
-        
         if ($this->session->userdata('is_logued_in') == FALSE)  {
             $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
             redirect(base_url().'index.php/login');
         }
-        
-        $pages=20; //Número de registros mostrados por páginas
-        $config['base_url'] = base_url().'index.php/alumnos/pagina/';
-        $config['total_rows'] = $this->alumnos_model->filas();//calcula el número de filas  
-        $config['per_page'] = $pages; //Número de registros mostrados por páginas
-        $config['num_links'] = 5; //Número de links mostrados en la paginación
-        $config['first_link'] = 'Primera';//primer link
-        $config['last_link'] = 'Última';//último link
-        $config["uri_segment"] = 3;//el segmento de la paginación
-        $config['next_link'] = 'Siguiente';//siguiente link
-        $config['prev_link'] = 'Anterior';//anterior link
-        $this->pagination->initialize($config); //inicializamos la paginación       
-        $data["alumnos"] = $this->alumnos_model->total_paginados(
-            $config['per_page'],
-            $this->uri->segment(3),
-            $pages);
-        $data["num_filas"] = $config['total_rows'];
-        $data["cursos"] = $this->alumnos_model->get_cursos();          
-        
-        //cargo la vista y le paso los datos
-        $this->load->view("alumnos",$data);
-    }
-
-    public function mod_view($iId){
-       $alumnos["verAlumno"]=$this->alumnos_model->verAlumno($iId);
-       $this->load->view("alumnomod_view",$alumnos);
-    }
-    
-    public function nueva(){
-        if($this->input->post("submit")){
-            // Primero vamos a hacer las validaciones.
-            $this->form_validation->set_rules('sNombre', 'Nombre', 'trim|required|max_length[32]|min_length[2]');
-            $this->form_validation->set_rules('sApellidos', 'Apellidos', 'trim|required|max_length[128]|min_length[2]');
-            $this->form_validation->set_rules('sUsuario', 'Usuario', 'trim|required|max_length[32]|min_length[2]');
-            $this->form_validation->set_rules('sEmail', 'E-mail', 'trim|valid_email|required|max_length[128]|min_length[2]');
-            $this->form_validation->set_rules('sPassword', 'Contraseña', 'trim|required|max_length[64]|min_length[8]');
-
-            // Una vez establecidas las reglas, validamos los campos.
-            $this->form_validation->set_message('required', '<b>%s</b> es obligatorio.');
-            $this->form_validation->set_message('valid_email', 'El <b>%s</b> no es válido.');
-            $this->form_validation->set_message('min_length', '<b>%s</b> debe tener al menos <b>%s</b> caracteres.');
-            $this->form_validation->set_message('max_length', '<b>%s</b> no puede tener más de <b>%s</b> caracteres.');
-
-            if ($this->form_validation->run() == FALSE) {
-                // Si la validación no se pasa, volvemos al directorio raiz.
-                $this->index();
-            } else {
-                // Hacemos la inserción.
-                 $add=$this->alumnos_model->nueva(
-                    $this->input->post("iPerfil"), 
-                    $this->input->post("sNombre"),
-                    $this->input->post("sApellidos"),
-                    $this->input->post("sEmail"),
-                    $this->input->post("sUsuario"),
-                    $this->input->post("sPassword"),
-                    $this->input->post("sCursos")
-                    );
-                if($add==true){
-                    //Sesion de una sola ejecución
-                    $this->session->set_flashdata('correcto', '<strong>Bien!</strong>, El alumno se registró con éxito.');
-                }else{
-                    $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong>, parece que hubo un problema y no hemos podido añadir el nuevo alumno.');
-                }       
-                redirect(base_url()."index.php/alumnos", "refresh");
-            }
-        }
-    }
-     
-    public function mod($iId){
-        if(is_numeric($iId)){
-            $datos["mod"]=$this->alumnos_model->mod($iId);
-            $datos["cursos"] = $this->alumnos_model->get_cursos();
-            $this->load->view("alumnomod_view",$datos);
-            
-            if($this->input->post("submit")){
-                // Hay que volver a validar los datos.
-                $this->form_validation->set_rules('sNombre', 'Nombre', 'trim|required|max_length[32]|min_length[2]');
-                $this->form_validation->set_rules('sApellidos', 'Apellidos', 'trim|required|max_length[128]|min_length[2]');
-                $this->form_validation->set_rules('sUsuario', 'Usuario', 'trim|required|max_length[32]|min_length[2]');
-                $this->form_validation->set_rules('sEmail', 'E-mail', 'trim|valid_email|required|max_length[128]|min_length[2]');
-                
-                // Una vez establecidas las reglas, validamos los campos.
-                $this->form_validation->set_message('required', '%s es obligatorio.');
-                $this->form_validation->set_message('valid_email', 'El %s no es válido.');
-                $this->form_validation->set_message('min_length', '%s debe tener al menos %s caracteres.');
-                $this->form_validation->set_message('max_length', '%s no puede tener más de %s caracteres.');
-                
-                if ($this->form_validation->run() == FALSE) {   
-                    $this->session->set_flashdata('alumno_ko', '<strong>Oops!</strong>, no hemos podido modificar los datos del alumno.');               
-                    redirect(base_url()."index.php/alumnos/mod/".$iId, "refresh");
-                } else {
-                    $mod=$this->alumnos_model->mod(
-                        $iId,
-                        $this->input->post("submit"),
-                        $this->input->post("sNombre"),
-                        $this->input->post("sApellidos"),
-                        $this->input->post("sEmail"),
-                        $this->input->post("sUsuario"),
-                        $this->input->post("iPerfil"),
-                        $this->input->post("iCurso"));
-                    if($mod==true){
-                        $this->session->set_flashdata('alumno_ok', '<strong>Bien!</strong> el alumno se modificó correctamente.');
-                    }else{
-                        $this->session->set_flashdata('alumno_ko', '<strong>Oops!</strong> no hemos podido modificar los datos del alumno.');
-                    }
-
-                    redirect(base_url()."index.php/alumnos/mod/".$iId, "refresh");
-
-                }
-            }
+        if($this->session->userdata('admin') == 1) {
+            $data["universidades"] = $this->Alumnos_model->get_universidades();
+            $data["titulaciones"] = $this->Alumnos_model->get_titulaciones();
+            $data["asignaturas"] = $this->Alumnos_model->get_asignaturas();
         } else {
-            redirect(base_url()."index.php/alumno"); 
+            $data["universidades"] = $this->Alumnos_model->get_universidades($this->session->userdata('id_usuario'));
+            $data["titulaciones"] = $this->Alumnos_model->get_titulaciones($this->session->userdata('id_usuario'));
+            $data["asignaturas"] = $this->Alumnos_model->get_asignaturas($this->session->userdata('id_usuario')); 
+        }
+
+        $this->load->helper('url'); 
+        $this->load->view("alumnos", $data);
+    }
+
+    /* 
+        Función que "montará" la lista según los datos que se mostrarán en la vista y que obtendremos a través del 
+        modelo.
+    */
+    public function ajax_list()
+    {
+        $list = $this->Alumnos_model->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $alumno) {
+            $no++;
+            $row = array();
+            $row[] = '<input type="checkbox" id="usuario" class="usuario" name="usuario[]" value="'.$alumno->iId.'">';
+            $row[] = $alumno->sNombre;
+            $row[] = $alumno->sApellidos;
+            $row[] = $alumno->sEmail;
+
+            // Añadimos HTML para las acciones de la tabla.
+
+            $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Editar" onclick="editar_alumno('."'".$alumno->iId."'".')"><i class="glyphicon glyphicon-pencil"></i> Datos</a>
+                <a class="btn btn-sm btn-success" href="javascript:void(0)" title="Curso" onclick="editar_cursos('."'".$alumno->iId."'".')"><i class="glyphicon glyphicon-plus"></i> Curso</a>
+                <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="borrar_alumno('."'".$alumno->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Borrar</a>
+                ';
+        
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => $_POST['draw'],
+            "recordsTotal" => $this->Alumnos_model->count_all(),
+            "recordsFiltered" => $this->Alumnos_model->count_filtered(),
+            "data" => $data,
+        );
+        // Salida JSON.
+        echo json_encode($output);
+    }
+
+    /* 
+        Función que "montará" la lista según los datos que se mostrarán en la vista y que obtendremos a través del 
+        modelo.
+    */
+    public function ajax_list_cursos($iId)
+    {
+        $list = $this->Alumnos_model->get_datatables_cursos($iId);
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $curso) {
+            $no++;
+            $row = array();
+            $row[] = $curso->sUniversidad;
+            $row[] = $curso->sTitulacion;
+            $row[] = $curso->sNombre;
+
+            // Añadimos HTML para las acciones de la tabla.
+
+            $row[] = '<a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="borrar_curso('."'".$curso->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Borrar</a>
+                ';
+        
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => $_POST['draw'],
+            "recordsTotal" => $this->Alumnos_model->count_all_cursos($iId),
+            "recordsFiltered" => $this->Alumnos_model->count_filtered_cursos($iId),
+            "data" => $data,
+        );
+        // Salida JSON.
+        echo json_encode($output);
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando añadimos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_add()
+    {
+        $this->_validate();
+
+        $admin = 0;
+        $activo = 1;
+        if ($this->input->post("bActivo")[0] == "") $activo = 0;
+
+        $bloqueado = 1;
+        if ($this->input->post("bBloqueado")[0] == "") $bloqueado = 0;
+
+        $data = array(
+            'iPerfil' => 1,
+            'sNombre' => $this->input->post('sNombre'),
+            'sApellidos' => $this->input->post('sApellidos'),
+            'sUsuario' => $this->input->post('sUsuario'),
+            'sPassword' => sha1($this->input->post('sPassword')),
+            'sEmail' => $this->input->post('sEmail'),
+            'iAdmin' => $admin,
+            'bActivo' => $activo,
+            'bBloqueado' => $bloqueado,
+        );
+
+
+        $insert = $this->Alumnos_model->save($data, 
+            $this->input->post('iId_Universidad'), 
+            $this->input->post('iId_Titulacion'), 
+            $this->input->post('iId_Asignatura'));
+
+        echo json_encode(array("status" => TRUE));
+    }
+
+     /*
+        Función AJAX que se ejecutará cuando añadimos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_add_curso($iId_Usuario)
+    {
+        $data = array(
+            'iId_Asignatura' => $this->input->post('iId_Asignatura'),
+            'iId_Titulacion' => $this->input->post('iId_Titulacion'),
+            'iId_Universidad' => $this->input->post('iId_Universidad'),
+            'iId_Usuario' => $iId_Usuario,
+        );
+
+        $insert = $this->Alumnos_model->save_cursos($data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+     /*
+        Funciones AJAX que se ejecutarán cuando editemos un registro de la tabla de la BBDD "pregunta" 
+    */
+    public function ajax_edit($iId)
+    {
+        $data = $this->Alumnos_model->get_by_id($iId);
+        echo json_encode($data);
+    }
+
+     /*
+        Funciones AJAX que se ejecutarán cuando editemos un registro de la tabla de la BBDD "pregunta" 
+    */
+    public function ajax_edit_cursos($iId)
+    {
+        $data = $this->Alumnos_model->get_by_id_cursos($iId);
+        echo json_encode($data);
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando actualizamos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_update()
+    {
+        $this->_validate();
+
+        $admin = 0;
+        $activo = 1;
+        if ($this->input->post("bActivo")[0] == "") $activo = 0;
+        $bloqueado = 1;
+        if ($this->input->post("bBloqueado")[0] == "") $bloqueado = 0;
+
+        $data = array(
+            'sNombre' => $this->input->post('sNombre'),
+            'sApellidos' => $this->input->post('sApellidos'),
+            'sUsuario' => $this->input->post('sUsuario'),
+            'sPassword' => sha1($this->input->post('sPassword')),
+            'sEmail' => $this->input->post('sEmail'),
+            'iAdmin' => $admin,
+            'bActivo' => $activo,
+            'bBloqueado' => $bloqueado,
+        );
+        
+        $this->Alumnos_model->update(array('iId' => $this->input->post('iId')), $data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_delete($iId)
+    {
+        $this->Alumnos_model->delete_by_id($iId);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "usuario" de forma masiva. 
+    */
+    public function ajax_delete_todos()
+    {
+        foreach ($_POST["usuario"] as $item){
+            $eliminar = $this->Alumnos_model->delete_by_id($item);
+        }
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_delete_curso($iId)
+    {
+        $this->Alumnos_model->delete_curso_by_id($iId);
+        echo json_encode(array("status" => TRUE));
+    }
+
+
+    /*
+        Función auxiliar para validar los campos del formulario antes de darlo de alta como nuevo registro o
+        para la modificación del mismo. En ambas acciones se utilizará la validación. 
+    */
+    private function _validate()
+    {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;
+
+        if($this->input->post('sNombre') == '')
+        {
+            $data['inputerror'][] = 'sNombre';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('sApellidos') == '')
+        {
+            $data['inputerror'][] = 'sApellidos';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('sUsuario') == '')
+        {
+            $data['inputerror'][] = 'sUsuario';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('sPassword') == '')
+        {
+            $data['inputerror'][] = 'sPassword';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+        
+        if($this->input->post('sEmail') == '')
+        {
+            $data['inputerror'][] = 'sEmail';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+        
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
         }
     }
 
-     
-    //Controlador para eliminar
-    public function eliminar($iId,$npag="NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
-        if(is_numeric($iId)){
-            $eliminar = $this->alumnos_model->eliminar($iId);
-            if ($eliminar == true) {
-                $this->session->set_flashdata('correcto', '<strong>Bien!</strong> el alumno se eliminó con éxito.');
-            }else{
-              $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudo eliminar el alumno. Recuerde que no es posible eliminar un alumno que tenga preguntas asociadas.');
-          }
-          redirect(base_url()."index.php/alumnos/pagina/$npag");
-        }else{
-          redirect(base_url()."index.php/alumnos/pagina/$npag");
+    // Recarga de selectores
+
+    public function ajax_recarga_titulaciones()
+    {
+        if($this->input->is_ajax_request() && $this->input->get("universidad"))
+        {
+            $iId_Universidad = $this->input->get("universidad");
+            $titulaciones = $this->Alumnos_model->get_titulaciones_by_id($iId_Universidad);
+            $data = array("titulaciones" => $titulaciones);
+            echo json_encode($data);
         }
     }
 
-    //Controlador para eliminar
-    public function eliminar_todos($npag = "NULL"){
-        if ((is_numeric($npag) == FALSE) or (is_numeric($npag) && $npag < 0)) $npag = "";
-        foreach ($_POST["alumnos"] as $item){
-            $eliminar=$this->alumnos_model->eliminar($item);
+    public function ajax_recarga_asignaturas()
+    {
+        if($this->input->is_ajax_request() && $this->input->get("titulacion"))
+        {
+            $iId_Titulacion = $this->input->get("titulacion");
+            $asignaturas = $this->Alumnos_model->get_asignaturas_by_id($iId_Titulacion);
+            $data = array("asignaturas" => $asignaturas);
+            echo json_encode($data);
         }
-        if ($eliminar == true){
-            $this->session->set_flashdata('correcto', '<strong>Bien!</strong> se eliminaron los datos.');
-        }else{
-            $this->session->set_flashdata('incorrecto', '<strong>Oops!</strong> no se pudieron eliminar todos los datos o no seleccionó ningún registro. Recuerde que no es posible eliminar un alumno que tenga preguntas asociadas.');
-        } 
-        redirect(base_url()."index.php/alumnos/pagina/$npag");
     }
 }
 ?>

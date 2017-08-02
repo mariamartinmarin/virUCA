@@ -7,7 +7,7 @@ class Login extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-		$this->load->model('login_model');
+		$this->load->model('Login_model');
 		$this->load->library(array('session','form_validation'));
 		$this->load->helper(array('url','form'));
 		$this->load->helper('date');
@@ -56,11 +56,11 @@ class Login extends CI_Controller
 			}else{
 				$username = $this->input->post('username');
 				$password = sha1($this->input->post('password'));
-				$check_user = $this->login_model->login_user($username,$password);
+				$check_user = $this->Login_model->login_user($username,$password);
 				if($check_user == TRUE)
 				{
 					// Comprobamos primero si la aplicación está disponible (sólo si es alumno).
-					$app = $this->login_model->aplicacion_activa();
+					$app = $this->Login_model->aplicacion_activa();
 					if ($check_user->iPerfil == 1 && $app->iActiva == 0) {
 						// Acceso a la aplicacion no permitido.
 						redirect(base_url().'index.php/inactiva/');
@@ -73,6 +73,12 @@ class Login extends CI_Controller
 						'sNombreCompleto' => $check_user->sNombre.", ".$check_user->sApellidos);
 					$this->db->insert('acceso', $data);
 
+					// Creo array de asignaturas.
+					$asignaturas = $this->Login_model->get_asignaturas_id($check_user->iId);
+					$titulaciones = $this->Login_model->get_titulaciones_id($check_user->iId);
+					$universidades = $this->Login_model->get_universidades_id($check_user->iId);
+
+
 					$data = array(
 	                'is_logued_in' 	=> 		TRUE,
 	                'id_usuario' 	=> 		$check_user->iId,
@@ -83,7 +89,10 @@ class Login extends CI_Controller
 	                'iId_Panel'		=>		'',
 	                'iTurno'		=>		'',
 	                'tirada'		=>		'',
-	                'pregunta'		=>		'0'
+	                'pregunta'		=>		'0',
+	                'asignaturas'	=>		$asignaturas,
+	                'universidades'	=>		$universidades,
+	                'titulaciones' 	=>		$titulaciones
             		);		
 					$this->session->set_userdata($data);
 					//$this->session->mark_as_temp($data, 30);

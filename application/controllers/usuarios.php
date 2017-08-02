@@ -218,6 +218,17 @@ class Usuarios extends CI_Controller{
         echo json_encode(array("status" => TRUE));
     }
 
+     /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "usuario" de forma masiva. 
+    */
+    public function ajax_delete_todos()
+    {
+        foreach ($_POST["usuario"] as $item){
+            $eliminar = $this->Usuarios_model->delete_by_id($item);
+        }
+        echo json_encode(array("status" => TRUE));
+    }
+
     /*
         Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "usuario" 
     */

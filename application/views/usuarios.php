@@ -67,7 +67,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <ul class="breadcrumb">
-                                    <li><a href="#">Profesores</a></li>
+                                    <li><a href="#">Usuarios</a></li>
                                     <li class="active">Gestión de Profesores</li>
                                 </ul>
                             </div>
@@ -340,7 +340,7 @@
             }
 
             function eliminar_todos(pregunta) {
-                bootbox.confirm("¿Estás seguro/a que quieres eliminar las preguntas? Recuerde que si existen dependencias, no podrá eliminarse el registro.",
+                bootbox.confirm("¿Estás seguro/a que quieres eliminar los profesores seleccionados? Recuerde que si existen dependencias, no podrá eliminarse el registro.",
 
                 function(result) {
                     if (result == true) {
@@ -348,7 +348,7 @@
                             url : "<?php echo site_url('index.php/Preguntas/ajax_delete_todos')?>/",
                             type : "POST",
                             dataType : "JSON",
-                            data : $('.pregunta:checked').serialize(),
+                            data : $('.usuario:checked').serialize(),
                             success: function(data) {
 
                                 if(data.status) //if success close modal and reload ajax table
@@ -726,7 +726,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" id="btnSaveCursos" onclick="save_cursos()" class="btn btn-primary">Guardar</button>
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Salir</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->

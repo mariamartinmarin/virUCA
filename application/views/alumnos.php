@@ -14,50 +14,37 @@
         <!-- Mobile Metas -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- Web Fonts  -->
+        <!-- Fuente  -->
         <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800%7CShadows+Into+Light" rel="stylesheet" type="text/css">
 
         <!-- Libs CSS -->
         <link rel="stylesheet" href="<?=base_url()?>vendor/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" href="<?=base_url()?>vendor/font-awesome/css/font-awesome.css">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/magnific-popup/magnific-popup.css" media="screen">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/isotope/jquery.isotope.css" media="screen">
-        
+       
+        <link rel="stylesheet" href="<?=base_url('js/datatables/css/dataTables.bootstrap.css')?>" rel="stylesheet">
+
         <!-- Theme CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-elements.css">
+        <link rel="stylesheet" href="<?=base_url()?>css/theme-blog.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
-        
+        <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
+
         <!-- Custom Loader -->
         <link rel="stylesheet" href="<?=base_url()?>css/loader.css">
-        
         <!-- Responsive CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme-responsive.css" />
-
         <!-- Skin CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/skins/default.css">
-
         <!-- Custom CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/custom.css">
 
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
-        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
         <script src="<?=base_url()?>vendor/jquery.js"></script>
-        <script type="text/javascript" src="<?=base_url()?>js/tablesorter/jquery.tablesorter.js"></script>
-        <script type="text/javascript" src="<?=base_url()?>js/busquedasimple.js"></script>
         <script type="text/javascript">
-            $(document).ready(function() 
-            { 
-                $("#table_alumnos").tablesorter( {sortList: [[1,0], [2,0], [3,0]]} ); 
-            } 
-            ); 
-            $(window).load(function() { $(".loader").fadeOut("slow");});
+            $(window).load(function() { $(".loader").fadeOut("slow");}); 
         </script>
-
-
-
-
         <!--[if IE]>
             <link rel="stylesheet" href="css/ie.css">
         <![endif]-->
@@ -65,7 +52,7 @@
         <!--[if lte IE 8]>
             <script src="vendor/respond.js"></script>
         <![endif]-->
-        
+
     </head>
     <body>
         <div id="preloader">
@@ -80,7 +67,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <ul class="breadcrumb">
-                                    <li><a href="#">Alumnos</a></li>
+                                    <li><a href="#">Usuarios</a></li>
                                     <li class="active">Gestión de Alumnos</li>
                                 </ul>
                             </div>
@@ -95,258 +82,776 @@
                
                 <div class="container">
 
-                    <!-- Errores de inserción. -->
-                     <?php if($this->session->flashdata('correcto')) { ?>
-                        <div class="alert alert-success">
-                            <?php echo $this->session->flashdata('correcto');?>
-                        </div>
-                    <?php } ?>
+                    <button class="btn btn-success" onclick="add_alumno()">
+                        <i class="glyphicon glyphicon-plus"></i> Alumno
+                    </button>
+                    <button class="btn btn-warning" onclick="eliminar_todos($(usuario))">
+                        <i class="glyphicon glyphicon-trash"></i> Eliminar todos
+                    </button>
+                    <button class="btn btn-default" onclick="reload_table()">
+                        <i class="glyphicon glyphicon-refresh"></i> Refrescar
+                    </button>
 
-                    <?php if($this->session->flashdata('incorrecto')) { ?>
-                        <div class="alert alert-danger">
-                            <?php echo $this->session->flashdata('incorrecto'); ?>
-                        </div>
-                    <?php } ?>
-                    <!-- Fin errores -->
+                    <br />
+                    <br />
 
-                    <!-- Listado -->
+                    <table id="table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>E-mail</th>
+                        <th>Acción</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
 
-                    <?php if ($alumnos != "" && $cursos != "") { 
-                    // Obtener página.
-                    $npag =  $this->uri->segment(3);
-                    ?>
-
-                    <?php echo form_fieldset('Listado de alumnos');
-                    $atributos = array('class' => 'navbar-form', 'role' => 'search');
-                    ?>
-                    <blockquote>
-                        Administrar y crear usuarios <b>Alumnos</b> en el sistema. En la parte inferior tiene el formulario para dar de alta nuevos usuarios.
-                    </blockquote>
-                    
-                    <?=form_open(base_url().'index.php/alumnos/eliminar_todos/'.$npag);?>
-                    <div class="input-group">
-                        <span class="input-group-addon">Buscar</span>
-                        <input id="filtrar" type="text" class="form-control" placeholder="Buscar en esta página">
-                    </div>
-
-                    <hr class="short">
-                    
-                    <div class="panel panel-default">
-                        <!-- Default panel contents -->
-                        <div class="panel-heading">
-                            Se están mostrando un total de <b><?=$num_filas;?> registros</b>
-                        </div>
-                        <table class="table table-bordered table-striped"  id="table_alumnos">
-                            <thead>
-                                <th>&nbsp;</th>
-                                <th>Nombre</th>
-                                <th>Apellidos</th>
-                                <th>Curso Académico</th>
-                                <th>Titulación</th>
-                                <th>Opciones</th>
-                            </thead>
-                            <tbody class="buscar">
-                                <?php 
-                                foreach($alumnos as $fila){ 
-                                ?>
-
-                                <tr><td>
-                                    <span class="show-grid-block">
-                                        <input type="checkbox" name="alumnos[]" value="<?=$fila->iId;?>">
-                                    </span>
-                                </td>
-                                    
-                                <td><?=$fila->sNombre;?></td>
-                                <td><?=$fila->sApellidos;?></td>  
-                                <td><?=$fila->sCurso;?></td> 
-                                <td><?=$fila->sTitulacion;?></td>
-                                <td>
-                                    <a href="#" 
-                                        data-bb="confirm" 
-                                        data-id="<?=$fila->iId;?>"
-                                        data-pg="<?=$npag?>" 
-                                        class="btn-group-xs">
-                                            <i class="icon icon-trash-o"></i>
-                                    </a>
-
-                                    <a href="<?=base_url("index.php/alumnos/mod/$fila->iId/$npag")?>" 
-                                    class="btn-group-xs"><i class="icon icon-pencil"></i></a>
-                                </td>
-                                <?php
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-
-                    </div>
-
-                    <input type="submit" class="btn btn-warning" value="Eliminar conjunto">
-                    <br style="clear:both;">
-                    <?php echo $this->pagination->create_links() ?>
-                    <hr class="short">
-                    
-                    
-
-                    <?=form_close();?>
-                    
-                    <?php
-
-                    } else {
-                    ?>
-                        <div class="alert alert-success">
-                            Actualmente no hay ningún alumno activo.
-                        </div>
-                        <?php
-                        if ($cursos == '') {
-                        ?>
-                        <div class="alert alert-success">
-                            No se pueden dar de alta alumnos si no hay ningún <b>Curso Académico</b> en el sistema.
-                        </div>
-                        <?php
-                        } 
-                    }
-                    ?>
-
-                    <!-- Fin del listado -->
-
-                    <?php if ($cursos != '') { ?>
-                        
-
-                   <?=form_open(base_url().'index.php/alumnos/nueva');
-                   $tipo_usuario = 1;
-                   echo form_hidden('iPerfil',$tipo_usuario);
-
-                    $sNombre = array(
-                    'name' => 'sNombre',
-                    'id' => 'sNombre',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sNombre'),
-                    'maxlength' => '100'
-                    );
-
-                    $sApellidos = array(
-                    'name' => 'sApellidos',
-                    'id' => 'sApellidos',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sApellidos')
-                    );
-
-                    $sEmail = array(
-                    'name' => 'sEmail',
-                    'id' => 'sEmail',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sEmail')
-                    );
-
-                    $sUsuario = array(
-                    'name' => 'sUsuario',
-                    'id' => 'sUsuario',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sUsuario')
-                    );
-                    $sPassword = array(
-                    'name' => 'sPassword',
-                    'id' => 'sPassword',
-                    'size' => '50',
-                    'class' => 'form-control',
-                    'value' => set_value('sPassword')
-                    );
-
-                    $sCursos = array(
-                    'name' => 'sCursos',
-                    'id' => 'sCursos',
-                    'size' => '50',
-                    'class' => 'form-control input-lg',
-                    'value' => set_value('sCursos') 
-                    );
-
-                    $submit = array(
-                    'name' => 'submit',
-                    'id' => 'submit',
-                    'value' => 'Enviar',
-                    'title' => 'Enviar',
-                    'class' => 'btn btn-default' 
-                    );
-                    ?>
-                    
-                    <?=form_fieldset('Añadir nuevo alumno.');?>
-
-                    <!--- formulario organizado con validación -->
-
-                   <div class="row">
-                        <div class="form-group">
-                            <div class="col-md-6">
-                                <label>Nombre *</label>
-                                <?=form_input($sNombre)?>
-                                <?=form_error('sNombre','<br><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Apellidos *</label>
-                                <?=form_input($sApellidos)?>
-                                <?=form_error('sApellidos', '<br><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="form-group">
-                            <div class="col-md-6">
-                                <label>Usuario *</label>
-                                <?=form_input($sUsuario)?>
-                                <?=form_error('sUsuario','<br><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Contraseña *</label>
-                                <?=form_input($sPassword)?>
-                                <?=form_error('sPassword','<br><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="form-group">
-                            <div class="col-md-6">
-                                <label>E-mail</label>
-                                <?=form_input($sEmail)?>
-                                <?=form_error('sEmail','<br><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>','</div>');?>
-                            </div>
-                            <div class="col-md-6">                            
-                                <?=form_label('Curso Académico: '); ?>
-                                <?=form_dropdown('sCursos', $cursos, '', 'class=form-control input-lg'); ?>
-                                
-                            </div>
-                        </div>
-                    </div>                      
-                    <?=form_submit($submit)?>
-                    <?=form_close()?>
-
-                    <!-- Fin del formulario organizado -->
-                    
-                    <?=form_fieldset_close();?>
-
-                    <?php
-
-                    } 
-                    ?>
-                    <hr class="short">
-                    
-
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th>Nombre</th>
+                            <th>Apellidos</th>
+                            <th>E-mail</th>
+                            <th>Acción</th>
+                        </tr>
+                    </tfoot>
+                    </table> 
                 </div>
             </div>
             <?php $this->load->view('footer');?>
         </div>
 
-<!-- Libs -->
-        
+        <script src="<?=base_url('vendor/bootstrap/js/bootstrap.min.js')?>"></script>
+        <script src="<?=base_url('js/datatables/js/jquery.dataTables.min.js')?>"></script>
+        <script src="<?=base_url('js/datatables/js/dataTables.bootstrap.js')?>"></script>
+        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
+        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+
+        <script type="text/javascript">
+            bootbox.setDefaults({
+                locale: "es"
+            });
+
+            var save_method; // Para el uso del método save.
+            var table;
+
+            $(document).ready(function() {
+
+                //datatables
+                table = $('#table').DataTable({ 
+                    "language": {
+                        "paginate": {
+                            "first": "Primero",
+                            "last": "Último",
+                            "next": "Siguiente",
+                            "previous": "Anterior"
+                        },
+                        "search": "Buscar alumno: ",
+                        "lengthMenu": "Mostrando _MENU_ alumnos por página.",
+                        "loadingRecords": "Cargando alumnos",
+                        "processing": "Cargando alumnos",
+                        "zeroRecords": "No se han encontrado alumnos",
+                        "emptyTable": "No hay alumnos disponibles",
+                        "info": "Alumnos del _START_ al _END_, (total de _TOTAL_)",
+                        "sInfoFiltered":   "",
+                        "infoEmpty": "Mostrando 0 de 0 alumnos",
+                        "aria": {
+                            "sortAscending": ": ordenar columna ascendentemente",
+                            "sortDescending": ": ordenar columna descendentemente"
+                        }
+                    },
+                    "processing": true, //Feature control the processing indicator.
+                    "serverSide": true, //Feature control DataTables' server-side processing mode.
+                    "order": [], //Initial no order.
+
+                    // Load data for the table's content from an Ajax source
+                    "ajax": {
+                        "url": "<?php echo site_url('index.php/Alumnos/ajax_list')?>",
+                        "type": "POST"
+                    },
+
+                    //Set column definition initialisation properties.
+                    "columnDefs": [
+                    { 
+                        "targets": [ -1,0,3 ], //last column
+                        "orderable": false, //set not orderable
+                    },
+                    ],
+
+                });
+            });
+
+            function add_alumno()
+            {
+                save_method = 'add';
+                $('#form')[0].reset(); // reset form on modals
+                $('.form-group').removeClass('has-error'); // clear error class
+                $('.help-block').empty(); // clear error string
+                cargar_titulaciones();
+                $('#modal_form_new').modal('show'); // show bootstrap modal
+                $('.modal-title').text('Añadir alumno'); // Set Title to Bootstrap modal title
+            }
+
+            function editar_cursos(iId)
+            {
+                save_method = 'update';
+                $('#form_cursos')[0].reset(); // reset form on modals
+                $('.form-group').removeClass('has-error'); // clear error class
+                $('.help-block').empty(); // clear error string
+                //Ajax Load data from ajax
+                $.ajax({
+                    url : "<?php echo site_url('index.php/Alumnos/ajax_edit_cursos/')?>" + iId,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+
+                        $('[name="iId_Usuario"]').val(data.iId);
+                        $('[name="sNombre"]').val(data.sNombre); 
+                        $('[name="sApellidos"]').val(data.sApellidos);
+                        cargar_titulaciones();
+                        $('#modal_form_cursos').modal('show'); // show bootstrap modal when complete loaded
+                        $('.modal-title').text('Editar cursos'); // Set title to Bootstrap modal title   
+
+                        table_cursos = $('#table_cursos').DataTable({ 
+                        "bDestroy" : true,
+                        "language": {                                                               
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Último",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            },
+                            "search": "Buscar curso: ",
+                            "lengthMenu": "Mostrando _MENU_ cursos por página.",
+                            "loadingRecords": "Cargando cursos",
+                            "processing": "Cargando cursos",
+                            "zeroRecords": "No se han encontrado cursos",
+                            "emptyTable": "No hay cursos disponibles",
+                            "info": "Cursos del _START_ hasta el _END_, (total de _TOTAL_)",
+                            "sInfoFiltered":   "",
+                            "infoEmpty": "Mostrando 0 de 0 profesores",
+                            "aria": {
+                                "sortAscending": ": ordenar columna ascendentemente",
+                                "sortDescending": ": ordenar columna descendentemente"
+                            }
+                        },
+                        "processing": true, //Feature control the processing indicator.
+                        "serverSide": true, //Feature control DataTables' server-side processing mode.
+                        "order": [], //Initial no order.
+
+                        // Load data for the table's content from an Ajax source
+                        "ajax": {
+                            "url": "<?php echo site_url('index.php/Alumnos/ajax_list_cursos/')?>" + 
+                            data.iId,
+                            "type": "POST"
+                        },
+
+                        //Set column definition initialisation properties.
+                        "columnDefs": [
+                        { 
+                            "targets": [ -1 ], //last column
+                            "orderable": false, //set not orderable
+                        },],
+                        });
+                        // Fin datatables para cursos  
+                                              
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Ocurrió un error mientras se intentaba editar el alumno.');
+                    }
+                });
+            }
+
+            function editar_alumno(iId)
+            {
+                save_method = 'update';
+                $('#form')[0].reset(); // reset form on modals
+                $('.form-group').removeClass('has-error'); // clear error class
+                $('.help-block').empty(); // clear error string
+                //Ajax Load data from ajax
+                $.ajax({
+                    url : "<?php echo site_url('index.php/Alumnos/ajax_edit/')?>" + iId,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        $('[name="iId"]').val(data.iId);
+                        $('[name="sNombre"]').val(data.sNombre); 
+                        $('[name="sApellidos"]').val(data.sApellidos);
+                        $('[name="sUsuario"]').val(data.sUsuario);
+                        $('[name="sPassword"]').val(data.sPassword); 
+                        $('[name="sEmail"]').val(data.sEmail);
+                        $("#bActivo").prop("checked", false);
+                        $("#bBloqueado").prop("checked", false);
+                        if (data.bActivo == 1) $("#bActivo").prop("checked", true);
+                        if (data.bBloqueado == 1) $("#bBloqueado").prop("checked", true); 
+                        $('[name="bActivo"]').val(data.bActivo);
+                        $('[name="bBloqueado"]').val(data.bBloqueado);  
+
+                        $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
+                        $('.modal-title').text('Editar alumno'); // Set title to Bootstrap modal title                            
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Ocurrió un error mientras se intentaba editar el alumno.');
+                    }
+                });
+            }
+
+
+            function reload_table()
+            {
+                table.ajax.reload(null,false); //reload datatable ajax 
+            }
+
+            function reload_table_cursos()
+            {
+                table_cursos.ajax.reload(null,false); //reload datatable ajax 
+            }
+
+            function eliminar_todos(pregunta) {
+                alert(pregunta);
+                bootbox.confirm("¿Estás seguro/a que quieres eliminar los alumnos seleccionados? Recuerde que si existen dependencias, no podrá eliminarse el registro.",
+
+                function(result) {
+                    if (result == true) {
+                        $.ajax({
+                            url : "<?php echo site_url('index.php/Alumnos/ajax_delete_todos')?>/",
+                            type : "POST",
+                            dataType : "JSON",
+                            data : $('.usuario:checked').serialize(),
+                            success: function(data) {
+
+                                if(data.status) //if success close modal and reload ajax table
+                                {
+                                    $('#modal_form').modal('hide');
+                                    bootbox.alert("Operación realizada con éxito.");
+                                    reload_table();
+
+                                } else {
+                                    bootbox.alert({
+                                        message: data.error_string
+                                    });
+                                } 
+                            },
+                            error: function (jqXHR, textStatus, errorThrown)
+                            {
+                                bootbox.alert('Error al eliminar el registro. Asegúrese que ha señalado algún registro.');
+                            }
+                        });
+                    }
+                });
+            }
+
+            function save_new()
+            {
+                $('#btnSave').text('guardando ...'); // Cambiar valor del texto
+                $('#btnSave').attr('disabled',true); // Desactivar botón.
+                var url;
+                url = "<?php echo site_url('index.php/Alumnos/ajax_add')?>";
+               
+
+                // AJAX añade datos a la base de datos.
+                $.ajax({
+                    url : url,
+                    type: "POST",
+                    data: $('#form_new').serialize(),
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        if(data.status) //if success close modal and reload ajax table
+                        {
+                            $('#modal_form').modal('hide');
+                            bootbox.alert("Operación realizada con éxito.");
+                            reload_table();
+                        }
+                        else
+                        {
+                            for (var i = 0; i < data.inputerror.length; i++) 
+                            {
+                                $('[name="'+data.inputerror[i]+'"]').parent().parent().addClass('has-error'); //select parent twice to select div form-group class and add has-error class
+                                $('[name="'+data.inputerror[i]+'"]').next().text(data.error_string[i]); //select span help-block class set text error string
+                            }
+                        }
+                        $('#btnSave').text('Guardar');
+                        $('#btnSave').attr('disabled',false); 
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Se ha producido un error al intentar añadir/modificar el registro.');
+                        $('#btnSave').text('Guardar');
+                        $('#btnSave').attr('disabled',false); 
+                    }
+                });
+            }
+
+            function save()
+            {
+                $('#btnSave').text('guardando ...'); // Cambiar valor del texto
+                $('#btnSave').attr('disabled',true); // Desactivar botón.
+                var url;
+
+                if(save_method == 'add') {
+                    url = "<?php echo site_url('index.php/Alumnos/ajax_add')?>";
+                } else {
+                    url = "<?php echo site_url('index.php/Alumnos/ajax_update')?>";
+                }
+
+                // AJAX añade datos a la base de datos.
+                $.ajax({
+                    url : url,
+                    type: "POST",
+                    data: $('#form').serialize(),
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        if(data.status) //if success close modal and reload ajax table
+                        {
+                            $('#modal_form').modal('hide');
+                            bootbox.alert("Operación realizada con éxito.");
+                            reload_table();
+                        }
+                        else
+                        {
+                            for (var i = 0; i < data.inputerror.length; i++) 
+                            {
+                                $('[name="'+data.inputerror[i]+'"]').parent().parent().addClass('has-error'); //select parent twice to select div form-group class and add has-error class
+                                $('[name="'+data.inputerror[i]+'"]').next().text(data.error_string[i]); //select span help-block class set text error string
+                            }
+                        }
+                        $('#btnSave').text('Guardar');
+                        $('#btnSave').attr('disabled',false); 
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Se ha producido un error al intentar añadir/modificar el registro.');
+                        $('#btnSave').text('Guardar');
+                        $('#btnSave').attr('disabled',false); 
+                    }
+                });
+            }
+
+            function save_cursos()
+            {
+                $('#btnSaveCursos').text('guardando ...'); // Cambiar valor del texto
+                $('#btnSaveCursos').attr('disabled',true); // Desactivar botón.
+                var url;
+                var iId_Usuario = $('#iId_Usuario').val();
+                url = "<?php echo site_url('index.php/Alumnos/ajax_add_curso/')?>"+iId_Usuario,
+
+                // AJAX añade datos a la base de datos.
+                $.ajax({
+                    url : url,
+                    type: "POST",
+                    data: $('#form_cursos').serialize(),
+                    dataType: "JSON",
+                    success: function(data)
+                    {
+                        if(data.status) //if success close modal and reload ajax table
+                        {
+                            //$('#modal_form').modal('hide');
+                            bootbox.alert("Operación realizada con éxito.");
+                            reload_table_cursos();
+                        }
+                        else
+                        {
+                            for (var i = 0; i < data.inputerror.length; i++) 
+                            {
+                                $('[name="'+data.inputerror[i]+'"]').parent().parent().addClass('has-error'); //select parent twice to select div form-group class and add has-error class
+                                $('[name="'+data.inputerror[i]+'"]').next().text(data.error_string[i]); //select span help-block class set text error string
+                            }
+                        }
+                        $('#btnSaveCursos').text('Guardar');
+                        $('#btnSaveCursos').attr('disabled',false); 
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        bootbox.alert('Se ha producido un error al intentar añadir/modificar el registro.');
+                        $('#btnSaveCursos').text('Guardar');
+                        $('#btnSaveCursos').attr('disabled',false); 
+                    }
+                });
+            }
+
+            function borrar_alumno(iId)
+            {
+                bootbox.confirm("¿Estás seguro/a que desea eliminar este alumno? Si lo hace, se eliminarán todas las preguntas que dicho alumno aportó al sistema.", 
+                function(result){ 
+                    if (result == true) {
+                        // AJAX borra los datos de la base de datos.
+                        $.ajax({
+                            url : "<?php echo site_url('index.php/Alumnos/ajax_delete')?>/"+iId,
+                            type: "POST",
+                            dataType: "JSON",
+                            success: function(data)
+                            {
+                                if(data.status) //if success close modal and reload ajax table
+                                {
+                                    $('#modal_form').modal('hide');
+                                    bootbox.alert("Operación realizada con éxito.");
+                                    reload_table();
+                                } else {
+                                    bootbox.alert({
+                                        message: data.error_string
+                                    });
+                                }
+                            },
+                            error: function (jqXHR, textStatus, errorThrown)
+                            {
+                                bootbox.alert('Error al eliminar el profesor. Asegúrese que no participa en una o más partidas e inténtelo más tarde.');
+                            }
+                        });
+                    } 
+                });
+            }
+
+
+            function borrar_curso(iId)
+            {
+                bootbox.confirm("¿Estás seguro/a que desea eliminar este curso?", 
+                function(result){ 
+                    if (result == true) {
+                        $.ajax({
+                            url : "<?php echo site_url('index.php/Alumnos/ajax_delete_curso')?>/"+iId,
+                            type: "POST",
+                            dataType: "JSON",
+                            success: function(data)
+                            {
+                                if(data.status) //if success close modal and reload ajax table
+                                {
+                                    //$('#modal_form_cursos').modal('hide');
+                                    bootbox.alert("Operación realizada con éxito.");
+                                    reload_table_cursos();
+                                } else {
+                                    bootbox.alert({
+                                        message: data.error_string
+                                    });
+                                }
+                            },
+                            error: function (jqXHR, textStatus, errorThrown)
+                            {
+                                bootbox.alert('Error al eliminar el curso.');
+                            }
+                        });
+                    } 
+                });
+            }
+
+            // Para recargar titulaciones
+
+            function cargar_titulaciones(iId)
+            {  
+                var iId_Universidad = $("#universidades option:selected").attr("value");
+                $.get("<?php echo site_url('index.php/Alumnos/ajax_recarga_titulaciones')?>",
+                    {"universidad":iId_Universidad}, function(data) {
+                        var titulaciones = "";
+                        var titulacion = JSON.parse(data);
+                        for (datos in titulacion.titulaciones) {
+                            titulaciones += '<option value="'+titulacion.titulaciones[datos].iId+'">'+
+                            titulacion.titulaciones[datos].sTitulacion+'</option>';
+                        }
+                        $('select#titulaciones').html(titulaciones);
+                        cargar_asignaturas();
+                    });
+            } 
+
+            // Para recargar titulaciones
+
+            function cargar_asignaturas(iId)
+            {  
+                var iId_Titulacion = $("#titulaciones option:selected").attr("value");
+
+                $.get("<?php echo site_url('index.php/Alumnos/ajax_recarga_asignaturas')?>",
+                    {"titulacion":iId_Titulacion}, function(data) {
+                        var asignaturas = "";
+                        var asignatura = JSON.parse(data);
+                        for (datos in asignatura.asignaturas) {
+                            asignaturas += '<option value="'+asignatura.asignaturas[datos].iId+'">'+
+                            asignatura.asignaturas[datos].sNombre+'</option>';
+                        }
+                        $('select#asignaturas').html(asignaturas);
+                    });
+            }
+        </script>
+
+
+
+        <!-- CAJA PARA AÑADIR ALUMNO -->
+        <div class="modal fade" id="modal_form_new" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h3 class="modal-title">Alta de alumno</h3>
+                    </div>
+                    <div class="modal-body form">
+                        <form action="#" id="form_new" class="form-horizontal">
+                            <input type="hidden" value="" name="iId"/> 
+                            <div class="form-body">
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?=form_label('Nombre * '); ?>
+                                        <input name="sNombre" placeholder="Nombre" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?=form_label('Apellidos * '); ?>
+                                        <input name="sApellidos" placeholder="Apellidos" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Universidad *</label>
+                                    <div class="col-md-9">
+                                        <?php $atributos = 'class=form-control id="universidades" onChange="cargar_titulaciones();"'; ?>
+                                        <?=form_dropdown('iId_Universidad', $universidades, '', $atributos); ?>
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Titulación *</label>
+                                    <div class="col-md-9">
+                                        <?php $atributos2 = 'class=form-control id="titulaciones"
+                                        onChange="cargar_asignaturas();"'; ?>
+                                        <?=form_dropdown('iId_Titulacion', $titulaciones, '', $atributos2); ?>
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div> 
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Asignatura *</label>
+                                    <div class="col-md-9">
+                                            <?php $atributos3 = 'class=form-control id="asignaturas"'; ?>
+                                        <?=form_dropdown('iId_Asignatura', $asignaturas, '', $atributos3); ?>
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?=form_label('Usuario * '); ?>
+                                        <input name="sUsuario" placeholder="Nombre de usuario" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?=form_label('Contraseña * '); ?>
+                                        <input name="sPassword" placeholder="Contraseña" class="form-control" type="password">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <?=form_label('E-mail * '); ?>
+                                        <input name="sEmail" placeholder="Correo Electrónico" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                        
+                                <input type="checkbox" id="bActivo" name="bActivo[]" value="1">&nbsp;Activo
+                                <input type="checkbox" id="bBloqueado" name="bBloqueado[]" value="2">&nbsp;Bloqueado
+
+                            
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <sub><b>*</b> Datos obligatorios.</sub>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="btnSave" onclick="save_new()" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        <!-- End Bootstrap modal -->
+
+
+        <!-- CAJA PARA EDITAR ALUMNO -->
+        <div class="modal fade" id="modal_form" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h3 class="modal-title">Alta de alumno</h3>
+                    </div>
+                    <div class="modal-body form">
+                        <form action="#" id="form" class="form-horizontal">
+                            <input type="hidden" value="" name="iId"/> 
+                            <div class="form-body">
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?=form_label('Nombre * '); ?>
+                                        <input name="sNombre" placeholder="Nombre" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?=form_label('Apellidos * '); ?>
+                                        <input name="sApellidos" placeholder="Apellidos" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?=form_label('Usuario * '); ?>
+                                        <input name="sUsuario" placeholder="Nombre de usuario" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?=form_label('Contraseña * '); ?>
+                                        <input name="sPassword" placeholder="Contraseña" class="form-control" type="password">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <?=form_label('E-mail * '); ?>
+                                        <input name="sEmail" placeholder="Correo Electrónico" class="form-control" type="text">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                        
+                                <input type="checkbox" id="bActivo" name="bActivo[]" value="1">&nbsp;Activo
+                                <input type="checkbox" id="bBloqueado" name="bBloqueado[]" value="2">&nbsp;Bloqueado
+
+                            
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <sub><b>*</b> Datos obligatorios.</sub>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="btnSave" onclick="save()" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        <!-- End Bootstrap modal -->
+
+        <!-- CAJA PARA EDITAR CURSOS -->
+        <div class="modal fade" id="modal_form_cursos" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h3 class="modal-title">Añadir curso</h3>
+                    </div>
+                    <div class="modal-body form">
+                        <form action="#" id="form_cursos" class="form-horizontal">
+                            <input type="hidden" value="" id="iId_Usuario" name="iId_Usuario"/> 
+                            <div class="form-body">
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <?=form_label('Nombre'); ?>
+                                        <input name="sNombre" class="form-control" disabled="true">
+                                        <span class="help-block"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <?=form_label('Apellidos'); ?>
+                                        <input name="sApellidos" class="form-control" disabled="true">
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Universidad *</label>
+                                    <div class="col-md-9">
+                                        <?php $atributos = 'class=form-control id="universidades" onChange="cargar_titulaciones();"'; ?>
+                                        <?=form_dropdown('iId_Universidad', $universidades, '', $atributos); ?>
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Titulación *</label>
+                                    <div class="col-md-9">
+                                        <?php $atributos2 = 'class=form-control id="titulaciones"
+                                        onChange="cargar_asignaturas();"'; ?>
+                                        <?=form_dropdown('iId_Titulacion', $titulaciones, '', $atributos2); ?>
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div> 
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Asignatura *</label>
+                                    <div class="col-md-9">
+                                            <?php $atributos3 = 'class=form-control id="asignaturas"'; ?>
+                                        <?=form_dropdown('iId_Asignatura', $asignaturas, '', $atributos3); ?>
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                </form>
+
+                                <!-- Tabla de cursos -->
+                                <button class="btn btn-default" onclick="reload_table_cursos()">
+                                <i class="glyphicon glyphicon-refresh"></i> Refrescar
+                                </button>
+
+                                <br />
+                                <br />
+
+                                <table id="table_cursos" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th>Universidad</th>
+                                    <th>Titulación</th>
+                                    <th>Asignatura</th>
+                                    <th>Acción</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+
+                                <tfoot>
+                                    <tr>
+                                    <th>Universidad</th>
+                                    <th>Titulación</th>
+                                    <th>Asignatura</th>
+                                    <th>Acción</th>
+                                    </tr>
+                                </tfoot>
+                                </table>
+
+                                <!-- Fin de la tabla de cursos -->
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <sub><b>*</b> Datos obligatorios.</sub>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="btnSaveCursos" onclick="save_cursos()" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Salir</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        <!-- End Bootstrap modal -->
+
+
         <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
         <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
         <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
@@ -358,51 +863,6 @@
             $('body').css({'overflow':'visible'});
         })
         </script>
-        <!-- Theme Initializer -->
-        
-        <!-- Theme Initializer -->
-        <script src="<?=base_url()?>js/theme.plugins.js"></script>
-        <script src="<?=base_url()?>js/theme.js"></script>
-
-        <!-- Current Page JS -->
-        <script src="<?=base_url()?>js/views/view.contact.js"></script>
-        
-        <!-- Custom JS -->
-        <script src="<?=base_url()?>js/custom.js"></script>
-
-        <!-- BOOT BOX -->
-        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
-        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
-        
-        <script type="text/javascript">
-        bootbox.setDefaults({
-          locale: "es"
-        });
-        $(function() {
-            var cajas = {};
-
-            $(document).on("click", "a[data-bb]", function(e) {
-                e.preventDefault();
-                var type = $(this).data("bb");
-                var id = $(this).data("id");
-                var pg = $(this).data("pg");
-                if (typeof cajas[type] === 'function') {
-                    cajas[type](id, pg);
-                }
-            });
-
-            cajas.confirm = function(id, pg) {
-                bootbox.confirm("¿Estás seguro que quieres borrar a este alumno?", function(result) {
-                    if (result == true) {
-                        location.href = '<?=base_url()?>index.php/alumnos/eliminar/'+id+'/'+pg;
-                    }
-            });
-            };
-  
-        });
-
-        </script>
-        <!-- FIN BOOT -->
 
     </body>
 </html>

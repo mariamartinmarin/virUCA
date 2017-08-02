@@ -19,6 +19,7 @@ class DatosProfesor extends CI_Controller{
         $profesor["titulo"] = 'Modificación del perfil del usuario.';
         $iId = $this->session->userdata('id_usuario');
         $profesor["verProfesor"] = $this->DatosProfesor_model->verUsuario($iId);
+        $profesor["cursos"] = $this->DatosProfesor_model->verCursos($iId);
         $this->load->view("datosprofesor", $profesor);
     }
 
