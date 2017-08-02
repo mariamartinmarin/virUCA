@@ -104,6 +104,32 @@
 					<?php } ?>
 
 					<li class="dropdown">
+						<a class="dropdown-toggle" href="#">
+							Estadísticas<i class="icon icon-angle-down"></i>
+						</a>
+					
+						<ul class="dropdown-menu">
+							<li class="dropdown-submenu">
+								<a href="#">Informes</a>
+								<ul class="dropdown-menu">
+									<li><?=anchor(base_url().'index.php/panelesalta', 'Alumnos por universidades')?></li>
+									<li><?=anchor(base_url().'index.php/paneles', 'Alumnos por titulaciones')?></li>
+									<li><?=anchor(base_url().'index.php/paneles', 'Accesos')?></li>
+									<li><?=anchor(base_url().'index.php/paneles', 'Partidas pendientes')?></li>
+								</ul>
+							</li>
+							<li class="dropdown-submenu">
+								<a href="#">Gráficas</a>
+								<ul class="dropdown-menu">
+									<li><?=anchor(base_url().'index.php/panelesalta', 'Usuarios por titulación')?></li>
+									<li><?=anchor(base_url().'index.php/paneles', 'Partidas')?></li>
+								</ul>
+							</li>
+						</ul>
+						
+					</li>
+
+					<li class="dropdown">
 						<a class="dropdown-toggle" href="#">Ayuda
 							<i class="icon icon-angle-down"></i>
 						</a>

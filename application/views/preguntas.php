@@ -206,6 +206,7 @@
                 $('#form')[0].reset(); // reset form on modals
                 $('.form-group').removeClass('has-error'); // clear error class
                 $('.help-block').empty(); // clear error string
+                cargar_titulaciones();
                 $('#modal_form').modal('show'); // show bootstrap modal
                 $('.modal-title').text('Añadir pregunta'); // Set Title to Bootstrap modal title
             }
@@ -223,11 +224,15 @@
                     dataType: "JSON",
                     success: function(data)
                     {
+
                         $('[name="iId"]').val(data.iId);
                         $('[name="sPregunta"]').val(data.sPregunta); 
-                        $('[name="iId_Categoria"]').val(data.iId_Categoria);
+                        $('[name="iId_Universidad"]').val(data.iId_Universidad);
+                        //scargar_titulaciones();
+                        $('[name="iId_Titulacion"]').val(data.iId_Titulacion);
                         $('[name="iId_Asignatura"]').val(data.iId_Asignatura);
-                        $('[name="iId_Titulacion"]').val(data.iId_Titulacion); 
+                        $('[name="iId_Categoria"]').val(data.iId_Categoria);
+
                         $('[name="sObservaciones"]').val(data.sObservaciones);
                         $('[name="nPuntuacion"]').val(data.nPuntuacion);                           
                     },
@@ -432,6 +437,63 @@
                     } 
                 });
             }
+
+            // Para los selects
+
+            // Para recargar titulaciones
+
+            function cargar_titulaciones(iId)
+            {  
+                var iId_Universidad = $("#universidades option:selected").attr("value");
+                $.get("<?php echo site_url('index.php/Preguntas/ajax_recarga_titulaciones')?>",
+                    {"universidad":iId_Universidad}, function(data) {
+                        var titulaciones = "";
+                        var titulacion = JSON.parse(data);
+                        for (datos in titulacion.titulaciones) {
+                            titulaciones += '<option value="'+titulacion.titulaciones[datos].iId+'">'+
+                            titulacion.titulaciones[datos].sTitulacion+'</option>';
+                        }
+                        $('select#titulaciones').html(titulaciones);
+                        cargar_asignaturas();
+                    });
+            } 
+
+            // Para recargar titulaciones
+
+            function cargar_asignaturas(iId)
+            {  
+                var iId_Titulacion = $("#titulaciones option:selected").attr("value");
+
+                $.get("<?php echo site_url('index.php/Preguntas/ajax_recarga_asignaturas')?>",
+                    {"titulacion":iId_Titulacion}, function(data) {
+                        var asignaturas = "";
+                        var asignatura = JSON.parse(data);
+                        for (datos in asignatura.asignaturas) {
+                            asignaturas += '<option value="'+asignatura.asignaturas[datos].iId+'">'+
+                            asignatura.asignaturas[datos].sNombre+'</option>';
+                        }
+                        $('select#asignaturas').html(asignaturas);
+                        cargar_categorias();
+                    });
+            }
+
+            // Para cargar las categorias
+
+            function cargar_categorias(iId)
+            {  
+                var iId_Asignatura = $("#asignaturas option:selected").attr("value");
+
+                $.get("<?php echo site_url('index.php/Preguntas/ajax_recarga_categorias')?>",
+                    {"asignatura":iId_Asignatura}, function(data) {
+                        var categorias = "";
+                        var categoria = JSON.parse(data);
+                        for (datos in categoria.categorias) {
+                            categorias += '<option value="'+categoria.categorias[datos].iId+'">'+
+                            categoria.categorias[datos].sCategoria+'</option>';
+                        }
+                        $('select#categorias').html(categorias);
+                    });
+            }
         </script>
 
         <!-- Bootstrap modal -->
@@ -455,9 +517,20 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <div class="col-md-9">
+                                        <?php $atributos = 'class=form-control id="universidades" onChange="cargar_titulaciones();"'; ?>
+                                        <?=form_label('Universidad * '); ?>
+                                        <?=form_dropdown('iId_Universidad', $universidades, '', $atributos); ?>
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
                                     <div class="col-md-12">
+                                        <?php $atributos2 = 'class=form-control id="titulaciones"
+                                        onChange="cargar_asignaturas();"'; ?>
                                         <?=form_label('Titulación * '); ?>
-                                        <?=form_dropdown('iId_Titulacion', $titulaciones, '', 'class=form-control'); ?>
+                                        <?=form_dropdown('iId_Titulacion', $titulaciones, '', $atributos2); ?>
                                         <span class="help-block"></span>
                                     </div>
                                 </div>
@@ -465,13 +538,16 @@
                                 
                                 <div class="form-group">
                                     <div class="col-md-6">
+                                        <?php $atributos3 = 'class=form-control id="asignaturas"
+                                        onChange="cargar_categorias();"'; ?>
                                         <?=form_label('Asignatura * '); ?>
-                                        <?=form_dropdown('iId_Asignatura', $asignaturas, '', 'class=form-control'); ?>
+                                        <?=form_dropdown('iId_Asignatura', $asignaturas, '', $atributos3); ?>
                                         <span class="help-block"></span>
                                     </div>
                                     <div class="col-md-6">
                                         <?=form_label('Categorías * '); ?>
-                                        <?=form_dropdown('iId_Categoria', $categorias, '', 'class=form-control'); ?>
+                                        <?php $atributos4 = 'class=form-control id="categorias"' ?>
+                                        <?=form_dropdown('iId_Categoria', $categorias, '', $atributos4); ?>
                                         <span class="help-block"></span>
                                     </div>
                                 </div>

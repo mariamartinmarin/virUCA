@@ -172,7 +172,7 @@ class Panelesalta_model extends CI_Model{
       if ($query->num_rows() > 0) {
         // Almacenamos el resultado en una matriz.
         foreach($query->result() as $row)
-          $categorias[htmlspecialchars($row->iId, ENT_QUOTES)] = htmlspecialchars($row->sNombre, ENT_QUOTES);
+          $categorias[htmlspecialchars($row->iId, ENT_QUOTES)] = htmlspecialchars($row->sCategoria, ENT_QUOTES);
         $query->free_result();
         return $categorias;
       }

@@ -95,6 +95,7 @@
                     </div>
                 <?php } ?>
                 <!-- Fin errores -->
+                <?php if ($this->session->userdata('admin') != 1) { ?>
                 <?php echo form_fieldset('Cursos disponibles');?>
                 <blockquote>A continuación, se enumeran los cursos en los que está dado de alta. Si necesita alguna modificación sobre los mismos, deberá hacerlo <b>mediante petición al administrador</b> desde el menú de <b>PETICIONES</b></blockquote>
 
@@ -121,6 +122,7 @@
                         </tbody>
                         </table>'; 
                     }
+                }
                 ?>
 
                 <?php echo form_fieldset('Modificar mis datos');?>

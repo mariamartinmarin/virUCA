@@ -21,6 +21,7 @@ class Preguntas extends CI_Controller{
         $data["categorias"] = $this->Preguntas_model->get_categorias();
         $data["titulaciones"] = $this->Preguntas_model->get_titulaciones();
         $data["asignaturas"] = $this->Preguntas_model->get_asignaturas();
+        $data["universidades"] = $this->Preguntas_model->get_universidades();
 
         $this->load->helper('url'); 
         $this->load->view("preguntas", $data);
@@ -112,6 +113,7 @@ class Preguntas extends CI_Controller{
             'iId_Titulacion' => $this->input->post('iId_Titulacion'),
             'iId_Asignatura' => $this->input->post('iId_Asignatura'),
             'iId_Categoria' => $this->input->post('iId_Categoria'),
+            'iId_Universidad' => $this->input->post('iId_Universidad'),
             'sObservaciones' => $this->input->post('sObservaciones'),
             'nPuntuacion' => $this->input->post('nPuntuacion'),
         );
@@ -139,6 +141,7 @@ class Preguntas extends CI_Controller{
             'iId_Categoria' => $this->input->post('iId_Categoria'),
             'iId_Titulacion' => $this->input->post('iId_Titulacion'),
             'iId_Asignatura' => $this->input->post('iId_Asignatura'),
+            'iId_Universidad' => $this->input->post('iId_Universidad'),
             'sObservaciones' => $this->input->post('sObservaciones'),
             'nPuntuacion' => $this->input->post('nPuntuacion'),
         );
@@ -242,6 +245,42 @@ class Preguntas extends CI_Controller{
         {
             echo json_encode($data);
             exit();
+        }
+    }
+
+    // Para la recarga de los selectores
+
+
+    public function ajax_recarga_titulaciones()
+    {
+        if($this->input->is_ajax_request() && $this->input->get("universidad"))
+        {
+            $iId_Universidad = $this->input->get("universidad");
+            $titulaciones = $this->Preguntas_model->get_titulaciones_by_id($iId_Universidad);
+            $data = array("titulaciones" => $titulaciones);
+            echo json_encode($data);
+        }
+    }
+
+    public function ajax_recarga_asignaturas()
+    {
+        if($this->input->is_ajax_request() && $this->input->get("titulacion"))
+        {
+            $iId_Titulacion = $this->input->get("titulacion");
+            $asignaturas = $this->Preguntas_model->get_asignaturas_by_id($iId_Titulacion);
+            $data = array("asignaturas" => $asignaturas);
+            echo json_encode($data);
+        }
+    }
+
+    public function ajax_recarga_categorias()
+    {
+        if($this->input->is_ajax_request() && $this->input->get("asignatura"))
+        {
+            $iId_Asignatura = $this->input->get("asignatura");
+            $categorias = $this->Preguntas_model->get_categorias_by_id($iId_Asignatura);
+            $data = array("categorias" => $categorias);
+            echo json_encode($data);
         }
     }
 }

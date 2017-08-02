@@ -22,7 +22,7 @@ class Alumnos_model extends CI_Model{
     */
     private function _get_datatables_query() {
       $perfil = 1;
-      if ($this->session->userdata('iAdmin') == 1) {
+      if ($this->session->userdata('admin') == 1) {
         // Administrador. Acceso a todo.
         $this->db->from($this->table);
         $this->db->where('iPerfil', $perfil);

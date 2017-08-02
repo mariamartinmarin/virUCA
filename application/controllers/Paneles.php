@@ -4,12 +4,11 @@ class Paneles extends CI_Controller{
         parent::__construct();
         $this->load->model("Paneles_model");
         $this->load->library("session");
-        $this->load->library('pagination');
     }
-     
+
     //controlador por defecto
-    public function index($iId="NULL"){  
-        if($this->session->userdata('perfil') != 0)
+    public function index(){  
+        if($this->session->userdata('perfil') == 1)
         {
             redirect(base_url().'index.php/login');
         }
@@ -17,25 +16,205 @@ class Paneles extends CI_Controller{
             $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
             redirect(base_url().'index.php/login');
         }
-        $pages=20; //Número de registros mostrados por páginas
-        $config['base_url'] = base_url().'index.php/paneles/pagina/';
-        $config['total_rows'] = $this->Paneles_model->filas();//calcula el número de filas  
-        $config['per_page'] = $pages; //Número de registros mostrados por páginas
-        $config['num_links'] = 5; //Número de links mostrados en la paginación
-        $config['first_link'] = 'Primera';//primer link
-        $config['last_link'] = 'Última';//último link
-        $config["uri_segment"] = 3;//el segmento de la paginación
-        $config['next_link'] = 'Siguiente';//siguiente link
-        $config['prev_link'] = 'Anterior';//anterior link
-        $this->pagination->initialize($config); //inicializamos la paginación
-        $data["categorias"] = $this->Paneles_model->get_categorias(); 
-        $data["paneles"] = $this->Paneles_model->total_paginados(
-            $config['per_page'],
-            $this->uri->segment(3),
-            $pages);          
-        $data["num_filas"] = $config['total_rows'];
-        $this->load->view("paneles",$data);
+        if($this->session->userdata('admin') == 1) {
+            $data["universidades"] = $this->Paneles_model->get_universidades();
+            $data["titulaciones"] = $this->Paneles_model->get_titulaciones();
+            $data["asignaturas"] = $this->Paneles_model->get_asignaturas();
+        } else {
+            $data["universidades"] = $this->Paneles_model->get_universidades($this->session->userdata('id_usuario'));
+            $data["titulaciones"] = $this->Paneles_model->get_titulaciones($this->session->userdata('id_usuario'));
+            $data["asignaturas"] = $this->Paneles_model->get_asignaturas($this->session->userdata('id_usuario')); 
+        }
+
+        $this->load->helper('url'); 
+        $this->load->view("paneles", $data);
     }
+
+    /* 
+        Función que "montará" la lista según los datos que se mostrarán en la vista y que obtendremos a través del 
+        modelo.
+    */
+    public function ajax_list()
+    {
+        $list = $this->Paneles_model->get_datatables();
+        $id_usuario = $this->session->userdata('id_usuario');
+        $admin = $this->session->userdata('admin');
+
+        $data = array();
+        $no = $_POST['start'];
+        foreach ($list as $panel) {
+            $no++;
+            if ($panel->bActivo == 1) $tex_activo = "SI"; else $tex_activo = "NO";
+            $row = array();
+            $row[] = '<input type="checkbox" id="panel" class="panel" name="panel[]" value="'.$panel->iId.'">';
+            $row[] = $panel->sNombre;
+            $row[] = $panel->iCasillas;
+            $row[] = $panel->sTitulacion;
+            $row[] = $panel->sNombre_Asignatura;
+            $row[] = $tex_activo;
+
+            // Añadimos HTML para las acciones de la tabla.
+            if ($panel->iId_Propietario == $id_usuario || $admin == 1)
+                $row[] = '<a class="btn btn-sm btn-primary" href="javascript:void(0)" title="Datos" onclick="editar_panel('."'".$panel->iId."'".')"><i class="glyphicon glyphicon-pencil"></i> Datos</a>
+                <a class="btn btn-sm btn-success" href="javascript:void(0)" title="Editar" onclick="editar_casillas('."'".$panel->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Editar casillas</a>
+                <a class="btn btn-sm btn-danger" href="javascript:void(0)" title="Borrar" onclick="borrar_panel('."'".$panel->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Borrar</a>';
+            else 
+                $row[] = '<a class="btn btn-sm btn-success" href="javascript:void(0)" title="Editar" onclick="editar_casillas('."'".$panel->iId."'".')"><i class="glyphicon glyphicon-trash"></i> Editar casillas</a>';
+        
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => $_POST['draw'],
+            "recordsTotal" => $this->Paneles_model->count_all(),
+            "recordsFiltered" => $this->Paneles_model->count_filtered(),
+            "data" => $data,
+        );
+        // Salida JSON.
+        echo json_encode($output);
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando añadimos un registro de la tabla de la BBDD "panel" 
+    */
+    public function ajax_add()
+    {
+        $this->_validate();
+
+        $activo = 1;
+        if ($this->input->post("bActivo")[0] == "") $activo = 0;
+
+        $data = array(
+            'sNombre' => $this->input->post('sNombre'),
+            'iCasillas' => $this->input->post('iCasillas'),
+            'iId_Propietario' => $this->session->userdata('id_usuario'),
+            'iId_Universidad' => $this->input->post('iId_Universidad'),
+            'iId_Titulacion' => $this->input->post('iId_Titulacion'),
+            'iId_Asignatura' => $this->input->post('iId_Asignatura'),
+            'bActivo' => $activo,
+        );
+        $insert = $this->Paneles_model->save($data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando actualizamos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_update()
+    {
+        $this->_validate();
+
+        $activo = 1;
+        if ($this->input->post("bActivo")[0] == "") $activo = 0;
+
+        $data = array(
+            'sNombre' => $this->input->post('sNombre'),
+            'iCasillas' => $this->input->post('iCasillas'),
+            'iId_Propietario' => $this->session->userdata('id_usuario'),
+            'iId_Universidad' => $this->input->post('iId_Universidad'),
+            'iId_Titulacion' => $this->input->post('iId_Titulacion'),
+            'iId_Asignatura' => $this->input->post('iId_Asignatura'),
+            'bActivo' => $activo,
+        );
+        
+        $this->Paneles_model->update(array('iId' => $this->input->post('iId')), $data);
+        echo json_encode(array("status" => TRUE));
+    }
+
+
+
+     /*
+        Funciones AJAX que se ejecutarán cuando editemos un registro de la tabla de la BBDD "pregunta" 
+    */
+    public function ajax_edit($iId)
+    {
+        $data = $this->Paneles_model->get_by_id($iId);
+        echo json_encode($data);
+    }
+
+    /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "usuario" 
+    */
+    public function ajax_delete($iId)
+    {
+        $this->_validate_delete($iId);
+        $this->Paneles_model->delete_by_id($iId);
+        echo json_encode(array("status" => TRUE));
+    }
+
+   
+  /*
+        Función auxiliar para confirmar si se puede borrar un panel o no.
+    */
+    private function _validate_delete($iId)
+    {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;
+
+        if ($this->Paneles_model->tiene_partidas($iId) == 1) {
+            $data['inputerror'][] = 'sNombre';
+            $data['error_string'][] = 'Tiene partidas asociadas. No puede borrar el panel.';
+            $data['status'] = FALSE;
+        }
+        
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
+        }
+    }
+
+
+    /*
+        Función auxiliar para validar los campos del formulario antes de darlo de alta como nuevo registro o
+        para la modificación del mismo. En ambas acciones se utilizará la validación. 
+    */
+    private function _validate()
+    {
+        $data = array();
+        $data['error_string'] = array();
+        $data['inputerror'] = array();
+        $data['status'] = TRUE;
+
+        if($this->input->post('sNombre') == '')
+        {
+            $data['inputerror'][] = 'sNombre';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+
+
+        if($this->input->post('iId_Universidad') == '')
+        {
+            $data['inputerror'][] = 'sUsuario';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+
+        if($this->input->post('iId_Titulacion') == '')
+        {
+            $data['inputerror'][] = 'sPassword';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+        
+        if($this->input->post('iId_Asignatura') == '')
+        {
+            $data['inputerror'][] = 'sEmail';
+            $data['error_string'][] = 'Dato obligatorio.';
+            $data['status'] = FALSE;
+        }
+        
+        if($data['status'] === FALSE)
+        {
+            echo json_encode($data);
+            exit();
+        }
+    }
+     
+    
      
     public function mod($iId){
         if(is_numeric($iId)){

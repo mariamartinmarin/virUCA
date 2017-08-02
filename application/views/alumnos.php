@@ -627,7 +627,7 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-3">Asignatura *</label>
                                     <div class="col-md-9">
-                                            <?php $atributos3 = 'class=form-control id="asignaturas"'; ?>
+                                        <?php $atributos3 = 'class=form-control id="asignaturas"'; ?>
                                         <?=form_dropdown('iId_Asignatura', $asignaturas, '', $atributos3); ?>
                                         <span class="help-block"></span>
                                     </div>

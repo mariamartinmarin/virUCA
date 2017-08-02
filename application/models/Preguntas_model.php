@@ -15,10 +15,22 @@ class Preguntas_model extends CI_Model{
     /* Función privada que obtiene los datos de la BBDD necesarios para construir la vista.
     */
     private function _get_datatables_query() {
-      $this->db->select('pregunta.*, usuario.sNombre, usuario.sApellidos, categoria.sCategoria');
-      $this->db->from('pregunta');
-      $this->db->join('usuario', 'usuario.iId = pregunta.iId_Usuario');
-      $this->db->join('categoria', 'categoria.iId = pregunta.iId_Categoria');
+      if ($this->session->userdata('admin') == 1) {
+        // Visualiza todas las preguntas.
+        $this->db->select('pregunta.*, usuario.sNombre, usuario.sApellidos, categoria.sCategoria');
+        $this->db->from('pregunta');
+        $this->db->join('usuario', 'usuario.iId = pregunta.iId_Usuario');
+        $this->db->join('categoria', 'categoria.iId = pregunta.iId_Categoria');
+      } else {
+        // Visualiza todas las preguntas de su ámbito.
+        $this->db->select('pregunta.*, usuario.sNombre, usuario.sApellidos, categoria.sCategoria');
+        $this->db->from('pregunta');
+        $this->db->join('usuario', 'usuario.iId = pregunta.iId_Usuario');
+        $this->db->join('categoria', 'categoria.iId = pregunta.iId_Categoria');
+        $this->db->where_in('pregunta.iId_Universidad', $this->session->userdata('universidades'));
+        $this->db->where_in('pregunta.iId_Titulacion', $this->session->userdata('titulaciones'));
+        $this->db->where_in('pregunta.iId_Asignatura', $this->session->userdata('asignaturas'));
+      }
 
       $i = 0;
 
@@ -296,6 +308,61 @@ class Preguntas_model extends CI_Model{
       return $categorias;
     }
   }
+
+  /* Función para obtener las categorías disponibles en el sistema. */
+  public function get_universidades() {
+    $query = $this->db->query("select * from universidad");
+    if ($query->num_rows() > 0) {
+      // Almacenamos el resultado en una matriz.
+      foreach($query->result() as $row)
+        $universidades[htmlspecialchars($row->iId, ENT_QUOTES)] = htmlspecialchars($row->sUniversidad, ENT_QUOTES);
+      $query->free_result();
+      return $universidades;
+    }
+  }
+
+  // Funciones para recarga de selects
+
+  public function get_titulaciones_by_id($iId_Universidad) {
+    if ($this->session->userdata('admin') == 1)
+      $query = $this->db->query("select * from titulacion where iId_Universidad = $iId_Universidad");
+    else {
+      $this->db->select('titulacion.*, usuarioscurso.iId as iId_Cur_Tit');
+      $this->db->from('titulacion');
+      $this->db->join('usuarioscurso', 'usuarioscurso.iId_Titulacion = titulacion.iId');
+      $this->db->where('usuarioscurso.iId_Usuario', $this->session->userdata('id_usuario'));
+      $this->db->where('titulacion.iId_Universidad', $iId_Universidad);
+      $query = $this->db->get();
+    }
+    return $query->result();
+  }
+
+  public function get_asignaturas_by_id($iId_Titulacion) {
+    if ($this->session->userdata('admin') == 1)
+      $query = $this->db->query("select * from asignatura where iId_Titulacion = $iId_Titulacion");
+    else {
+      $this->db->select('asignatura.* , usuarioscurso.iId as iId_Cur_Tit');
+      $this->db->from('asignatura');
+      $this->db->join('usuarioscurso', 'usuarioscurso.iId_Asignatura = asignatura.iId');
+      $this->db->where('usuarioscurso.iId_Usuario', $this->session->userdata('id_usuario'));
+      $this->db->where('asignatura.iId_Titulacion', $iId_Titulacion);
+      $query = $this->db->get();
+    }
+      return $query->result();
+    }
+
+    public function get_categorias_by_id($iId_Asignatura) {
+    if ($this->session->userdata('admin') == 1)
+      $query = $this->db->query("select * from categoria where iId_Asignatura = $iId_Asignatura");
+    else {
+      $this->db->select('categoria.*');
+      $this->db->from('categoria');
+      $this->db->where_in('categoria.iId_Asignatura', $this->session->userdata('asignaturas'));
+      $this->db->where('categoria.iId_Asignatura', $iId_Asignatura);
+      $query = $this->db->get();
+    }
+      return $query->result();
+    }
 
 
 }

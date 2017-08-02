@@ -10,15 +10,20 @@ class Categorias extends CI_Controller{
 
     //controlador por defecto
     public function index(){
-        if($this->session->userdata('admin') != 1)
+        if($this->session->userdata('perfil') == 1)
         {
             redirect(base_url().'index.php/login');
         }
         if ($this->session->userdata('is_logued_in') == FALSE)  {
             $this->session->set_flashdata('SESSION_ERR', 'Debe identificarse en el sistema.');
             redirect(base_url().'index.php/login');
-        }           
-        $data["asignaturas"] = $this->Categorias_model->get_asignaturas();
+        }     
+        if ($this->session->userdata('admin') == 1)      
+            $data["asignaturas"] = $this->Categorias_model->get_asignaturas();
+        else
+            $data["asignaturas"] = $this->Categorias_model->get_asignaturas($this->session->userdata('id_usuario'));
+
+
         $this->load->helper('url');
         $this->load->view("categorias", $data);
     }

@@ -14,9 +14,17 @@ class Categorias_model extends CI_Model{
 
   /* Función privada que obtiene los datos de la BBDD necesarios para construir la vista. */
   private function _get_datatables_query() {
-    $this->db->select('c.*, a.sNombre sAsignatura');
-    $this->db->from('categoria c');
-    $this->db->join('asignatura a', 'a.iId = c.iId_Asignatura');
+    if ($this->session->userdata('admin') == 1) {
+      $this->db->select('c.*, a.sNombre sAsignatura');
+      $this->db->from('categoria c');
+      $this->db->join('asignatura a', 'a.iId = c.iId_Asignatura');
+    } else {
+      $this->db->select('c.*, a.sNombre sAsignatura');
+      $this->db->from('categoria c');
+      $this->db->join('asignatura a', 'a.iId = c.iId_Asignatura');
+      $this->db->join('usuarioscurso u', 'a.iId = u.iId_Asignatura');
+      $this->db->where('u.iId_Usuario', $this->session->userdata('id_usuario'));
+    }
       
       $i = 0;
 
@@ -152,8 +160,20 @@ class Categorias_model extends CI_Model{
     Función que devuelve todas las titulaciones del sistema para ser utilizadas en la SELECT de modificación
     y/o inserción de asignatura.
   */
-  public function get_asignaturas() {
-    $query = $this->db->query("select * from asignatura");
+  public function get_asignaturas($iId_Usuario = NULL) {
+
+    if (is_null($iId_Usuario))
+      // Si es el administrador.
+      $query = $this->db->query("select * from asignatura");
+    else {
+      // Si es un profesor, podrá asignar a las categorías cualesquiera de las asignaturas de su ámbito.
+      $this->db->select('asignatura.*, usuarioscurso.iId as iId_Cur_Asg');
+      $this->db->from('asignatura');
+      $this->db->join('usuarioscurso', 'usuarioscurso.iId_Asignatura = asignatura.iId');
+      $this->db->where('usuarioscurso.iId_Usuario', $this->session->userdata('id_usuario'));
+      $query = $this->db->get();
+    }
+
     if ($query->num_rows() > 0) {
       // Almacenamos el resultado en una matriz.
       foreach($query->result() as $row)
