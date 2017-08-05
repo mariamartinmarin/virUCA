@@ -142,6 +142,17 @@ class Paneles extends CI_Controller{
         echo json_encode(array("status" => TRUE));
     }
 
+     /*
+        Función AJAX que se ejecutará cuando eliminamos un registro de la tabla de la BBDD "usuario" de forma masiva. 
+    */
+    public function ajax_delete_todos()
+    {
+        foreach ($_POST["panel"] as $item){
+            $eliminar = $this->Paneles_model->delete_by_id($item);
+        }
+        echo json_encode(array("status" => TRUE));
+    }
+
    
   /*
         Función auxiliar para confirmar si se puede borrar un panel o no.
@@ -214,12 +225,14 @@ class Paneles extends CI_Controller{
         }
     }
      
-    
+    // Modificación de las celdas de un panel.
      
     public function mod($iId){
-        if(is_numeric($iId)){
+        
+
+        if ((is_numeric($iId) && $this->Paneles_model->esPropietario($iId)) || ((is_numeric($iId) && $this->session->userdata("admin") == 1))) {
             $datos["paneles"]=$this->Paneles_model->mod($iId);
-            $datos["categorias"] = $this->Paneles_model->get_categorias();
+            $datos["categorias"] = $this->Paneles_model->get_categorias($iId);
             $datos["enpartida"] = $this->Paneles_model->enPartida($iId);
 
             $this->load->view("panelesmod_view",$datos);
@@ -250,9 +263,37 @@ class Paneles extends CI_Controller{
                 //$this->session->set_flashdata('profesor_ko', 'Es:'.$mierda);
             } 
         } else {
-            redirect(base_url()."index.php/paneles"); 
+            redirect(base_url()); 
         }
     }
+
+     public function eliminar_casillas($iId){
+        foreach ($_POST["panel"] as $item){
+            $eliminar = $this->Paneles_model->eliminar_casilla($item, $this->input->post('iId'));
+        }
+        if ($eliminar == true){
+            $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong> se eliminaron todas las casillas señaladas.');
+        } else {
+            $this->session->set_flashdata('profesor_ko', 
+                '<strong>Oops!</strong> no se pudiero eliminar una o todas las casillas señaladas.');
+        } 
+        redirect(base_url()."index.php/paneles/mod/".$this->input->post('iId'));
+    }
+
+    // Función para añadir una nueva casilla
+     public function nueva($iId) {
+        $add = $this->Paneles_model->add($iId, $this->input->post("eFuncion"), $this->input->post("iId_Categoria"));
+
+        if ($add == true) {
+            $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong> celda añadida.');
+        } else {
+            $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong> no se pudo añadir la celda.');
+        }
+        redirect(base_url()."index.php/paneles/mod/".$iId);
+    }
+
+
+
 
      
     //Controlador para eliminar
@@ -290,28 +331,8 @@ class Paneles extends CI_Controller{
         redirect(base_url()."index.php/paneles/pagina/$npag");
     }
 
-    public function eliminar_casillas($iId){
-        foreach ($_POST["panel"] as $item){
-            $eliminar = $this->Paneles_model->eliminar_casilla($item);
-        }
-        if ($eliminar == true){
-            $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong> se eliminaron todas las casillas señaladas.');
-        } else {
-            $this->session->set_flashdata('profesor_ko', 
-                '<strong>Oops!</strong> no se pudiero eliminar una o todas las casillas señaladas.');
-        } 
-        redirect(base_url()."index.php/paneles/mod/".$this->input->post('iId'));
-    }
+   
 
-    public function nueva($iId) {
-        
-        $add = $this->Paneles_model->add($iId, $this->input->post("eFuncion"), $this->input->post("iId_Categoria"));
-        if ($add == true) {
-            $this->session->set_flashdata('profesor_ok', '<strong>Bien!</strong> celda añadida.');
-        } else {
-            $this->session->set_flashdata('profesor_ko', '<strong>Oops!</strong> no se pudo añadir la celda.');
-        }
-        redirect(base_url()."index.php/paneles/mod/".$iId);
-    }
+   
 }
 ?>

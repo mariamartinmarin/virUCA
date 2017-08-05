@@ -197,7 +197,7 @@
                     
                     foreach ($casillas as $casilla) {
                         // Pinto la casilla.
-                        echo "<div data-toggle='tooltip' title='".$casilla->sNombre."' id='casilla".$contCasilla."' class='test circulo fade' style='background:".$casilla->sColor."; border: 1px dotted black;'>";
+                        echo "<div data-toggle='tooltip' title='".$casilla->sCategoria."' id='casilla".$contCasilla."' class='test circulo fade' style='background:".$casilla->sColor."; border: 1px dotted black;'>";
                         echo "<h4 style='margin:0 !important;' class='fuego'><b>".$contCasilla."</b></h4>";
                         
                         // Dependiendo de la función de la casilla, pintaremos esa función.

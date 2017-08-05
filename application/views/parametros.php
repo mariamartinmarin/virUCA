@@ -59,23 +59,16 @@
     <div class="body">
         <?php $this->load->view('menup_view');?>
         <div role="main" class="main">
-            <section class="page-top">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <ul class="breadcrumb">
-                                    <li><a href="#">Configuración</a></li>
-                                    <li class="active">Parámetros de Configuración</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h2>Parametrización de la aplicación</h2>
-                            </div>
-                        </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a href="#">Configuración</a></li>
+                            <li class="active"><strong>Parámetros de Configuración de la Aplicación</strong></li>
+                        </ul>
                     </div>
-            </section>
+                </div>
+                </div>
 
             <div class="container">
                 

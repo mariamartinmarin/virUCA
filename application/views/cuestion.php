@@ -163,7 +163,7 @@
 
                 <div style="float:left; margin-left: 20px;">
                     <blockquote>
-                        <div class="example stopwatch" data-date='00:00:60'></div>
+                        <div class="example stopwatch" data-timer='600'></div>
                         <button type="button" class="btn btn-success start">Empezar</button>
                         <button type="button" class="btn btn-danger stop">Parar</button>
                         <button type="button" class="btn btn-info restart">Iniciar</button>
@@ -204,10 +204,6 @@
     <script type="text/javascript">
         
         $(document).ready(function(){
-            $(".start").click(function(){ $(".example.stopwatch").TimeCircles().start(); });
-            $(".stop").click(function(){ $(".example.stopwatch").TimeCircles().stop(); });
-            $(".restart").click(function(){ $(".example.stopwatch").TimeCircles().restart(); }); 
-
             $(".example.stopwatch").TimeCircles({
                 "animation": "smooth",
                 "bg_width": 1.2,
@@ -237,7 +233,12 @@
                     }
                 }
             });
+            $(".start").click(function(){ $(".example.stopwatch").TimeCircles().start(); });
+            $(".stop").click(function(){ $(".example.stopwatch").TimeCircles().stop(); });
+            $(".restart").click(function(){ $(".example.stopwatch").TimeCircles().restart(); }); 
+
             $(".example.stopwatch").TimeCircles().stop();
+            
         });
 
         function aleatorio(a,b) {return Math.round(Math.random()*(b-a)+parseInt(a));}

@@ -38,6 +38,7 @@
         <link rel="stylesheet" href="<?=base_url()?>css/skins/default.css">
         <!-- Custom CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/custom.css">
+        <link rel="stylesheet" href="<?=base_url()?>js/sweetalert/sweetalert.css">
 
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
@@ -62,23 +63,17 @@
             <?php $this->load->view('menup_view');?>
             <div role="main" class="main">
 
-                <section class="page-top">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <ul class="breadcrumb">
-                                    <li><a href="#">Usuarios</a></li>
-                                    <li class="active">Gestión de Profesores</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h2>Gestión de Profesores</h2>
-                            </div>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <ul class="breadcrumb">
+                                <li><a href="#">Usuarios</a></li>
+                                <li class="active"><strong>Gestión de profesores</strong></li>
+                            </ul>
                         </div>
                     </div>
-                </section>
+                </div>
                
                 <div class="container">
 
@@ -128,14 +123,9 @@
         <script src="<?=base_url('vendor/bootstrap/js/bootstrap.min.js')?>"></script>
         <script src="<?=base_url('js/datatables/js/jquery.dataTables.min.js')?>"></script>
         <script src="<?=base_url('js/datatables/js/dataTables.bootstrap.js')?>"></script>
-        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
-        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+        <script src="<?=base_url()?>js/sweetalert/sweetalert.min.js"></script>
 
         <script type="text/javascript">
-            bootbox.setDefaults({
-                locale: "es"
-            });
-
             var save_method; // Para el uso del método save.
             var table;
 
@@ -183,26 +173,6 @@
                     ],
 
                 });
-
-                //$.fn.dataTable.ext.errMode = 'none';
-
-                
-
-
-
-
-                
-
-                //set input/textarea/select event when change value, remove class error and remove text help block 
-                //$("input").change(function(){
-                //    $(this).parent().parent().removeClass('has-error');
-                //    $(this).next().empty();
-                //});
-                //$("select").change(function(){
-                //    $(this).parent().parent().removeClass('has-error');
-                //    $(this).next().empty();
-                //});
-
             });
 
             function add_profesor()
@@ -212,6 +182,7 @@
                 $('.form-group').removeClass('has-error'); // clear error class
                 $('.help-block').empty(); // clear error string
                 $('#modal_form').modal('show'); // show bootstrap modal
+                $("#sUsuario").prop("disabled", false);
                 $('.modal-title').text('Añadir profesor'); // Set Title to Bootstrap modal title
             }
 
@@ -284,7 +255,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Ocurrió un error mientras se intentaba editar el usuario.');
+                        swal("Oops! algo no fue bien ...", "Ocurrió un problema mientras se editaban los cursos.", "warning");
                     }
                 });
             }
@@ -308,6 +279,7 @@
                         $('[name="sUsuario"]').val(data.sUsuario);
                         $('[name="sPassword"]').val(data.sPassword); 
                         $('[name="sEmail"]').val(data.sEmail);
+                        $("#sUsuario").prop("disabled", true);
                         $("#iAdmin").prop("checked", false);
                         $("#bActivo").prop("checked", false);
                         $("#bBloqueado").prop("checked", false);
@@ -323,7 +295,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Ocurrió un error mientras se intentaba editar el usuario.');
+                       swal("Oops! algo no fue bien ...", "Ocurrió un problema mientras se editaba el usuario.", "warning");
                     }
                 });
             }
@@ -340,10 +312,17 @@
             }
 
             function eliminar_todos(pregunta) {
-                bootbox.confirm("¿Estás seguro/a que quieres eliminar los profesores seleccionados? Recuerde que si existen dependencias, no podrá eliminarse el registro.",
-
-                function(result) {
-                    if (result == true) {
+                swal({
+                    title: "¿Estás seguro/a?",
+                    text: "Si existen dependencias, no podrá eliminarse el registro.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Borrar",
+                    cancelButtonText: "No, dejarlo como está",
+                    closeOnConfirm: false
+                    },
+                    function(){
                         $.ajax({
                             url : "<?php echo site_url('index.php/Preguntas/ajax_delete_todos')?>/",
                             type : "POST",
@@ -354,22 +333,19 @@
                                 if(data.status) //if success close modal and reload ajax table
                                 {
                                     $('#modal_form').modal('hide');
-                                    bootbox.alert("Operación realizada con éxito.");
+                                    swal("Bien!", "Operación realizada con éxito", "success");
                                     reload_table();
 
                                 } else {
-                                    bootbox.alert({
-                                        message: data.error_string
-                                    });
+                                    swal("Oops! algo no ha ido bien ...", data.error_string, "warning");
                                 } 
                             },
                             error: function (jqXHR, textStatus, errorThrown)
                             {
-                                bootbox.alert('Error al eliminar el registro. Asegúrese que ha señalado algún registro.');
+                                swal("Oops! algo no fue bien ...", "No se han podido eliminar algunos o todos los registros. Asegúrese que ha señalado algún registro.", "warning");
                             }
                         });
-                    }
-                });
+                    });
             }
 
             function save()
@@ -395,7 +371,7 @@
                         if(data.status) //if success close modal and reload ajax table
                         {
                             $('#modal_form').modal('hide');
-                            bootbox.alert("Operación realizada con éxito.");
+                            swal("Bien!", "Operación realizada con éxito", "success");
                             reload_table();
                         }
                         else
@@ -411,7 +387,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Se ha producido un error al intentar añadir/modificar el registro.');
+                        swal("Oops! algo no fue bien ...", "No se ha podido actualizar el registro. Inténtelo más tarde.", "warning");
                         $('#btnSave').text('Guardar');
                         $('#btnSave').attr('disabled',false); 
                     }
@@ -437,7 +413,7 @@
                         if(data.status) //if success close modal and reload ajax table
                         {
                             //$('#modal_form').modal('hide');
-                            bootbox.alert("Operación realizada con éxito.");
+                            swal("Bien!", "Operación realizada con éxito", "success");
                             reload_table_cursos();
                         }
                         else
@@ -453,7 +429,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Se ha producido un error al intentar añadir/modificar el registro.');
+                        swal("Oops! algo no fue bien ...", "No se ha podido actualizar el registro. Inténtelo más tarde.", "warning");
                         $('#btnSaveCursos').text('Guardar');
                         $('#btnSaveCursos').attr('disabled',false); 
                     }
@@ -462,10 +438,17 @@
 
             function borrar_usuario(iId)
             {
-                bootbox.confirm("¿Estás seguro/a que desea eliminar este profesor? Debe saber, que si el profesor está asociado a una o más partidas, no podrá ser eliminado para mantener la integridad de los datos.", 
-                function(result){ 
-                    if (result == true) {
-                        // AJAX borra los datos de la base de datos.
+                swal({
+                    title: "¿Estás seguro/a?",
+                    text: "Debe saber, que si el profesor está asociado a una o más partidas, no podrá ser eliminado.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Borrar",
+                    cancelButtonText: "No, dejarlo como está",
+                    closeOnConfirm: false
+                    },
+                    function(){                
                         $.ajax({
                             url : "<?php echo site_url('index.php/Usuarios/ajax_delete')?>/"+iId,
                             type: "POST",
@@ -475,29 +458,35 @@
                                 if(data.status) //if success close modal and reload ajax table
                                 {
                                     $('#modal_form').modal('hide');
-                                    bootbox.alert("Operación realizada con éxito.");
+                                    swal("Bien!", "Operación realizada con éxito", "success");
                                     reload_table();
                                 } else {
-                                    bootbox.alert({
-                                        message: data.error_string
-                                    });
+                                    swal("Bien!", data.error_string, "success");
                                 }
                             },
                             error: function (jqXHR, textStatus, errorThrown)
                             {
-                                bootbox.alert('Error al eliminar el profesor. Asegúrese que no participa en una o más partidas e inténtelo más tarde.');
+                                swal("Oops! algo no fue bien ...", "No se ha podido eliminar el profesor, asegúrese que no participa en ninguna partida antes de volver a intentarlo.", "warning");
                             }
                         });
-                    } 
-                });
-            }
+                    });
+            } 
+              
 
 
             function borrar_curso(iId)
             {
-                bootbox.confirm("¿Estás seguro/a que desea eliminar este curso?", 
-                function(result){ 
-                    if (result == true) {
+                swal({
+                    title: "¿Estás seguro/a?",
+                    text: "¿Desea eliminar este curso realmente?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Borrar",
+                    cancelButtonText: "No, dejarlo como está",
+                    closeOnConfirm: false
+                    },
+                    function(){ 
                         $.ajax({
                             url : "<?php echo site_url('index.php/Usuarios/ajax_delete_curso')?>/"+iId,
                             type: "POST",
@@ -507,22 +496,19 @@
                                 if(data.status) //if success close modal and reload ajax table
                                 {
                                     //$('#modal_form_cursos').modal('hide');
-                                    bootbox.alert("Operación realizada con éxito.");
+                                    swal("Bien!", "Operación realizada con éxito", "success");
                                     reload_table_cursos();
                                 } else {
-                                    bootbox.alert({
-                                        message: data.error_string
-                                    });
+                                    swal("Bien!", data.error_string, "success");
                                 }
                             },
                             error: function (jqXHR, textStatus, errorThrown)
                             {
-                                bootbox.alert('Error al eliminar el curso.');
+                                swal("Oops! algo no fue bien ...", "No hemos podido eliminar el curso, inténtelo más tarde.", "warning");
                             }
                         });
-                    } 
-                });
-            }
+                    });
+            } 
 
             // Para recargar titulaciones
 
@@ -575,12 +561,12 @@
                                 <div class="form-group">
                                     <div class="col-md-6">
                                         <?=form_label('Nombre * '); ?>
-                                        <input name="sNombre" placeholder="Nombre" class="form-control" type="text">
+                                        <input tabindex="1" name="sNombre" placeholder="Nombre" class="form-control" type="text">
                                         <span class="help-block"></span>
                                     </div>
                                     <div class="col-md-6">
                                         <?=form_label('Apellidos * '); ?>
-                                        <input name="sApellidos" placeholder="Apellidos" class="form-control" type="text">
+                                        <input tabindex="2" name="sApellidos" placeholder="Apellidos" class="form-control" type="text">
                                         <span class="help-block"></span>
                                     </div>
                                 </div>
@@ -588,12 +574,12 @@
                                 <div class="form-group">
                                     <div class="col-md-6">
                                         <?=form_label('Usuario * '); ?>
-                                        <input name="sUsuario" placeholder="Nombre de usuario" class="form-control" type="text">
+                                        <input tabindex="3" id="sUsuario" name="sUsuario" placeholder="Nombre de usuario" class="form-control" type="text">
                                         <span class="help-block"></span>
                                     </div>
                                     <div class="col-md-6">
                                         <?=form_label('Contraseña * '); ?>
-                                        <input name="sPassword" placeholder="Contraseña" class="form-control" type="password">
+                                        <input tabindex="4" name="sPassword" placeholder="Contraseña" class="form-control" type="password">
                                         <span class="help-block"></span>
                                     </div>
                                 </div>
@@ -601,15 +587,16 @@
                                 <div class="form-group">
                                     <div class="col-md-12">
                                         <?=form_label('E-mail * '); ?>
-                                        <input name="sEmail" placeholder="Correo Electrónico" class="form-control" type="text">
+                                        <input tabindex="5" name="sEmail" placeholder="Correo Electrónico" class="form-control" type="text">
                                         <span class="help-block"></span>
                                     </div>
                                 </div>
 
                         
-                                <input type="checkbox" id="iAdmin" name="iAdmin[]" value="0">&nbsp;Hacer administrador
-                                <input type="checkbox" id="bActivo" name="bActivo[]" value="1">&nbsp;Activo
-                                <input type="checkbox" id="bBloqueado" name="bBloqueado[]" value="2">&nbsp;Bloqueado
+                                <input tabindex="6" type="checkbox" id="iAdmin" 
+                                    name="iAdmin[]" value="0">&nbsp;Hacer administrador
+                                <input tabindex="7" type="checkbox" id="bActivo" name="bActivo[]" value="1">&nbsp;Activo
+                                <input tabindex="8" type="checkbox" id="bBloqueado" name="bBloqueado[]" value="2">&nbsp;Bloqueado
 
                             
                                 <div class="form-group">
@@ -639,6 +626,7 @@
                     </div>
                     <div class="modal-body form">
                         <form action="#" id="form_cursos" class="form-horizontal">
+                            <input type="hidden" name="csrf" value="<?php echo $this->session->userdata('token');?>">
                             <input type="hidden" value="" id="iId_Usuario" name="iId_Usuario"/> 
                             <div class="form-body">
                                 <div class="form-group">

@@ -79,7 +79,7 @@ class Jugar_model extends CI_Model{
 
           } else $error = true;
         } else $error = true;
-      } else $error = true;
+      } else $error = 1;
       return $error;
     }
 
@@ -144,7 +144,7 @@ class Jugar_model extends CI_Model{
 
     public function get_casillas($iId="NULL") {
       if ($iId != "NULL") {
-        $this->db->select('pc.*, cat.sColor, cat.sNombre');
+        $this->db->select('pc.*, cat.sColor, cat.sCategoria');
         $this->db->from('panelcasillas pc');
         $this->db->join('categoria cat', 'pc.iId_Categoria = cat.iId');
         $this->db->where('pc.iId_Panel', $iId);
@@ -391,12 +391,23 @@ class Jugar_model extends CI_Model{
     }
   }
 
+  public function finalizada($iId_Partida) {
+      $query_finalizada = $this->db->query("SELECT bFinalizada FROM partida where iId = $iId_Partida");
+      if ($query_finalizada->num_rows() > 0) {
+        $datos_finalizada = $query_finalizada->row();
+        if ($datos_finalizada->bFinalizada == 1)
+          return true;
+        else
+          return false;
+    }
+  }
+
   public function get_profesor_id($iId_Partida) {
     $iId_Profesor = 0;
-    $consulta_profesor = $this->db->query("SELECT iId_Profesor_Act FROM partida WHERE iId = $iId_Partida");
+    $consulta_profesor = $this->db->query("SELECT iId_Profesor FROM partida WHERE iId = $iId_Partida");
     if ($consulta_profesor->result() > 0) {
       $datos_profesor = $consulta_profesor->row();
-      $iId_Profesor = $datos_profesor->iId_Profesor_Act;   
+      $iId_Profesor = $datos_profesor->iId_Profesor;   
     }
     return $iId_Profesor;
   }

@@ -1,5 +1,12 @@
-<header id="header">
-
+<header id="header" class="flat-menu clean-top">
+	<div class="header-top">
+					<div class="container">
+						<p>
+							Contacta con nosotros! <span><i class="icon icon-phone"></i>+34 956 016300</span> | <a href="#">ciencias@uca.es</a>
+						</p>
+						
+					</div>
+				</div>
 	<div class="container">
 		<h1 class="logo">
 			<a href="<?=base_url()?>">
@@ -38,71 +45,31 @@
 							<li><?=anchor(base_url().'index.php/universidad', 'Gestión de Universidades')?></li>
 							<li><?=anchor(base_url().'index.php/titulacion', 'Gestión de Titulaciones')?></li>
 							<li><?=anchor(base_url().'index.php/asignatura', 'Gestión de Asignaturas')?></li>
-							<li><?=anchor(base_url().'index.php/curso', 'Gestión de curso académico')?></li>
 						</ul>
 					</li>
 					<?php } ?>
 
-					<li class="dropdown">
-						<a class="dropdown-toggle" href="#">
-							Preguntas<i class="icon icon-angle-down"></i>
-						</a>
-						<ul class="dropdown-menu">
-							<li><?=anchor(base_url().'index.php/categorias', 'Gestionar categorías')?></li>
-							<li><?=anchor(base_url().'index.php/preguntas', 'Gestionar preguntas')?></li>
-						</ul>
-					</li>
 					
 					<li class="dropdown">
 						<a class="dropdown-toggle" href="#">
-							Partidas<i class="icon icon-angle-down"></i>
+							Juego<i class="icon icon-angle-down"></i>
 						</a>
 					
 						<ul class="dropdown-menu">
 							<li class="dropdown-submenu">
-								<a href="#">Paneles</a>
+								<a href="#">Preguntas</a>
 								<ul class="dropdown-menu">
-									<li><?=anchor(base_url().'index.php/panelesalta', 'Crear Panel')?></li>
-									<li><?=anchor(base_url().'index.php/paneles', 'Listado de Paneles')?></li>
+									<li><?=anchor(base_url().'index.php/categorias', 'Gestionar categorías')?></li>
+									<li><?=anchor(base_url().'index.php/preguntas', 'Gestionar preguntas')?></li>
 								</ul>
 							</li>
-							<li><?=anchor(base_url().'index.php/partida', 'Crear Partida')?></li>
-							<li><?=anchor(base_url().'index.php/partidas', 'Listado de Partidas')?></li>
+							<li><?=anchor(base_url().'index.php/paneles', 'Gestionar Paneles')?></li>
+							<li><?=anchor(base_url().'index.php/partidas', 'Gestionar Partidas')?></li>
+							
 						</ul>
 						
 					</li>				
 				
-					<li class="dropdown">
-						<a class="dropdown-toggle" href="#">Configuración<i class="icon icon-angle-down"></i></a>
-						<ul class="dropdown-menu">
-							<li><?=anchor(base_url().'index.php/parametros', 'Parametros')?></li>
-							<?php if ($this->session->userdata('admin') == 1) { ?>
-							<li><?=anchor(base_url().'index.php/accesos', 'Accesos')?></li>
-							<?php } ?>
-						</ul>
-					</li>
-
-					<?php if ($this->session->userdata('admin') == 1) { ?>
-					<li class="dropdown">
-						<a class="dropdown-toggle" href="#">Peticiones
-							<i class="icon icon-angle-down"></i>
-						</a>
-						<ul class="dropdown-menu">
-							<li><?=anchor(base_url().'index.php/gestionarpeticiones', 'Gestionar Peticiones')?></li>
-						</ul>
-					</li>
-					<?php } else { ?>
-					<li class="dropdown">
-						<a class="dropdown-toggle" href="#">Peticiones
-							<i class="icon icon-angle-down"></i>
-						</a>
-						<ul class="dropdown-menu">
-							<li><?=anchor(base_url().'index.php/enviarpeticion', 'Enviar petición')?></li>
-							<li><?=anchor(base_url().'index.php/mispeticiones', 'Mis peticiones')?></li>
-						</ul>
-					</li>
-					<?php } ?>
-
 					<li class="dropdown">
 						<a class="dropdown-toggle" href="#">
 							Estadísticas<i class="icon icon-angle-down"></i>
@@ -129,11 +96,41 @@
 						
 					</li>
 
+
+					<li class="dropdown">
+						<a class="dropdown-toggle" href="#">Configuración<i class="icon icon-angle-down"></i></a>
+						<ul class="dropdown-menu">
+							<li><?=anchor(base_url().'index.php/parametros', 'Parametros')?></li>
+							<?php if ($this->session->userdata('admin') == 1) { ?>
+							<li><?=anchor(base_url().'index.php/accesos', 'Accesos')?></li>
+							<?php } ?>
+						</ul>
+					</li>
+
 					<li class="dropdown">
 						<a class="dropdown-toggle" href="#">Ayuda
 							<i class="icon icon-angle-down"></i>
 						</a>
 						<ul class="dropdown-menu">
+
+							<?php if ($this->session->userdata('admin') == 1) { ?>
+							<li class="dropdown-submenu">
+								<a class="dropdown-toggle" href="#">Peticiones</a>
+								<ul class="dropdown-menu">
+									<li><?=anchor(base_url().'index.php/tipopeticion', 'Tipos de peticiones')?></li>
+									<li><?=anchor(base_url().'index.php/gestionarpeticiones', 'Gestionar Peticiones')?></li>
+								</ul>
+							</li>
+							<?php } else { ?>
+							<li class="dropdown-submenu">
+								<a class="dropdown-toggle" href="#">Peticiones</a>
+								<ul class="dropdown-menu">
+									<li><?=anchor(base_url().'index.php/mispeticiones', 'Mis peticiones')?></li>
+								</ul>
+							</li>
+							<?php } ?>
+
+
 							<li><?=anchor(base_url().'index.php/contacto', 'Contacto')?></li>
 							<li><?=anchor(base_url().'index.php/faqs', 'FAQS')?></li>
 							<li><?=anchor(base_url().'index.php/ayuda', 'Ayuda')?></li>
@@ -147,7 +144,7 @@
 								
 					<li class="dropdown mega-menu-item mega-menu-shop">
 						<a class="dropdown-toggle mobile-redirect" href="#">
-							<i class="icon icon-user"></i> Datos de la sesión
+							<i class="icon icon-user"></i> <?=$this->session->userdata('username')?>
 							<i class="icon icon-angle-down"></i>
 						</a>
 

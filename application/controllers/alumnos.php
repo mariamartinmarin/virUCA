@@ -106,7 +106,8 @@ class Alumnos extends CI_Controller{
     */
     public function ajax_add()
     {
-        $this->_validate();
+        $modo = "NEW";
+        $this->_validate($modo);
 
         $admin = 0;
         $activo = 1;
@@ -186,7 +187,6 @@ class Alumnos extends CI_Controller{
         $data = array(
             'sNombre' => $this->input->post('sNombre'),
             'sApellidos' => $this->input->post('sApellidos'),
-            'sUsuario' => $this->input->post('sUsuario'),
             'sPassword' => sha1($this->input->post('sPassword')),
             'sEmail' => $this->input->post('sEmail'),
             'iAdmin' => $admin,
@@ -232,45 +232,65 @@ class Alumnos extends CI_Controller{
         Función auxiliar para validar los campos del formulario antes de darlo de alta como nuevo registro o
         para la modificación del mismo. En ambas acciones se utilizará la validación. 
     */
-    private function _validate()
+    private function _validate($accion = "MOD")
     {
+        $this->form_validation->set_message('required','Campo obligatorio.'); 
+        $this->form_validation->set_message('min_length[3]','Debe tener más de 3 caracteres.');
+        $this->form_validation->set_message('valid_email','E-mail no válido.');
+        $this->form_validation->set_message('is_unique','Usuario existente.');
+
+        
         $data = array();
         $data['error_string'] = array();
         $data['inputerror'] = array();
         $data['status'] = TRUE;
 
-        if($this->input->post('sNombre') == '')
+        if ($this->form_validation->set_rules('sNombre', 'Nombre', 'required|min_length[3]|trim')  
+            && !$this->form_validation->run())
         {
             $data['inputerror'][] = 'sNombre';
-            $data['error_string'][] = 'Dato obligatorio.';
+            $data['error_string'][] =  strip_tags(form_error('sNombre'));
             $data['status'] = FALSE;
         }
 
-        if($this->input->post('sApellidos') == '')
+        if ($this->form_validation->set_rules('sApellidos', 'Apellidos', 'required|min_length[3]|trim')
+            && !$this->form_validation->run())
         {
             $data['inputerror'][] = 'sApellidos';
-            $data['error_string'][] = 'Dato obligatorio.';
+            $data['error_string'][] = strip_tags(form_error('sApellidos'));
             $data['status'] = FALSE;
         }
 
-        if($this->input->post('sUsuario') == '')
-        {
-            $data['inputerror'][] = 'sUsuario';
-            $data['error_string'][] = 'Dato obligatorio.';
-            $data['status'] = FALSE;
-        }
+        if ($accion == "NEW")
+            if ($this->form_validation->set_rules('sUsuario', 'Usuarios', 'required|is_unique[usuario.sUsuario]|min_length[3]|trim') && !$this->form_validation->run())
+            {
+                $data['inputerror'][] = 'sUsuario';
+                $data['error_string'][] = strip_tags(form_error('sUsuario'));
+                $data['status'] = FALSE;
+            }
+        else
+            if ($this->form_validation->set_rules('sUsuario', 'Usuarios', 'required|min_length[3]|trim')
+            && !$this->form_validation->run())
+            {
+                $data['inputerror'][] = 'sUsuario';
+                $data['error_string'][] = strip_tags(form_error('sUsuario'));
+                $data['status'] = FALSE;
+            }
 
-        if($this->input->post('sPassword') == '')
+
+        if ($this->form_validation->set_rules('sPassword', 'Contraseña', 'required|min_length[3]|trim')
+            && !$this->form_validation->run())
         {
             $data['inputerror'][] = 'sPassword';
-            $data['error_string'][] = 'Dato obligatorio.';
+            $data['error_string'][] = strip_tags(form_error('sPassword'));
             $data['status'] = FALSE;
         }
         
-        if($this->input->post('sEmail') == '')
+        if ($this->form_validation->set_rules('sEmail', 'Email', 'required|min_length[3]|trim|valid_email')
+            && !$this->form_validation->run())
         {
             $data['inputerror'][] = 'sEmail';
-            $data['error_string'][] = 'Dato obligatorio.';
+            $data['error_string'][] = strip_tags(form_error('sEmail'));
             $data['status'] = FALSE;
         }
         

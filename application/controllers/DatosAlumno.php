@@ -20,6 +20,7 @@ class DatosAlumno extends CI_Controller{
         $alumno["titulo"] = 'Modificar mi perfil.';
         $iId = $this->session->userdata('id_usuario');
         $alumno["verAlumno"] = $this->DatosAlumno_model->verUsuario($iId);
+        $alumno["cursos"] = $this->DatosAlumno_model->verCursos($iId);
         $this->load->view("datosalumno", $alumno);
     }
 

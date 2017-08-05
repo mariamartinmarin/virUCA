@@ -63,23 +63,16 @@
     <div class="body">
         <?php $this->load->view('menup_view');?>
         <div role="main" class="main">
-            <section class="page-top">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <ul class="breadcrumb">
-                                <li><a href="#">Profesores</a></li>
-                                <li class="active"><?=$titulo;?></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h2><?=$titulo?></h2>
-                        </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a href="#">Mis Datos</a></li>
+                            <li class="active"><strong>Configuración del Perfil</strong></li>
+                        </ul>
                     </div>
                 </div>
-            </section>
+                </div>
 
             <div class="container">
                 <!-- Errores de inserción. -->

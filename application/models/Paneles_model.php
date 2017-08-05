@@ -21,9 +21,9 @@ class Paneles_model extends CI_Model{
           titulacion.sTitulacion, 
           asignatura.sNombre as sNombre_Asignatura,
           titulacion.sTitulacion,
-          usuario.sNombre,
+          usuario.sNombre as sNombre_Usuario,
           usuario.sApellidos');
-      $this->db->from('panel p');
+      $this->db->from('panel');
       $this->db->join('usuario', 'usuario.iId = panel.iId_Propietario');
       $this->db->join('titulacion', 'titulacion.iId = panel.iId_Titulacion');
       $this->db->join('asignatura', 'asignatura.iId = panel.iId_Asignatura');
@@ -110,11 +110,11 @@ class Paneles_model extends CI_Model{
     // Ahora generamos las casillas.
     for ($i = 1; $i <= $data["iCasillas"]; $i++) {
       // Seleccionar categoría aleatoria.
-      $id_categoria = $this->Panelesalta_model->get_random_cat();
+      $id_categoria = $this->get_random_cat($data["iId_Asignatura"]);
       // Por defecto, función nula.
       $funcion = "Ninguno";
       // Dar de alta casilla.
-      $data_casilla = array('iId_Panel' => $id_panel,
+      $data_casilla = array('iId_Panel' => $iId_Panel,
         'iId_Categoria' => $id_categoria,
         'iNumCasilla' => $i,
         'eFuncion' => $funcion);
@@ -124,24 +124,19 @@ class Paneles_model extends CI_Model{
     return $iId_Panel;    
   }
 
-  public function get_random_cat() {
-        $this->db->order_by('rand()');
-        $this->db->limit(1);
-        // Sólo podemos tomar las categorías para las que ha sido designado el panel según su asignatura y su
-        /* titulación.
-        $this->db->select("*");
-        $this->db->from("categorias");
-        $this->db->join("usuarioscurso", "usuarioscurso.iId_")
+  public function get_random_cat($iId_Asignatura) {
+    // Sólo podemos tomar las categorías para las que ha sido designado el panel según su asignatura y su
+    // titulación.
+    $this->db->join("asignatura", "asignatura.iId = $iId_Asignatura");
+    $this->db->order_by('rand()');
+    $this->db->limit(1);
+    $query = $this->db->get('categoria');
 
-        $this->db->where_in('panel.iId_Universidad', $this->session->userdata('universidades'));
-
-        $query = $this->db->get('categoria');
-
-        foreach($query->result() as $fila){
-          $iId_Categoria = $fila->iId;
-        }
-        return $iId_Categoria;*/
+    foreach($query->result() as $fila){
+      $iId_Categoria = $fila->iId;
     }
+    return $iId_Categoria;
+  }
 
   /*
     Función que actualiza un registro de la base de datos según una condición.
@@ -299,6 +294,114 @@ class Paneles_model extends CI_Model{
       return $query->result();
     }
 
+  // Vamos a obtener las categorías para la modificación del panel. Sólo podremos tomar las categorías de la asignatura
+  // que esté definida en dicho panel.
+  public function get_categorias($iId_Panel) {
+    $query_asignatura = $this->db->query("select iId_Asignatura from panel where iId = $iId_Panel");
+    $datos_asignatura = $query_asignatura->row();
+    $iId_Asignatura = $datos_asignatura->iId_Asignatura;
+
+    $query_categorias = $this->db->query("select * from categoria where iId_Asignatura = $iId_Asignatura");
+
+    if ($query_categorias->num_rows() > 0)
+      // Almacenamos el resultado en una matriz.
+      foreach($query_categorias->result() as $row)
+        $categorias[htmlspecialchars($row->iId, ENT_QUOTES)] = htmlspecialchars($row->sCategoria, ENT_QUOTES);
+
+    $query_categorias->free_result();
+    return $categorias;
+    }
+
+    // Elimina una casilla del panel.
+
+    public function eliminar_casilla($iId, $iId_Panel){
+      // Obtengo antes el número de casillas del panel actual.
+      $panel_query = $this->db->query("SELECT iId, iId_Panel FROM panelcasillas where iId=$iId");
+      if($panel_query->num_rows()>0) {
+        $datos_panel = $panel_query->row();
+        $iId_Panel = $datos_panel->iId_Panel;
+      }
+
+      $casillas_query = $this->db->query("SELECT iCasillas FROM panel where iId=$iId_Panel");
+      if($casillas_query->num_rows()>0) {
+        $datos_casillas = $casillas_query->row();
+        $nCasillas = $datos_casillas->iCasillas;
+      }
+
+      $consulta=$this->db->query("DELETE FROM panelcasillas WHERE iId=$iId");
+      if ($consulta == true){
+        // Decrementamos en 1 el campo iCasillas de la tabla panel.
+        $newiCasillas = $nCasillas - 1;
+        $consulta = $this->db->query("UPDATE panel set iCasillas = $newiCasillas where iId = $iId_Panel");
+
+        // Reorganizamos los índices.
+        $this->reorganiza_casillas($iId_Panel);
+        
+
+        // Devolvemos el estatus.
+
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    // Una vez que se ha eliminado una casilla, hay que reorganizar los ordendes.
+
+    public function reorganiza_casillas($iId_Panel) {
+      $query_celdas = $this->db->query("SELECT iId FROM panelcasillas WHERE iId_Panel = $iId_Panel");
+        if ($query_celdas->num_rows() > 0) {
+          $orden_casilla = 1;
+          foreach ($query_celdas->result() as $casilla) {
+            $query_actualiza_pos = $this->db->query("UPDATE panelcasillas SET
+              iNumCasilla = $orden_casilla WHERE iId = $casilla->iId");
+            $orden_casilla++;
+          }
+        }
+    }
+
+    // Añadir una casilla o casillas al panel.
+     public function add($iId_Panel, $eFuncion, $iId_Categoria) {
+      if ($eFuncion != "" && $iId_Categoria != "") {
+        $data = array('iId_Categoria' => $iId_Categoria,
+        'iId_Panel' => $iId_Panel,
+        'eFuncion' => $eFuncion);
+
+        if ($this->db->insert('panelcasillas', $data)) {
+          $this->Paneles_model->reorganiza_casillas($iId_Panel);
+          // Actualizar el número de casillas de la tabla PANEL.
+          $obtener_casillas = $this->db->query("SELECT iCasillas FROM panel where iId = $iId_Panel");
+          $datos_casillas = $obtener_casillas->row();
+          $iCasillas_new = $datos_casillas->iCasillas + 1;
+          $actualiza_panel = $this->db->query("UPDATE panel SET iCasillas = $iCasillas_new WHERE iId = $iId_Panel");
+          return true;
+        } else { 
+          return false;
+        }
+      }
+    }
+
+    // Función para saber si un panel pertenece al usuario logueado.
+
+    function esPropietario($iId_Panel) {
+      $query = $this->db->query("select iId_Propietario from panel where iId = $iId_Panel");
+      $datos = $query->row();
+
+      if ($query->num_rows() > 0)
+        if ($datos->iId_Propietario == $this->session->userdata('id_usuario'))
+          return true;
+        else
+          return false;
+      else 
+        return false;
+    }
+
+
+
+
+
+
+
 
     function total_paginados($por_pagina, $segmento, $pages) 
     {
@@ -402,82 +505,13 @@ class Paneles_model extends CI_Model{
       }
     }
 
-    public function reorganiza_casillas($iId_Panel) {
-      $query_celdas = $this->db->query("SELECT iId FROM panelcasillas WHERE iId_Panel = $iId_Panel");
-        if ($query_celdas->num_rows() > 0) {
-          $orden_casilla = 1;
-          foreach ($query_celdas->result() as $casilla) {
-            $query_actualiza_pos = $this->db->query("UPDATE panelcasillas SET
-              iNumCasilla = $orden_casilla WHERE iId = $casilla->iId");
-            $orden_casilla++;
-          }
-        }
-    }
+    
 
-    public function eliminar_casilla($iId){
-      // Obtengo antes el número de casillas del panel actual.
-      $panel_query = $this->db->query("SELECT iId, iId_Panel FROM panelcasillas where iId=$iId");
-      if($panel_query->num_rows()>0) {
-        $datos_panel = $panel_query->row();
-        $iId_Panel = $datos_panel->iId_Panel;
-      }
+    
 
-      $casillas_query = $this->db->query("SELECT iCasillas FROM panel where iId=$iId_Panel");
-      if($casillas_query->num_rows()>0) {
-        $datos_casillas = $casillas_query->row();
-        $nCasillas = $datos_casillas->iCasillas;
-      }
+   
 
-      $consulta=$this->db->query("DELETE FROM panelcasillas WHERE iId=$iId");
-      if ($consulta == true){
-        // Decrementamos en 1 el campo iCasillas de la tabla panel.
-        $newiCasillas = $nCasillas - 1;
-        $consulta = $this->db->query("UPDATE panel set iCasillas = $newiCasillas where iId = $iId_Panel");
-
-        // Reorganizamos los índices.
-        reorganiza_casillas($iId_Panel);
-        
-
-        // Devolvemos el estatus.
-
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    public function add($iId_Panel, $eFuncion, $iId_Categoria) {
-      echo $iId_Panel."/".$eFuncion."/".$iId_Categoria;
-      if ($eFuncion != "" && $iId_Categoria != "") {
-
-        $data = array('iId_Categoria' => $iId_Categoria,
-        'iId_Panel' => $iId_Panel,
-        'eFuncion' => $eFuncion);
-
-        if ($this->db->insert('panelcasillas', $data)) {
-          $this->Paneles_model->reorganiza_casillas($iId_Panel);
-          // Actualizar el número de casillas de la tabla PANEL.
-          $obtener_casillas = $this->db->query("SELECT iCasillas FROM panel where iId = $iId_Panel");
-          $datos_casillas = $obtener_casillas->row();
-          $iCasillas_new = $datos_casillas->iCasillas + 1;
-          $actualiza_panel = $this->db->query("UPDATE panel SET iCasillas = $iCasillas_new WHERE iId = $iId_Panel");
-          return true;
-        } else { 
-          return false;
-        }
-      }
-    }
-
-    public function get_categorias() {
-      $query = $this->db->query("select * from categoria");
-      if ($query->num_rows() > 0) {
-        // Almacenamos el resultado en una matriz.
-        foreach($query->result() as $row)
-          $categorias[htmlspecialchars($row->iId, ENT_QUOTES)] = htmlspecialchars($row->sCategoria, ENT_QUOTES);
-        $query->free_result();
-        return $categorias;
-      }
-    }
+    
 
 
 }

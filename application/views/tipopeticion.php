@@ -13,13 +13,9 @@
 
         <!-- Mobile Metas -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <!-- Fuente  -->
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800%7CShadows+Into+Light" rel="stylesheet" type="text/css">
-
         <!-- Libs CSS -->
         <link rel="stylesheet" href="<?=base_url()?>vendor/font-awesome/css/font-awesome.css">
-        <link rel="stylesheet" href="<?=base_url()?>vendor/bootstrap/css/bootstrap.css">   
+        <link rel="stylesheet" href="<?=base_url()?>vendor/bootstrap/css/bootstrap.css?id=2">   
         <link rel="stylesheet" href="<?=base_url('js/datatables/css/dataTables.bootstrap.css')?>" rel="stylesheet">
 
         <!-- Theme CSS -->
@@ -63,12 +59,13 @@
             <?php $this->load->view('menup_view');?>
             <div role="main" class="main">
 
-               <div class="container">
+            <div class="container">
                 <div class="row">
                     <div class="col-md-12">
                         <ul class="breadcrumb">
-                            <li><a href="#">Curso</a></li>
-                            <li class="active"><strong>Gestión de Universidades</strong></li>
+                            <li><a href="#">Ayuda</a></li>
+                            <li><a href="#">Peticiones</a></li>
+                            <li class="active"><strong>Gestión de Peticiones</strong></li>
                         </ul>
                     </div>
                 </div>
@@ -77,10 +74,10 @@
                 <div class="container">
                 <!-- AJAX -->
 
-                    <button class="btn btn-success" onclick="add_universidad()">
-                        <i class="glyphicon glyphicon-plus"></i> Universidad
+                    <button class="btn btn-success" onclick="add_peticion()">
+                        <i class="glyphicon glyphicon-plus"></i> Peticion
                     </button>
-                    <button class="btn btn-warning" onclick="eliminar_todos($(universidad))">
+                    <button class="btn btn-warning" onclick="eliminar_todos($(peticion))">
                         <i class="glyphicon glyphicon-trash"></i> Eliminar todos
                     </button>
                     <button class="btn btn-default" onclick="reload_table()">
@@ -93,12 +90,9 @@
                     <thead>
                     <tr>
                         <th></th>
-                        <th>Nombre</th>
-                        <th>Dirección</th>
-                        <th>Teléfono</th>
-                        <th>Fax</th>
-                        <th>Provincia</th>
-                        <th style="width:200px;">Acción</th>
+                        <th>Petición</th> 
+                        <th>Activa</th>                      
+                        <th>Acción</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -107,11 +101,8 @@
                     <tfoot>
                         <tr>
                             <th></th>
-                            <th>Nombre</th>
-                            <th>Dirección</th>
-                            <th>Teléfono</th>
-                            <th>Fax</th>
-                            <th>Provincia</th>
+                            <th>Petición</th> 
+                            <th>Activa</th>                     
                             <th>Acción</th>
                         </tr>
                     </tfoot>
@@ -129,16 +120,17 @@
     <script src="<?=base_url('vendor/bootstrap/js/bootstrap.min.js')?>"></script>
     <script src="<?=base_url('js/datatables/js/jquery.dataTables.min.js')?>"></script>
     <script src="<?=base_url('js/datatables/js/dataTables.bootstrap.js')?>"></script>
-        <script src="<?=base_url()?>js/sweetalert/sweetalert.min.js"></script>
+    <script src="<?=base_url()?>js/sweetalert/sweetalert.min.js"></script>
 
 
 
     <script type="text/javascript">
+        
         var save_method; // Para el uso del método save.
         var table;
 
         $(document).ready(function() {
-
+           
             //datatables
             table = $('#table').DataTable({ 
                 "language": {
@@ -148,14 +140,14 @@
                         "next": "Siguiente",
                         "previous": "Anterior"
                     },
-                    "search": "Buscar universidades: ",
-                    "lengthMenu": "Mostrando _MENU_ universidades por página.",
-                    "loadingRecords": "Cargando universidades",
-                    "processing": "Cargando universidades",
+                    "search": "Buscar peticiones: ",
+                    "lengthMenu": "Mostrando _MENU_ tipos por página.",
+                    "loadingRecords": "Cargando tipos de peticiones",
+                    "processing": "Cargando tipos de peticiones",
                     "zeroRecords": "No se han encontrado registros",
-                    "emptyTable": "No hay universidades disponibles",
-                    "info": "Mostrando _START_ de _END_ universidades, de un total de _TOTAL_",
-                    "infoEmpty": "Mostrando 0 de 0 universidades",
+                    "emptyTable": "No hay tipos de peticiones disponibles",
+                    "info": "Mostrando _START_ de _END_ tipos, de un total de _TOTAL_",
+                    "infoEmpty": "Mostrando 0 de 0 tipos de peticiones",
                     "aria": {
                         "sortAscending": ": ordenar columna ascendentemente",
                         "sortDescending": ": ordenar columna descendentemente"
@@ -166,7 +158,7 @@
                 "order": [], //Initial no order.
                 // Load data for the table's content from an Ajax source
                 "ajax": {
-                    "url": "<?php echo site_url('index.php/Universidad/ajax_list')?>",
+                    "url": "<?php echo site_url('index.php/Tipopeticion/ajax_list')?>",
                     "type": "POST"
                 },
                 //Set column definition initialisation properties.
@@ -177,25 +169,19 @@
                 },
                 ],
             });
-
-            //set input/textarea/select event when change value, remove class error and remove text help block 
-            $("input").change(function(){
-                $(this).parent().parent().removeClass('has-error');
-                $(this).next().empty();
-            });
         });
 
-        function add_universidad()
+        function add_peticion()
         {
             save_method = 'add';
             $('#form')[0].reset(); // reset form on modals
             $('.form-group').removeClass('has-error'); // clear error class
             $('.help-block').empty(); // clear error string
             $('#modal_form').modal('show'); // show bootstrap modal
-            $('.modal-title').text('Añadir universidad'); // Set Title to Bootstrap modal title
+            $('.modal-title').text('Añadir tipo de petición'); // Set Title to Bootstrap modal title
         }
 
-        function editar_universidad(iId)
+        function editar_peticion(iId)
         {
             save_method = 'update';
             $('#form')[0].reset(); // reset form on modals
@@ -203,71 +189,69 @@
             $('.help-block').empty(); // clear error strin
             //Ajax Load data from ajax
             $.ajax({
-                url : "<?php echo site_url('index.php/Universidad/ajax_edit/')?>/" + iId,
+                url : "<?php echo site_url('index.php/Tipopeticion/ajax_edit/')?>/" + iId,
                 type: "GET",
                 dataType: "JSON",
                 success: function(data)
                 {
 
                     $('[name="iId"]').val(data.iId);
-                    $('[name="sUniversidad"]').val(data.sUniversidad);
-                    $('[name="sDireccion"]').val(data.sDireccion);
-                    $('[name="sCP"]').val(data.sCP);
-                    $('[name="sLocalidad"]').val(data.sLocalidad);
-                    $('[name="sProvincia"]').val(data.sProvincia);
-                    $('[name="sPais"]').val(data.sPais);
-                    $('[name="nTelefono"]').val(data.nTelefono);
-                    $('[name="nFax"]').val(data.nFax);
-                    $('[name="sWeb"]').val(data.sWeb);
+                    $('[name="sPeticion"]').val(data.sPeticion);
+                    $('[name="sRequerimientos"]').val(data.sRequerimientos);
+                    if (data.bActiva == 1) $("#bActiva").prop("checked", true);
+                    $('[name="bActiva"]').val(data.bActiva);
+                    
                     $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
-                    $('.modal-title').text('Editar universidad'); // Set title to Bootstrap modal title
+                    $('.modal-title').text('Editar tipo de petición'); // Set title to Bootstrap modal title
                 },
                 error: function (jqXHR, textStatus, errorThrown)
                 {
-                    swal("Oops! algo no fue bien ...", "Ocurrió un problema mientras se editaba la universidad.", "warning");
+                    swal("Oops! algo no fue bien ...", "Ocurrió un problema mientras se editaba la petición.", "warning");
                 }
             });
         }
-
         function reload_table()
         {
             table.ajax.reload(null,false); //reload datatable ajax 
         }
 
-        function eliminar_todos(universidad) {
-             swal({
-                    title: "¿Estás seguro/a?",
-                    text: "¿Desea eliminar las universidades señaladas?",
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Borrar",
-                    cancelButtonText: "No, dejarlo como está",
-                    closeOnConfirm: false
-                    },
+        function eliminar_todos(peticion) {
+            swal({
+                title: "¿Estás seguro/a?",
+                text: "Si borras todas las peticiones, se borrarán todas las solicitudes asociadas!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Borrar",
+                cancelButtonText: "No, dejarlo como está",
+                closeOnConfirm: false
+                },
                     function(){
                         $.ajax({
-                            url : "<?php echo site_url('index.php/Universidad/ajax_delete_todos')?>/",
+                            url : "<?php echo site_url('index.php/Tipopeticion/ajax_delete_todos')?>/",
                             type : "POST",
                             dataType : "JSON",
-                            data : $('.universidad:checked').serialize(),
+                            data : $('.peticion:checked').serialize(),
                             success: function(data) {
                                 if(data.status) //if success close modal and reload ajax table
                                 {
                                     $('#modal_form').modal('hide');
-                                    swal("Bien!", "Operación realizada con éxito", "success");
+                                    swal("Bien!", "Se han eliminado los tipos de peticiones solicitadas", "success");
                                     reload_table();
                                 } else {
-                                    swal("Oops! algo no ha ido bien ...", data.error_string, "warning");
-                                } 
-                            },
+                                        bootbox.alert({
+                                            message: data.error_string
+                                        });
+                                    } 
+                                },
                             error: function (jqXHR, textStatus, errorThrown)
                             {
-                                swal("Oops! algo no fue bien ...", "No se han podido eliminar todos los registros. Inténtelo más tarde.", "warning");
+                                swal("Oops! algo no fue bien ...", "Error al eliminar el registro. Inténtelo más tarde.", "warning");
                             }
                         });
                     });
-            }
+        }
+                    
 
         function save()
         {
@@ -275,9 +259,9 @@
             $('#btnSave').attr('disabled',true); // Desactivar botón.
             var url;
             if(save_method == 'add') {
-                url = "<?php echo site_url('index.php/Universidad/ajax_add')?>";
+                url = "<?php echo site_url('index.php/Tipopeticion/ajax_add')?>";
             } else {
-                url = "<?php echo site_url('index.php/Universidad/ajax_update')?>";
+                url = "<?php echo site_url('index.php/Tipopeticion/ajax_update')?>";
             }
 
             // AJAX añade datos a la base de datos.
@@ -307,49 +291,58 @@
                 },
                 error: function (jqXHR, textStatus, errorThrown)
                 {
-                    swal("Oops! algo no fue bien ...", "Se ha producido un error al intentar añadir/modificar el registro.", "warning");
+                    swal("Oops! algo no fue bien ...", "Se ha producido un error al tratar de actualizar el registro.", "warning");
                     $('#btnSave').text('Guardar');
                     $('#btnSave').attr('disabled',false); 
                 }
             });
         }
 
-        function borrar_universidad(iId)
+        function borrar_peticion(iId)
         {
+
             swal({
-                    title: "¿Estás seguro/a?",
-                    text: "¿Desea eliminar la universidad?",
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Borrar",
-                    cancelButtonText: "No, dejarlo como está",
-                    closeOnConfirm: false
-                    },
+                title: "¿Estás seguro/a?",
+                text: "Si borras todas las peticiones, se borrarán todas las solicitudes asociadas!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Borrar",
+                cancelButtonText: "No, dejarlo como está",
+                closeOnConfirm: false
+                },
                     function(){
-                        $.ajax({
-                            url : "<?php echo site_url('index.php/Universidad/ajax_delete')?>/"+iId,
-                            type: "POST",
-                            dataType: "JSON",
-                            success: function(data)
+                    // AJAX borra los datos de la base de datos.
+                    $.ajax({
+                        url : "<?php echo site_url('index.php/Tipopeticion/ajax_delete')?>/"+iId,
+                        type: "POST",
+                        dataType: "JSON",
+                        success: function(data)
+                        {
+                            if(data.status) //if success close modal and reload ajax table
                             {
-                                if(data.status) //if success close modal and reload ajax table
-                                {
-                                    $('#modal_form').modal('hide');
-                                    swal("Bien!", "Operación realizada con éxito", "success");
-                                    reload_table();
-                                } else {
-                                    swal("Oops! algo no ha ido bien ...", data.error_string, "warning");
-                                }
-                            },
-                            error: function (jqXHR, textStatus, errorThrown)
-                            {
-                                swal("Oops! algo no fue bien ...", "No se ha podido eliminar la universidad. Inténtelo más tarde.", "warning");
+                                $('#modal_form').modal('hide');
+                                reload_table();
+                                swal("Eliminados!", "Se han eliminado los tipos de peticiones solicitados", "success");
+                            } else {
+                                bootbox.alert({
+                                    message: data.error_string
+                                });
                             }
-                        });
+                        },
+                        error: function (jqXHR, textStatus, errorThrown)
+                        {
+                            swal("Oops! algo no fue bien", "No se ha podido eliminar la petición.", "warning");
+                        }
                     });
-            } 
-           
+                }
+            );
+        }
+
+
+
+
+
     </script>
 
     <!-- Bootstrap modal -->
@@ -358,7 +351,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h3 class="modal-title">Alta de universidad</h3>
+                    <h3 class="modal-title">Alta de tipo de petición</h3>
                 </div>
                 <div class="modal-body form">
                     <form action="#" id="form" class="form-horizontal">
@@ -366,73 +359,33 @@
                         <div class="form-body">                            
                             <div class="form-group">
                                 <div class="col-md-12">
-                                    <?=form_label('Universidad * '); ?>
-                                    <input tabindex="1" name="sUniversidad" placeholder="Universidad" class="form-control" type="text">
+                                    <?=form_label('Petición * '); ?>
+                                    <input name="sPeticion" placeholder="Petición" class="form-control" type="text">
                                     <span class="help-block"></span>
                                 </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-md-6">
-                                    <?=form_label('Dirección '); ?>
-                                    <input tabindex="2" name="sDireccion" placeholder="Dirección" class="form-control" type="text">
-                                    <span class="help-block"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <?=form_label('Código postal  '); ?>
-                                    <input tabindex="3" name="sCP" placeholder="Código postal" class="form-control" type="text">
-                                    <span class="help-block"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-md-6">
-                                    <?=form_label('Localidad'); ?>
-                                    <input tabindex="4" name="sLocalidad" placeholder="Localidad" class="form-control" type="text">
-                                    <span class="help-block"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <?=form_label('Provincia'); ?>
-                                    <input tabindex="5" name="sProvincia" placeholder="Provincia" class="form-control" type="text">
-                                    <span class="help-block"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-md-6">
-                                    <?=form_label('País '); ?>
-                                    <input tabindex="6" name="sPais" placeholder="País" class="form-control" type="text">
-                                    <span class="help-block"></span>
-                                </div>                               
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-md-6">
-                                    <?=form_label('Teléfono * '); ?>
-                                    <input tabindex="7" name="nTelefono" placeholder="Teléfono" class="form-control" type="text">
-                                    <span class="help-block"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <?=form_label('Fax  '); ?>
-                                    <input tabindex="8" name="nFax" placeholder="Fax" class="form-control" type="text">
-                                    <span class="help-block"></span>
-                                </div>
-                            </div>
+                            </div> 
 
                             <div class="form-group">
                                 <div class="col-md-12">
-                                    <?=form_label('Web  '); ?>
-                                    <input tabindex="9" name="sWeb" placeholder="http://" class="form-control" type="text">
+                                    <?=form_label('Requerimientos '); ?>
+                                    <textarea class="form-control" name="sRequerimientos" placeholder="Requerimientos (si hay)" rows="5"></textarea>
                                     <span class="help-block"></span>
                                 </div>
                             </div>
-                        
+
+                            <input type="checkbox" id="bActiva" name="bActiva[]" value="1">&nbsp;Activa
+
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <sub><b>*</b> Datos obligatorios.</sub>
+                                </div>
+                            </div>                                           
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button tabindex="10" type="button" id="btnSave" onclick="save()" class="btn btn-primary">Guardar</button>
-                    <button tabindex="11" type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btnSave" onclick="save()" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

@@ -40,7 +40,7 @@ class Cuestion_model extends CI_Model{
 
       // Ahora busco la categoría de esa celda.
 
-      $this->db->select('c.sNombre');
+      $this->db->select('c.sCategoria');
       $this->db->from('categoria c');
       $this->db->join('panelcasillas pc', 'c.iId = pc.iId_Categoria');
       $this->db->where('pc.iNumCasilla', $iCasilla);
@@ -50,7 +50,7 @@ class Cuestion_model extends CI_Model{
 
       if($consulta->num_rows()>0) {
         $datos = $consulta->row();
-        $categoria = $datos->sNombre;
+        $categoria = $datos->sCategoria;
       }
       return $categoria;
   }

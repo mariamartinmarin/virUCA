@@ -38,6 +38,7 @@
         <link rel="stylesheet" href="<?=base_url()?>css/skins/default.css">
         <!-- Custom CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/custom.css">
+        <link rel="stylesheet" href="<?=base_url()?>js/sweetalert/sweetalert.css">
 
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
@@ -62,23 +63,17 @@
             <?php $this->load->view('menup_view');?>
             <div role="main" class="main">
 
-                <section class="page-top">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <ul class="breadcrumb">
-                                    <li><a href="#">Usuarios</a></li>
-                                    <li class="active">Gestión de Alumnos</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h2>Gestión de Alumnos</h2>
-                            </div>
-                        </div>
+               
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a href="#">Usuarios</a></li>
+                            <li class="active"><strong>Gestión de alumnos</strong></li>
+                        </ul>
                     </div>
-                </section>
+                </div>
+            </div>
                
                 <div class="container">
 
@@ -126,13 +121,10 @@
         <script src="<?=base_url('vendor/bootstrap/js/bootstrap.min.js')?>"></script>
         <script src="<?=base_url('js/datatables/js/jquery.dataTables.min.js')?>"></script>
         <script src="<?=base_url('js/datatables/js/dataTables.bootstrap.js')?>"></script>
-        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
-        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+        <script src="<?=base_url()?>js/sweetalert/sweetalert.min.js"></script>
 
         <script type="text/javascript">
-            bootbox.setDefaults({
-                locale: "es"
-            });
+           
 
             var save_method; // Para el uso del método save.
             var table;
@@ -186,15 +178,16 @@
             function add_alumno()
             {
                 save_method = 'add';
-                $('#form')[0].reset(); // reset form on modals
+                $('#form_new')[0].reset(); // reset form on modals
                 $('.form-group').removeClass('has-error'); // clear error class
                 $('.help-block').empty(); // clear error string
                 cargar_titulaciones();
+                $("#sUsuario").prop("disabled", false);
                 $('#modal_form_new').modal('show'); // show bootstrap modal
                 $('.modal-title').text('Añadir alumno'); // Set Title to Bootstrap modal title
             }
 
-            function editar_cursos(iId)
+             function editar_cursos(iId)
             {
                 save_method = 'update';
                 $('#form_cursos')[0].reset(); // reset form on modals
@@ -261,7 +254,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Ocurrió un error mientras se intentaba editar el alumno.');
+                        swal("Oops! algo no fue bien ...", "Ocurrió un problema mientras se editaban los cursos.", "warning");
                     }
                 });
             }
@@ -285,6 +278,7 @@
                         $('[name="sUsuario"]').val(data.sUsuario);
                         $('[name="sPassword"]').val(data.sPassword); 
                         $('[name="sEmail"]').val(data.sEmail);
+                        $("#sUsuario").prop("disabled", true);
                         $("#bActivo").prop("checked", false);
                         $("#bBloqueado").prop("checked", false);
                         if (data.bActivo == 1) $("#bActivo").prop("checked", true);
@@ -297,13 +291,13 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Ocurrió un error mientras se intentaba editar el alumno.');
+                        swal("Oops! algo no fue bien ...", "Ocurrió un problema mientras se editaba el alumno.", "warning");
                     }
                 });
             }
 
 
-            function reload_table()
+           function reload_table()
             {
                 table.ajax.reload(null,false); //reload datatable ajax 
             }
@@ -314,11 +308,17 @@
             }
 
             function eliminar_todos(pregunta) {
-                alert(pregunta);
-                bootbox.confirm("¿Estás seguro/a que quieres eliminar los alumnos seleccionados? Recuerde que si existen dependencias, no podrá eliminarse el registro.",
-
-                function(result) {
-                    if (result == true) {
+                swal({
+                    title: "¿Estás seguro/a?",
+                    text: "¿Desea eliminar los alumnos seleccionados? Si existen dependencias, no podrá eliminarse el registro.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Borrar",
+                    cancelButtonText: "No, dejarlo como está",
+                    closeOnConfirm: false
+                    },
+                    function(){
                         $.ajax({
                             url : "<?php echo site_url('index.php/Alumnos/ajax_delete_todos')?>/",
                             type : "POST",
@@ -329,22 +329,19 @@
                                 if(data.status) //if success close modal and reload ajax table
                                 {
                                     $('#modal_form').modal('hide');
-                                    bootbox.alert("Operación realizada con éxito.");
+                                    swal("Bien!", "Operación realizada con éxito", "success");
                                     reload_table();
 
                                 } else {
-                                    bootbox.alert({
-                                        message: data.error_string
-                                    });
+                                    swal("Oops! algo no ha ido bien ...", data.error_string, "warning");
                                 } 
                             },
                             error: function (jqXHR, textStatus, errorThrown)
                             {
-                                bootbox.alert('Error al eliminar el registro. Asegúrese que ha señalado algún registro.');
+                                swal("Oops! algo no fue bien ...", "No se han podido eliminar algunos o todos los registros. Asegúrese que ha señalado algún registro.", "warning");
                             }
                         });
-                    }
-                });
+                    });
             }
 
             function save_new()
@@ -365,8 +362,8 @@
                     {
                         if(data.status) //if success close modal and reload ajax table
                         {
-                            $('#modal_form').modal('hide');
-                            bootbox.alert("Operación realizada con éxito.");
+                            $('#modal_form_new').modal('hide');
+                            swal("Bien!", "Operación realizada con éxito", "success");
                             reload_table();
                         }
                         else
@@ -382,7 +379,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Se ha producido un error al intentar añadir/modificar el registro.');
+                        swal("Oops! algo no fue bien ...", "Se ha producido un error al intentar añadir/modificar el registro. Inténtelo más tarde.", "warning");
                         $('#btnSave').text('Guardar');
                         $('#btnSave').attr('disabled',false); 
                     }
@@ -411,8 +408,9 @@
                     {
                         if(data.status) //if success close modal and reload ajax table
                         {
+                            swal("Bien!", "Operación realizada con éxito", "success");
                             $('#modal_form').modal('hide');
-                            bootbox.alert("Operación realizada con éxito.");
+                            
                             reload_table();
                         }
                         else
@@ -428,7 +426,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Se ha producido un error al intentar añadir/modificar el registro.');
+                        swal("Oops! algo no fue bien ...", "Se ha producido un error al intentar añadir/modificar el registro. Inténtelo más tarde.", "warning");
                         $('#btnSave').text('Guardar');
                         $('#btnSave').attr('disabled',false); 
                     }
@@ -454,7 +452,7 @@
                         if(data.status) //if success close modal and reload ajax table
                         {
                             //$('#modal_form').modal('hide');
-                            bootbox.alert("Operación realizada con éxito.");
+                            bswal("Bien!", "Operación realizada con éxito", "success");
                             reload_table_cursos();
                         }
                         else
@@ -470,7 +468,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Se ha producido un error al intentar añadir/modificar el registro.');
+                        swal("Oops! algo no fue bien ...", "No se ha podido actualizar el registro. Inténtelo más tarde.", "warning");
                         $('#btnSaveCursos').text('Guardar');
                         $('#btnSaveCursos').attr('disabled',false); 
                     }
@@ -479,10 +477,17 @@
 
             function borrar_alumno(iId)
             {
-                bootbox.confirm("¿Estás seguro/a que desea eliminar este alumno? Si lo hace, se eliminarán todas las preguntas que dicho alumno aportó al sistema.", 
-                function(result){ 
-                    if (result == true) {
-                        // AJAX borra los datos de la base de datos.
+                swal({
+                    title: "¿Estás seguro/a?",
+                    text: "¿Quiere eliminar el alumno? Si lo hace, se eliminarán todas las preguntas que el alumno haya aportado al sistema.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Borrar",
+                    cancelButtonText: "No, dejarlo como está",
+                    closeOnConfirm: false
+                    },
+                    function(){
                         $.ajax({
                             url : "<?php echo site_url('index.php/Alumnos/ajax_delete')?>/"+iId,
                             type: "POST",
@@ -492,29 +497,33 @@
                                 if(data.status) //if success close modal and reload ajax table
                                 {
                                     $('#modal_form').modal('hide');
-                                    bootbox.alert("Operación realizada con éxito.");
+                                    swal("Bien!", "Operación realizada con éxito", "success");
                                     reload_table();
                                 } else {
-                                    bootbox.alert({
-                                        message: data.error_string
-                                    });
+                                    swal("Bien!", data.error_string, "success");
                                 }
                             },
                             error: function (jqXHR, textStatus, errorThrown)
                             {
-                                bootbox.alert('Error al eliminar el profesor. Asegúrese que no participa en una o más partidas e inténtelo más tarde.');
+                                swal("Oops! algo no fue bien ...", "No se ha podido eliminar el alumno. Inténtelo más tarde.", "warning");
                             }
                         });
-                    } 
-                });
-            }
-
+                    }); 
+                }
 
             function borrar_curso(iId)
             {
-                bootbox.confirm("¿Estás seguro/a que desea eliminar este curso?", 
-                function(result){ 
-                    if (result == true) {
+                swal({
+                    title: "¿Estás seguro/a?",
+                    text: "¿Desea eliminar este curso del sistema?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Borrar",
+                    cancelButtonText: "No, dejarlo como está",
+                    closeOnConfirm: false
+                    },
+                    function(){
                         $.ajax({
                             url : "<?php echo site_url('index.php/Alumnos/ajax_delete_curso')?>/"+iId,
                             type: "POST",
@@ -524,21 +533,18 @@
                                 if(data.status) //if success close modal and reload ajax table
                                 {
                                     //$('#modal_form_cursos').modal('hide');
-                                    bootbox.alert("Operación realizada con éxito.");
+                                    swal("Bien!", "Operación realizada con éxito", "success");
                                     reload_table_cursos();
                                 } else {
-                                    bootbox.alert({
-                                        message: data.error_string
-                                    });
+                                    swal("Bien!", data.error_string, "success");
                                 }
                             },
                             error: function (jqXHR, textStatus, errorThrown)
                             {
-                                bootbox.alert('Error al eliminar el curso.');
+                                swal("Oops! algo no fue bien ...", "No se ha podido eliminar el curso. Inténtelo más tarde.", "warning");
                             }
                         });
-                    } 
-                });
+                    });
             }
 
             // Para recargar titulaciones
@@ -595,12 +601,12 @@
                                 <div class="form-group">
                                     <div class="col-md-6">
                                         <?=form_label('Nombre * '); ?>
-                                        <input name="sNombre" placeholder="Nombre" class="form-control" type="text">
+                                        <input tabindex="1" name="sNombre" placeholder="Nombre" class="form-control" type="text">
                                         <span class="help-block"></span>
                                     </div>
                                     <div class="col-md-6">
                                         <?=form_label('Apellidos * '); ?>
-                                        <input name="sApellidos" placeholder="Apellidos" class="form-control" type="text">
+                                        <input tabindex="2" name="sApellidos" placeholder="Apellidos" class="form-control" type="text">
                                         <span class="help-block"></span>
                                     </div>
                                 </div>
@@ -608,7 +614,7 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-3">Universidad *</label>
                                     <div class="col-md-9">
-                                        <?php $atributos = 'class=form-control id="universidades" onChange="cargar_titulaciones();"'; ?>
+                                        <?php $atributos = 'tabindex="3" class=form-control id="universidades" onChange="cargar_titulaciones();"'; ?>
                                         <?=form_dropdown('iId_Universidad', $universidades, '', $atributos); ?>
                                         <span class="help-block"></span>
                                     </div>
@@ -617,7 +623,7 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-3">Titulación *</label>
                                     <div class="col-md-9">
-                                        <?php $atributos2 = 'class=form-control id="titulaciones"
+                                        <?php $atributos2 = 'tabindex="4" class=form-control id="titulaciones"
                                         onChange="cargar_asignaturas();"'; ?>
                                         <?=form_dropdown('iId_Titulacion', $titulaciones, '', $atributos2); ?>
                                         <span class="help-block"></span>
@@ -627,7 +633,7 @@
                                 <div class="form-group">
                                     <label class="control-label col-md-3">Asignatura *</label>
                                     <div class="col-md-9">
-                                        <?php $atributos3 = 'class=form-control id="asignaturas"'; ?>
+                                        <?php $atributos3 = 'tabindex="5" class=form-control id="asignaturas"'; ?>
                                         <?=form_dropdown('iId_Asignatura', $asignaturas, '', $atributos3); ?>
                                         <span class="help-block"></span>
                                     </div>
@@ -637,12 +643,12 @@
                                 <div class="form-group">
                                     <div class="col-md-6">
                                         <?=form_label('Usuario * '); ?>
-                                        <input name="sUsuario" placeholder="Nombre de usuario" class="form-control" type="text">
+                                        <input tabindex="6" name="sUsuario" placeholder="Nombre de usuario" class="form-control" type="text">
                                         <span class="help-block"></span>
                                     </div>
                                     <div class="col-md-6">
                                         <?=form_label('Contraseña * '); ?>
-                                        <input name="sPassword" placeholder="Contraseña" class="form-control" type="password">
+                                        <input tabindex="7" name="sPassword" placeholder="Contraseña" class="form-control" type="password">
                                         <span class="help-block"></span>
                                     </div>
                                 </div>
@@ -650,14 +656,14 @@
                                 <div class="form-group">
                                     <div class="col-md-12">
                                         <?=form_label('E-mail * '); ?>
-                                        <input name="sEmail" placeholder="Correo Electrónico" class="form-control" type="text">
+                                        <input tabindex="8" name="sEmail" placeholder="Correo Electrónico" class="form-control" type="text">
                                         <span class="help-block"></span>
                                     </div>
                                 </div>
 
                         
-                                <input type="checkbox" id="bActivo" name="bActivo[]" value="1">&nbsp;Activo
-                                <input type="checkbox" id="bBloqueado" name="bBloqueado[]" value="2">&nbsp;Bloqueado
+                                <input tabindex="9" type="checkbox" id="bActivo" name="bActivo[]" value="1">&nbsp;Activo
+                                <input tabindex="10" type="checkbox" id="bBloqueado" name="bBloqueado[]" value="2">&nbsp;Bloqueado
 
                             
                                 <div class="form-group">
@@ -707,7 +713,7 @@
                                 <div class="form-group">
                                     <div class="col-md-6">
                                         <?=form_label('Usuario * '); ?>
-                                        <input name="sUsuario" placeholder="Nombre de usuario" class="form-control" type="text">
+                                        <input name="sUsuario" id="sUsuario" placeholder="Nombre de usuario" class="form-control" type="text">
                                         <span class="help-block"></span>
                                     </div>
                                     <div class="col-md-6">

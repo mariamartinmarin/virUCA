@@ -40,10 +40,12 @@ class Jugar extends CI_Controller{
         // Comprobamos si se va a continuar con una jugada o lo que quiere hacerse en cargar una partida
         // de primeras.
         if ($iTurno != "" && $tirada != "") {
-            $this->Jugar_model->gestionar_partida($iId_Partida,
+            if ($this->Jugar_model->gestionar_partida($iId_Partida,
                 $iId_Panel[0],
                 $iTurno,
-                $tirada);
+                $tirada) == 1) {
+                 redirect(base_url()."index.php/partidas", "refresh");
+            }
 
             $data["tirada"] = $tirada;
             $data["iTurno"] = $iTurno;
@@ -58,17 +60,22 @@ class Jugar extends CI_Controller{
         $data["resumen"] = $this->Jugar_model->get_resumen_partida($iId_Partida); 
         $iId_Profesor = $this->Jugar_model->get_profesor_id($iId_Partida); 
 
-        // Decidimos si vamos a mostrar el tablero, o una pregunta o el tablero en curso.
-        if ($iId_Profesor != $this->session->userdata('id_usuario')) {
-            // Cargamos la vista de visualización del tablero para seguir la partida.
-            redirect(base_url()."index.php/visualizar", "refresh");
-        } else {
-            // Caragamos el tablero de juego, o la vista de pregunta.
+        if ($iId_Profesor == $this->session->userdata('id_usuario')) {
+            // Soy propietario de la partida.
             if ($this->session->userdata('pregunta') == 1) 
                 redirect(base_url()."index.php/cuestion", "refresh");
             else
+                // Sólo jugará si es el propietario de la partida.
                 $this->load->view("jugar",$data);
+        } else {
+            // No soy propietario, así que sólo podré verla y no jugarla.
+            if ($this->Jugar_model->finalizada($iId_Partida) == true)
+                $this->load->view("jugar",$data);
+            else 
+                $this->load->view("partidas",$data);
         }
+
+       
     }
 
     public function correccion() {

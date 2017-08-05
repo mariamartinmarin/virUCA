@@ -21,6 +21,7 @@ class Pregunta extends CI_Controller{
         $data["categorias"] = $this->Pregunta_model->get_categorias();
         $data["titulaciones"] = $this->Pregunta_model->get_titulaciones();
         $data["asignaturas"] = $this->Pregunta_model->get_asignaturas();
+        $data["universidades"] = $this->Pregunta_model->get_universidades();
         $data["iEdicion"] = $this->Pregunta_model->get_edicion();
 
         $this->load->helper('url'); 
@@ -116,6 +117,7 @@ class Pregunta extends CI_Controller{
             'iId_Usuario' => $this->session->userdata('id_usuario'),
             'iId_Titulacion' => $this->input->post('iId_Titulacion'),
             'iId_Asignatura' => $this->input->post('iId_Asignatura'),
+            'iId_Universidad' => $this->input->post('iId_Universidad'),
             'iId_Categoria' => $this->input->post('iId_Categoria'),
         );
 
@@ -141,6 +143,7 @@ class Pregunta extends CI_Controller{
             'sPregunta' => $this->input->post('sPregunta'),
             'iId_Categoria' => $this->input->post('iId_Categoria'),
             'iId_Titulacion' => $this->input->post('iId_Titulacion'),
+            'iId_Universidad' => $this->input->post('iId_Universidad'),
             'iId_Asignatura' => $this->input->post('iId_Asignatura'),
         );
         

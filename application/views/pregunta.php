@@ -38,6 +38,7 @@
         <link rel="stylesheet" href="<?=base_url()?>css/skins/default.css">
         <!-- Custom CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/custom.css">
+        <link rel="stylesheet" href="<?=base_url()?>js/sweetalert/sweetalert.css">
 
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
@@ -60,28 +61,21 @@
             <?php $this->load->view('menua_view');?>
             <div role="main" class="main">
 
-                <section class="page-top">
+                <div class="home-intro light">
                     <div class="container">
+
                         <div class="row">
                             <div class="col-md-12">
                                 <ul class="breadcrumb">
                                     <li><a href="#">Preguntas</a></li>
-                                    <li class="active">Mis preguntas</li>
+                                    <li class="active">Mis Preguntas</li>
                                 </ul>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h2>Mis preguntas</h2>
-                            </div>
-                        </div>
                     </div>
-                </section>
+                </div>
                
                 <div class="container">
-                    <blockquote>
-                        Desde aquí podrás gestionar tus propias preguntas, y ver si los profesores han validado tu pregunta para que aparezca en el juego. Recuerda que, cuando los profesores decidan empezar la evaluación de las preguntas, se limitará el acceso a las mismas, pudiendo sólo visualizarlas y en ningún caso borrarlas o modificarlas.
-                    </blockquote>
                 
                     <?php if ($iEdicion == 1) { ?>
                     <button class="btn btn-success" onclick="add_pregunta()">
@@ -123,20 +117,15 @@
                     
                 </div>
             </div>
-            <?php $this->load->view('footer_login');?>
+            <?php $this->load->view('footer');?>
         </div>
 
         <script src="<?=base_url('vendor/bootstrap/js/bootstrap.min.js')?>"></script>
         <script src="<?=base_url('js/datatables/js/jquery.dataTables.min.js')?>"></script>
         <script src="<?=base_url('js/datatables/js/dataTables.bootstrap.js')?>"></script>
-        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
-        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+        <script src="<?=base_url()?>js/sweetalert/sweetalert.min.js"></script>
 
         <script type="text/javascript">
-            bootbox.setDefaults({
-                locale: "es"
-            });
-
             var save_method; // Para el uso del método save.
             var table;
 
@@ -202,6 +191,7 @@
                 $('#form')[0].reset(); // reset form on modals
                 $('.form-group').removeClass('has-error'); // clear error class
                 $('.help-block').empty(); // clear error string
+                cargar_titulaciones();
                 $('#modal_form').modal('show'); // show bootstrap modal
                 $('.modal-title').text('Añadir pregunta'); // Set Title to Bootstrap modal title
             }
@@ -222,12 +212,13 @@
                         $('[name="iId"]').val(data.iId);
                         $('[name="sPregunta"]').val(data.sPregunta); 
                         $('[name="iId_Categoria"]').val(data.iId_Categoria);
+                        $('[name="iId_Universidad"]').val(data.iId_Universidad);
                         $('[name="iId_Asignatura"]').val(data.iId_Asignatura);
                         $('[name="iId_Titulacion"]').val(data.iId_Titulacion);                            
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Ocurrió un error mientras se intentaba editar la pregunta.');
+                        swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba editar la pregunta. Inténtelo más tarde.", "warning");
                     }
                 });
 
@@ -241,7 +232,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Ocurrió un error mientras se intentaban recuperar las respuestas.');
+                        swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba editar la respuesta. Inténtelo de nuevo.", "warning");
                     }
                 });
 
@@ -255,7 +246,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Ocurrió un error mientras se intentaban recuperar las respuestas.');
+                        swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba editar la respuesta. Inténtelo de nuevo.", "warning");
                     }
                 });
 
@@ -269,7 +260,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Ocurrió un error mientras se intentaban recuperar las respuestas.');
+                        swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba editar la respuesta. Inténtelo de nuevo.", "warning");
                     }
                 });
 
@@ -283,7 +274,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Ocurrió un error mientras se intentaban recuperar las respuestas.');
+                        swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba editar la respuesta. Inténtelo de nuevo.", "warning");
                     }
                 });
 
@@ -311,7 +302,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Ocurrió un error mientras se intentaban recuperar las respuestas.');
+                        swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba editar la respuesta. Inténtelo de nuevo.", "warning");
                     }
                 });
             }
@@ -322,10 +313,17 @@
             }
 
             function eliminar_todos(pregunta) {
-                bootbox.confirm("¿Estás seguro/a que quieres eliminar las preguntas? Recuerde que si existen dependencias, no podrá eliminarse el registro.",
-
-                function(result) {
-                    if (result == true) {
+                swal({
+                    title: "¿Estás seguro/a?",
+                    text: "¿Estás seguro/a que quieres eliminar las preguntas? Recuerde que si existen dependencias, no podrá eliminarse el registro.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Borrar",
+                    cancelButtonText: "No, dejarlo como está",
+                    closeOnConfirm: false
+                    },
+                    function(){
                         $.ajax({
                             url : "<?php echo site_url('index.php/Pregunta/ajax_delete_todos')?>/",
                             type : "POST",
@@ -336,22 +334,19 @@
                                 if(data.status) //if success close modal and reload ajax table
                                 {
                                     $('#modal_form').modal('hide');
-                                    bootbox.alert("Operación realizada con éxito.");
+                                    swal("Bien!", "Operación realizada con éxito", "success");
                                     reload_table();
 
                                 } else {
-                                    bootbox.alert({
-                                        message: data.error_string
-                                    });
+                                    swal("Oops! algo no ha ido bien ...", data.error_string, "warning");
                                 } 
                             },
                             error: function (jqXHR, textStatus, errorThrown)
                             {
-                                bootbox.alert('Error al eliminar el registro. Asegúrese que ha señalado algún registro.');
+                                swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba eliminar los registros. Asegúrese que ha marcado alguno y que no existen dependencias.", "warning");
                             }
                         });
-                    }
-                });
+                    });
             }
 
             function save()
@@ -377,7 +372,7 @@
                         if(data.status) //if success close modal and reload ajax table
                         {
                             $('#modal_form').modal('hide');
-                            bootbox.alert("Operación realizada con éxito.");
+                            swal("Bien!", "Operación realizada con éxito", "success");
                             reload_table();
                         }
                         else
@@ -393,7 +388,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Se ha producido un error al intentar añadir/modificar el registro.');
+                        swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba actualizar el registro. Inténtelo más tarde.", "warning");
                         $('#btnSave').text('Guardar');
                         $('#btnSave').attr('disabled',false); 
                     }
@@ -402,10 +397,17 @@
 
             function borrar_pregunta(iId)
             {
-                bootbox.confirm("¿Estás seguro/a que desea eliminar esta pregunta? Debe saber, que si lo hace, se eliminará la pregunta del seguimiento de las partidas y no podrá ser recuperada de nuevo.", 
-                function(result){ 
-                    if (result == true) {
-                        // AJAX borra los datos de la base de datos.
+                swal({
+                    title: "¿Estás seguro/a?",
+                    text: "¿Estás seguro/a que desea eliminar esta pregunta? Debe saber, que si lo hace, se eliminará la pregunta del seguimiento de las partidas y no podrá ser recuperada de nuevo.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Borrar",
+                    cancelButtonText: "No, dejarlo como está",
+                    closeOnConfirm: false
+                    },
+                    function(){
                         $.ajax({
                             url : "<?php echo site_url('index.php/Preguntas/ajax_delete')?>/"+iId,
                             type: "POST",
@@ -415,22 +417,77 @@
                                 if(data.status) //if success close modal and reload ajax table
                                 {
                                     $('#modal_form').modal('hide');
-                                    bootbox.alert("Operación realizada con éxito.");
+                                    swal("Bien!", "Operación realizada con éxito", "success");
                                     reload_table();
                                 } else {
-                                    bootbox.alert({
-                                        message: data.error_string
-                                    });
+                                    swal("Oops! algo no ha ido bien ...", data.error_string, "warning");
                                 }
                             },
                             error: function (jqXHR, textStatus, errorThrown)
                             {
-                                bootbox.alert('Error al eliminar la pregunta. Inténtelo más tarde.');
+                                swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba eliminar la pregunta. Inténtelo más tarde.", "warning");
                             }
                         });
-                    } 
-                });
+                    }); 
             }
+
+            // Para los selects
+
+            // Para recargar titulaciones
+
+            function cargar_titulaciones(iId)
+            {  
+                var iId_Universidad = $("#universidades option:selected").attr("value");
+                $.get("<?php echo site_url('index.php/Preguntas/ajax_recarga_titulaciones')?>",
+                    {"universidad":iId_Universidad}, function(data) {
+                        var titulaciones = "";
+                        var titulacion = JSON.parse(data);
+                        for (datos in titulacion.titulaciones) {
+                            titulaciones += '<option value="'+titulacion.titulaciones[datos].iId+'">'+
+                            titulacion.titulaciones[datos].sTitulacion+'</option>';
+                        }
+                        $('select#titulaciones').html(titulaciones);
+                        cargar_asignaturas();
+                    });
+            } 
+
+            // Para recargar titulaciones
+
+            function cargar_asignaturas(iId)
+            {  
+                var iId_Titulacion = $("#titulaciones option:selected").attr("value");
+
+                $.get("<?php echo site_url('index.php/Preguntas/ajax_recarga_asignaturas')?>",
+                    {"titulacion":iId_Titulacion}, function(data) {
+                        var asignaturas = "";
+                        var asignatura = JSON.parse(data);
+                        for (datos in asignatura.asignaturas) {
+                            asignaturas += '<option value="'+asignatura.asignaturas[datos].iId+'">'+
+                            asignatura.asignaturas[datos].sNombre+'</option>';
+                        }
+                        $('select#asignaturas').html(asignaturas);
+                        cargar_categorias();
+                    });
+            }
+
+            // Para cargar las categorias
+
+            function cargar_categorias(iId)
+            {  
+                var iId_Asignatura = $("#asignaturas option:selected").attr("value");
+
+                $.get("<?php echo site_url('index.php/Preguntas/ajax_recarga_categorias')?>",
+                    {"asignatura":iId_Asignatura}, function(data) {
+                        var categorias = "";
+                        var categoria = JSON.parse(data);
+                        for (datos in categoria.categorias) {
+                            categorias += '<option value="'+categoria.categorias[datos].iId+'">'+
+                            categoria.categorias[datos].sCategoria+'</option>';
+                        }
+                        $('select#categorias').html(categorias);
+                    });
+            }
+
         </script>
 
         <!-- Bootstrap modal -->
@@ -453,10 +510,21 @@
                                     </div>
                                 </div>
 
+                               <div class="form-group">
+                                    <div class="col-md-9">
+                                        <?php $atributos = 'class=form-control id="universidades" onChange="cargar_titulaciones();"'; ?>
+                                        <?=form_label('Universidad * '); ?>
+                                        <?=form_dropdown('iId_Universidad', $universidades, '', $atributos); ?>
+                                        <span class="help-block"></span>
+                                    </div>
+                                </div>
+
                                 <div class="form-group">
                                     <div class="col-md-12">
+                                        <?php $atributos2 = 'class=form-control id="titulaciones"
+                                        onChange="cargar_asignaturas();"'; ?>
                                         <?=form_label('Titulación * '); ?>
-                                        <?=form_dropdown('iId_Titulacion', $titulaciones, '', 'class=form-control'); ?>
+                                        <?=form_dropdown('iId_Titulacion', $titulaciones, '', $atributos2); ?>
                                         <span class="help-block"></span>
                                     </div>
                                 </div>
@@ -464,13 +532,16 @@
                                 
                                 <div class="form-group">
                                     <div class="col-md-6">
+                                        <?php $atributos3 = 'class=form-control id="asignaturas"
+                                        onChange="cargar_categorias();"'; ?>
                                         <?=form_label('Asignatura * '); ?>
-                                        <?=form_dropdown('iId_Asignatura', $asignaturas, '', 'class=form-control'); ?>
+                                        <?=form_dropdown('iId_Asignatura', $asignaturas, '', $atributos3); ?>
                                         <span class="help-block"></span>
                                     </div>
                                     <div class="col-md-6">
                                         <?=form_label('Categorías * '); ?>
-                                        <?=form_dropdown('iId_Categoria', $categorias, '', 'class=form-control'); ?>
+                                        <?php $atributos4 = 'class=form-control id="categorias"' ?>
+                                        <?=form_dropdown('iId_Categoria', $categorias, '', $atributos4); ?>
                                         <span class="help-block"></span>
                                     </div>
                                 </div>

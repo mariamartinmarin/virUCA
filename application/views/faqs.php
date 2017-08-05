@@ -76,23 +76,17 @@
 
 			<div role="main" class="main">
 
-				<section class="page-top">
-					<div class="container">
-						<div class="row">
-							<div class="col-md-12">
-								<ul class="breadcrumb">
-									<li><a href="#">Ayuda</a></li>
-									<li class="active">FAQ's</li>
-								</ul>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<h2>Preguntas Frecuentes (FAQ's)</h2>
-							</div>
-						</div>
-					</div>
-				</section>
+			<div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a href="#">Ayuda</a></li>
+                            <li class="active"><strong>FAQ's (Preguntas Frecuentes)</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                </div>
+
 
 				<div class="container">
 					<div class="row">
@@ -163,19 +157,7 @@
 
 			</div>
 
-			<?php 
-			switch ($var) {
-				case '1':
-					$this->load->view('footer'); break;
-				default:
-					switch ($perfil) {
-						case '1': $this->load->view('footer_login'); break;
-						case '0': $this->load->view('footer'); break;
-						default: $this->load->view('footer_login'); break;
-					}
-					break;
-			}
-			?>
+			<?php $this->load->view('footer');?>
 		</div>
 
 		<!-- Libs -->

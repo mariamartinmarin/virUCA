@@ -280,6 +280,18 @@ class Pregunta_model extends CI_Model{
     }
   }
 
+  /* Función para obtener las categorías disponibles en el sistema. */
+  public function get_universidades() {
+    $query = $this->db->query("select * from universidad");
+    if ($query->num_rows() > 0) {
+      // Almacenamos el resultado en una matriz.
+      foreach($query->result() as $row)
+        $universidades[htmlspecialchars($row->iId, ENT_QUOTES)] = htmlspecialchars($row->sUniversidad, ENT_QUOTES);
+      $query->free_result();
+      return $universidades;
+    }
+  }
+
   /* Función para obtener las asignaturas disponibles en el sistema */
   public function get_asignaturas() {
     $this->db->select('asignatura.*');

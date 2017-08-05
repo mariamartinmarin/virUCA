@@ -75,23 +75,16 @@
 
 			<div role="main" class="main">
 
-				<section class="page-top">
-					<div class="container">
-						<div class="row">
-							<div class="col-md-12">
-								<ul class="breadcrumb">
-									<li><a href="#">Ayuda</a></li>
-									<li class="active">Ayuda</li>
-								</ul>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<h2>VirUCA. Ayuda general.</h2>
-							</div>
-						</div>
-					</div>
-				</section>
+				<div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a href="#">Ayuda</a></li>
+                            <li class="active"><strong>Ayuda de la Aplicación</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                </div>
 
 				<div class="container">
 					<ul class="nav nav-pills sort-source" data-sort-id="portfolio" data-option-key="filter">

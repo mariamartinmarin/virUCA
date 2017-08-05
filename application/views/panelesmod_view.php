@@ -59,24 +59,16 @@
     <div class="body">
         <?php $this->load->view('menup_view');?>
         <div role="main" class="main">
-            <section class="page-top">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <ul class="breadcrumb">
-                                <li><a href="#">Partida</a></li>
-                                <li><a href="#">Paneles</a></li>
-                                <li class="active">Modificar Panel</li>
-                            </ul>
-                        </div>
+           <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a href="#">Juego</a></li>
+                            <li class="active"><strong>Configurar Panel</strong></li>
+                        </ul>
                     </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h2>Modificar Panel</h2>
-                            </div>
-                        </div>
-                    </div>
-            </section>
+                </div>
+                </div>
 
             <div class="container">
                 <!-- Errores de inserción. -->
@@ -200,10 +192,11 @@
                     </div>
                     <?php } ?>
 
-                    <input type="button" class="btn btn-warning" value="Nuevo Panel" onclick="location.href='<?=base_url()?>index.php/panelesalta'">
+                    <input type="button" class="btn btn-warning" value="Listado de paneles" onclick="location.href='<?=base_url()?>index.php/paneles'">
                     <hr class="short">
                     <?=form_close();?>
                     
+                    <?php if ($enpartida <= 0) { ?>
                     <!-- Ahora vamos a dar la posibilidad de añadir una celda -->
                     <br>
                     <?=form_fieldset('Añadir una nueva casilla');?>
@@ -236,7 +229,7 @@
                     <input type="submit" class="btn btn-warning" value="Añadir casilla">
                     
                     <?=form_close();?>
-
+                    <?php } ?>
                     <?php
 
                     } else {

@@ -63,23 +63,16 @@
     <div class="body">
         <?php $this->load->view('menua_view');?>
         <div role="main" class="main">
-            <section class="page-top">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <ul class="breadcrumb">
-                                <li><a href="#">Mis Datos</a></li>
-                                <li class="active"><?=$titulo;?></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h2><?=$titulo?></h2>
-                        </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a href="#">Mis Datos</a></li>
+                            <li class="active"><strong>Configuració del Perfil</strong></li>
+                        </ul>
                     </div>
                 </div>
-            </section>
+                </div>
 
             <div class="container">
                 <!-- Errores de inserción. -->
@@ -96,8 +89,37 @@
                 <?php } ?>
                 <!-- Fin errores -->
 
+                <?php echo form_fieldset('Cursos disponibles');?>
+                <blockquote>A continuación, se enumeran los cursos en los que está dado de alta. Si necesita alguna modificación sobre los mismos, deberá hacerlo <b>mediante petición al administrador</b> desde el menú de <b>PETICIONES</b></blockquote>
+
+                <?php
+                if ($cursos == "") {
+                    echo "<div class='alert alert-danger'>En estos momentos no está dado de alta en ninguna universidad. Deberá darse de alta mediante una <b>petición al administrador</b> a través del menú <b>PETICIONES</b>.</div>";
+                } else {
+                    echo '<table class="table table-bordered table-striped" id="table_preguntas">
+                        <thead>
+                            <th>Universidad</th>
+                            <th>Titulación</th>
+                            <th>Asignatura</th>
+                        </thead>
+                        <tbody>';
+                            foreach($cursos as $curso){                                 
+                                echo '
+                                <tr>
+                                    <td>'.$curso->sUniversidad.'</td>
+                                    <td>'.$curso->sTitulacion.'</td>
+                                    <td>'.$curso->sNombre.'</td>
+                                </tr>';
+                            }
+                            echo '   
+                        </tbody>
+                        </table>'; 
+                    }
+                ?>
+
+
                 <?php echo form_fieldset('Modificar mis datos');?>
-                 <?=form_open(base_url().'index.php/DatosAlumno/mod');?>
+                <?=form_open(base_url().'index.php/DatosAlumno/mod');?>
                 <?php    
                     foreach ($verAlumno as $fila){ 
                     $tipo_usuario = 0;
@@ -167,15 +189,6 @@
                     );
                     ?>
 
-                    <div class="row">
-                        <div class="form-group">
-                            <div class="col-md-12">
-                               <blockquote>
-                                   Por razones de seguridad, la contraseña no se muestra por pantalla. Si necesita cambiarla y no se acuerda de la contraseña, contacte con el administrador del sitio para solucionar el problema a la mayor brevedad.
-                               </blockquote>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Campos del formulario -->
                     <div class="row">

@@ -182,7 +182,7 @@
 
 			</div>
 
-			<?php $this->load->view('footer_login');?>
+			<?php $this->load->view('footer');?>
 		</div>
 
 		<!-- Libs -->

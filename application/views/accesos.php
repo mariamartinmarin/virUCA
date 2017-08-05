@@ -37,6 +37,7 @@
         <link rel="stylesheet" href="<?=base_url()?>css/skins/default.css">
         <!-- Custom CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/custom.css">
+        <link rel="stylesheet" href="<?=base_url()?>js/sweetalert/sweetalert.css">
 
         <!-- Head Libs -->
         <script src="<?=base_url()?>vendor/modernizr.js"></script>
@@ -62,23 +63,16 @@
             <?php $this->load->view('menup_view');?>
             <div role="main" class="main">
 
-                <section class="page-top">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <ul class="breadcrumb">
-                                    <li><a href="#">Configuración</a></li>
-                                    <li class="active">Accesos</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h2>Gestión de Accesos al Sistema</h2>
-                            </div>
-                        </div>
+                <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a href="#">Configuración</a></li>
+                            <li class="active"><strong>Gestión de Accesos al Sistema</strong></li>
+                        </ul>
                     </div>
-                </section>
+                </div>
+                </div>
                
                 <div class="container">
                     <button class="btn btn-warning" onclick="eliminar_todos($(acceso))">
@@ -123,15 +117,12 @@
         <script src="<?=base_url('vendor/bootstrap/js/bootstrap.min.js')?>"></script>
         <script src="<?=base_url('js/datatables/js/jquery.dataTables.min.js')?>"></script>
         <script src="<?=base_url('js/datatables/js/dataTables.bootstrap.js')?>"></script>
-        <script src="<?=base_url()?>js/bootbox/boot.activate.js"></script>
-        <script src="<?=base_url()?>js/bootbox/bootbox.min.js"></script>
+    <script src="<?=base_url()?>js/sweetalert/sweetalert.min.js"></script>
 
 
 
         <script type="text/javascript">
-            bootbox.setDefaults({
-                locale: "es"
-            });
+            
             var save_method; // Para el uso del método save.
             var table;
 
@@ -184,44 +175,54 @@
             }
 
             function eliminar_todos(acceso) {
-                bootbox.confirm("¿Estás seguro/a que quieres eliminar los accesos señalados? En caso afirmativo, debe saber que se perderá cualquier tipo de rastro en el sistema del acceso de los usuarios seleccionados al mismo.",
+                swal({
+                    title: "¿Estás seguro/a?",
+                    text: "¿Estás seguro/a que quieres eliminar los accesos señalados? En caso afirmativo, debe saber que se perderá cualquier tipo de rastro en el sistema del acceso de los usuarios seleccionados al mismo.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Borrar",
+                    cancelButtonText: "No, dejarlo como está",
+                    closeOnConfirm: false
+                    },
+                    function(){
+                        $.ajax({
+                            url : "<?php echo site_url('index.php/Accesos/ajax_delete_todos')?>/",
+                            type : "POST",
+                            dataType : "JSON",
+                            data : $('.acceso:checked').serialize(),
+                            success: function(data) {
 
-                    function(result) {
-                        if (result == true) {
-                            $.ajax({
-                                url : "<?php echo site_url('index.php/Accesos/ajax_delete_todos')?>/",
-                                type : "POST",
-                                dataType : "JSON",
-                                data : $('.acceso:checked').serialize(),
-                                success: function(data) {
-
-                                    if(data.status) //if success close modal and reload ajax table
-                                    {
-                                        $('#modal_form').modal('hide');
-                                        bootbox.alert("Operación realizada con éxito.");
-                                        reload_table();
-
-                                    } else {
-                                        bootbox.alert({
-                                            message: data.error_string
-                                        });
+                                if(data.status) //if success close modal and reload ajax table
+                                {
+                                    $('#modal_form').modal('hide');
+                                    swal("Bien!", "Operación realizada con éxito", "success");
+                                    reload_table();
+                                } else {
+                                    swal("Oops! algo no ha ido bien ...", data.error_string, "warning");
                                     } 
                                 },
                                 error: function (jqXHR, textStatus, errorThrown)
                                 {
-                                    bootbox.alert('Error al eliminar el registro. Asegúrese que ha señalado algún registro.');
+                                    swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba eliminar los registros. Asegúrese que ha marcado alguno y que no existen dependencias.", "warning");
                                 }
                             });
-                        }
-                    });
+                        });
             }
 
             function borrar_acceso(iId)
             {
-                bootbox.confirm("¿Estás seguro/a que desea eliminar este acceso? En caso afirmativo, debe saber que se perderá cualquier tipo de rastro en el sistema del acceso de este usuario al mismo.", 
-                function(result){ 
-                    if (result == true) {
-                        // AJAX borra los datos de la base de datos.
+                 swal({
+                    title: "¿Estás seguro/a?",
+                    text: "¿Estás seguro/a que desea eliminar este acceso? En caso afirmativo, debe saber que se perderá cualquier tipo de rastro en el sistema del acceso de este usuario al mismo.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Borrar",
+                    cancelButtonText: "No, dejarlo como está",
+                    closeOnConfirm: false
+                    },
+                    function(){
                         $.ajax({
                             url : "<?php echo site_url('index.php/Accesos/ajax_delete')?>/"+iId,
                             type: "POST",
@@ -231,22 +232,19 @@
                                 if(data.status) //if success close modal and reload ajax table
                                 {
                                     $('#modal_form').modal('hide');
-                                    bootbox.alert("Operación realizada con éxito.");
+                                    swal("Bien!", "Operación realizada con éxito", "success");
                                     reload_table();
 
                                 } else {
-                                    bootbox.alert({
-                                        message: data.error_string
-                                    });
+                                    swal("Oops! algo no ha ido bien ...", data.error_string, "warning");
                                 }
                             },
                             error: function (jqXHR, textStatus, errorThrown)
                             {
-                                bootbox.alert('Error al eliminar el registro. Inténtelo más tarde.');
+                                swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba eliminar el registro. Asegúrese que ha marcado alguno.", "warning");
                             }
                         });
-                    } 
-                });
+                    }); 
             }
         </script>
 

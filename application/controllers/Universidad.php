@@ -39,7 +39,7 @@ class Universidad extends CI_Controller{
         foreach ($list as $universidad) {
             $no++;
             $row = array();
-            $row[] = '<input type="checkbox" id="acceso" class="universidad" name="universidad[]" value="'.$universidad->iId.'">';
+            $row[] = '<input type="checkbox" id="universidad" class="universidad" name="universidad[]" value="'.$universidad->iId.'">';
             $row[] = $universidad->sUniversidad;
             $row[] = $universidad->sDireccion;
             $row[] = $universidad->nTelefono;
@@ -160,31 +160,46 @@ class Universidad extends CI_Controller{
         Función auxiliar para validar los campos del formulario antes de darlo de alta como nuevo registro o
         para la modificación del mismo. En ambas acciones se utilizará la validación. 
     */
-    private function _validate()
+
+    private function _validate($accion = "MOD")
     {
+        $this->form_validation->set_message('required','Campo obligatorio.'); 
+        $this->form_validation->set_message('min_length[3]','Debe tener más de 3 caracteres.');
+        $this->form_validation->set_message('valid_email','E-mail no válido.');
+        $this->form_validation->set_message('is_unique','Usuario existente.');
+        $this->form_validation->set_message('valid_url','URL no válida.');
+
+        
         $data = array();
         $data['error_string'] = array();
         $data['inputerror'] = array();
         $data['status'] = TRUE;
 
-        // Comprobar que no haya ya un sTitulacion con el mismo nombre en la base de datos.
+       if ($this->form_validation->set_rules('sUniversidad', 'Universidad', 'required|min_length[3]|trim')  
+            && !$this->form_validation->run())
+            {
+                $data['inputerror'][] = 'sUniversidad';
+                $data['error_string'][] =  strip_tags(form_error('sUniversidad'));
+                $data['status'] = FALSE;
+            }
 
-        if($this->input->post('sUniversidad') == '')
-        {
-            $data['inputerror'][] = 'sUniversidad';
-            $data['error_string'][] = 'El nombre de la universidad es obligatorio';
-            $data['status'] = FALSE;
-        }
-
-        if($this->input->post('nTelefono') == '')
+        if ($this->form_validation->set_rules('nTelefono', 'Telefono', 'required|min_length[9]|trim')
+            && !$this->form_validation->run())
         {
             $data['inputerror'][] = 'nTelefono';
-            $data['error_string'][] = 'Teléfono obligatorio.';
+            $data['error_string'][] = strip_tags(form_error('nTelefono'));
+            $data['status'] = FALSE;
+        }
+
+
+        if ($this->form_validation->set_rules('sWeb', 'Web', 'min_length[3]|trim|valid_url')
+            && !$this->form_validation->run())
+        {
+            $data['inputerror'][] = 'sWeb';
+            $data['error_string'][] = strip_tags(form_error('sWeb'));
             $data['status'] = FALSE;
         }
         
-        
-
         if($data['status'] === FALSE)
         {
             echo json_encode($data);
@@ -192,9 +207,6 @@ class Universidad extends CI_Controller{
         }
     }
 
-
-
-    // FIN AJAX
     
 }
 ?>
