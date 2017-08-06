@@ -14,9 +14,6 @@
         <!-- Mobile Metas -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- Fuente  -->
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800%7CShadows+Into+Light" rel="stylesheet" type="text/css">
-
         <!-- Libs CSS -->
         <link rel="stylesheet" href="<?=base_url()?>vendor/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" href="<?=base_url()?>vendor/font-awesome/css/font-awesome.css">
@@ -26,9 +23,7 @@
         <!-- Theme CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-elements.css">
-        <link rel="stylesheet" href="<?=base_url()?>css/theme-blog.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
-        <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
 
         <!-- Custom Loader -->
         <link rel="stylesheet" href="<?=base_url()?>css/loader.css">
@@ -228,7 +223,7 @@
                     },
                     error: function (jqXHR, textStatus, errorThrown)
                     {
-                        bootbox.alert('Ocurrió un error mientras se intentaba editar la pregunta.');
+                        swal("Oops! algo no fue bien ...", "Ocurrió un error al tratar de editar la pregunta. Inténtelo más tarde.", "warning");
                     }
                 });
 
@@ -613,14 +608,6 @@
         </div><!-- /.modal -->
         <!-- End Bootstrap modal -->
 
-                <!-- AJAX -->
-
-
-
-        <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
-        <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
         
         <script type="text/javascript">
         $(window).load(function() {

@@ -3,8 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Tipopeticion_model extends CI_Model{
     var $table = 'tipopeticion';
-    var $column_order = array('sPeticion', null);
-    var $column_search = array('sPeticion');
+    var $column_order = array('sPeticion_lista', null);
+    var $column_search = array('sPeticion_lista');
     var $order = array('iId' => 'desc');
     
     public function __construct() {

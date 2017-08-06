@@ -14,13 +14,10 @@
         <!-- Mobile Metas -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- Fuente  -->
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800%7CShadows+Into+Light" rel="stylesheet" type="text/css">
-
+        
         <!-- Libs CSS -->
         <link rel="stylesheet" href="<?=base_url()?>vendor/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" href="<?=base_url()?>vendor/font-awesome/css/font-awesome.css">
-       
         <link rel="stylesheet" href="<?=base_url('js/datatables/css/dataTables.bootstrap.css')?>" rel="stylesheet">
 
         <!-- Theme CSS -->
@@ -28,7 +25,6 @@
         <link rel="stylesheet" href="<?=base_url()?>css/theme-elements.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-blog.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
-        <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
 
         <!-- Custom Loader -->
         <link rel="stylesheet" href="<?=base_url()?>css/loader.css">
@@ -722,9 +718,6 @@
         <!-- End Bootstrap modal -->
 
 
-        <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
-        <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
         <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
         
         <script type="text/javascript">

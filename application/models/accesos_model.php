@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Accesos_model extends CI_Model{
   var $table = 'acceso';
-  var $column_order = array('sNombreCompleto', 'dFecha', 'sIP', null);
+  var $column_order = array(null, 'sNombreCompleto', 'dFecha', 'sIP', null);
   var $column_search = array('sNombreCompleto', 'dFecha', 'sIP');
   var $order = array('iId' => 'desc');
 

@@ -41,7 +41,7 @@ class Tipopeticion extends CI_Controller{
             $row = array();
             if ($peticion->bActiva == 1) $tex_activo = "SI"; else $tex_activo = "NO";
             $row[] = '<input type="checkbox" id="peticion" class="peticion" name="peticion[]" value="'.$peticion->iId.'">';
-            $row[] = $peticion->sPeticion;
+            $row[] = $peticion->sPeticion_lista;
             $row[] = $tex_activo;
             
             // Añadimos HTML para las acciones de la tabla.
@@ -81,7 +81,7 @@ class Tipopeticion extends CI_Controller{
         if ($this->input->post("bActiva")[0] == "") $activa = 0;
         
         $data = array(
-                'sPeticion' => $this->input->post('sPeticion'),
+                'sPeticion_lista' => $this->input->post('sPeticion'),
                 'sRequerimientos' => $this->input->post('sRequerimientos'),
                 'bActiva' => $activa,
         );
@@ -98,7 +98,7 @@ class Tipopeticion extends CI_Controller{
         if ($this->input->post("bActiva")[0] == "") $activa = 0;
         
         $data = array(
-                'sPeticion' => $this->input->post('sPeticion'),
+                'sPeticion_lista' => $this->input->post('sPeticion'),
                 'sRequerimientos' => $this->input->post('sRequerimientos'),
                 'bActiva' => $activa,
         );

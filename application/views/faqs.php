@@ -137,7 +137,7 @@
 								<section class="toggle">
 									<label>Soy profesor, estoy intentando crear una partida, y para ello he creado un nuevo panel, pero cuando quiero crear la partida, este nuevo panel no aparece, ¿por qué?</label>
 									<p>Esto te puede estar pasando porque los paneles, cuando se acaban de crear, están inicialmene inactivos. Es decir, que no aparecerá en el selector de "Paneles" a la hora de crear una partida. Esto es así porque cuando creas un panel, es de esperar que quieras configurarlo a tu antojo, y por esa razón es necesario que lo revises antes de activarlo.<br\><br\>
-									Puedes activar el panel <strong>desmarcando la casilla "Panel Inactivo" dentro de la "Modificación de un panel".</p>
+									Puedes activar el panel <strong>desmarcando la casilla "Panel Inactivo" dentro de la "Modificación de un panel"</strong>.</p>
 								</section>
 
 								<section class="toggle">

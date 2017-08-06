@@ -3,8 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Categorias_model extends CI_Model{
   var $table = 'categoria';
-  var $column_order = array('sColor','sCategoria', 'sDescripcion', 'sAsignatura', null);
-  var $column_search = array('sCategoria');
+  var $column_order = array(null, 'sColor','sCategoria', 'sDescripcion', 'sAsignatura', null);
+  var $column_search = array('sColor', 'sCategoria', 'sDescripcion', 'a.sNombre');
   var $order = array('iId' => 'desc');
 
   public function __construct() {

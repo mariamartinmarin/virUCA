@@ -43,7 +43,7 @@
 						</a>
 						<ul class="dropdown-menu">
 							<li><?=anchor(base_url().'index.php/contacto', 'Contacto')?></li>
-							<li><?=anchor(base_url().'index.php/faqs', 'Ayuda')?></li>
+							<li><?=anchor(base_url().'index.php/faqs', 'FAQs')?></li>
 						</ul>
 					</li>
 

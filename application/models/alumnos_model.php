@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Alumnos_model extends CI_Model{
   var $table = 'usuario';
   
-  var $column_order = array(null, 'sNombre', 'sApellidos', null , 'sEmail', null);
+  var $column_order = array(null, 'sNombre', 'sApellidos', 'sEmail', null);
   var $column_search = array('sNombre','sApellidos', 'sEmail');
   var $order = array('iId' => 'desc');
 

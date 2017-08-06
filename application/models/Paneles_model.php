@@ -42,7 +42,8 @@ class Paneles_model extends CI_Model{
       $this->db->join('asignatura', 'asignatura.iId = panel.iId_Asignatura');
       $this->db->where_in('panel.iId_Universidad', $this->session->userdata('universidades'));
       $this->db->where_in('panel.iId_Titulacion', $this->session->userdata('titulaciones'));
-      $this->db->where_in('panel.iId_Asignatura', $this->session->userdata('asignaturas'));   
+      $this->db->where_in('panel.iId_Asignatura', $this->session->userdata('asignaturas'));  
+      $this->db->where('panel.iId_Propietario', $this->session->userdata('id_usuario')); 
     }
       
       $i = 0;

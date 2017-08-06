@@ -3,8 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Partidas_model extends CI_Model{
   var $table = 'partida';
-  var $column_order = array(null, 'sPartida', null, null , null, null);
-  var $column_search = array('sPartida');
+  var $column_order = array(null, 'sPartida', 'dFecha', null , null, null);
+  var $column_search = array('sPartida', 'dFecha', 'panel.sNombre');
   var $order = array('iId' => 'desc');
 
   public function __construct() {
@@ -40,6 +40,7 @@ class Partidas_model extends CI_Model{
         $this->db->where_in('panel.iId_Universidad', $this->session->userdata('universidades'));
         $this->db->where_in('panel.iId_Titulacion', $this->session->userdata('titulaciones'));
         $this->db->where_in('panel.iId_Asignatura', $this->session->userdata('asignaturas'));
+        $this->db->where('partida.iId_Profesor', $this->session->userdata('id_usuario')); 
       }
       
       $i = 0;
@@ -208,9 +209,10 @@ class Partidas_model extends CI_Model{
         // Sólo cogemos los paneles del ámbito del profesor en cuestión.
         $this->db->select("*");
         $this->db->from("panel");
-        $this->db->where_in('panel.iId_Universidad', $this->session->userdata('universidades'));
-        $this->db->where_in('panel.iId_Titulacion', $this->session->userdata('titulaciones'));
-        $this->db->where_in('panel.iId_Asignatura', $this->session->userdata('asignaturas'));
+        //$this->db->where_in('panel.iId_Universidad', $this->session->userdata('universidades'));
+        //$this->db->where_in('panel.iId_Titulacion', $this->session->userdata('titulaciones'));
+        //$this->db->where_in('panel.iId_Asignatura', $this->session->userdata('asignaturas'));
+        $this->db->where('iId_Propietario', $this->session->userdata('id_usuario'));
         $this->db->where('bActivo', 1);
         $query = $this->db->get();
       }

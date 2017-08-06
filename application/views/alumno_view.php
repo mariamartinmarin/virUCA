@@ -61,19 +61,16 @@
 
 			<div role="main" class="main">
 
-				<div class="home-intro light">
-            <div class="container">
-
+				<div class="container">
                 <div class="row">
                     <div class="col-md-12">
                         <ul class="breadcrumb">
                             <li><a href="#">Viruca</a></li>
-                            <li class="active">Panel Principal</li>
+                            <li class="active"><strong>Panel principal</strong></li>
                         </ul>
                     </div>
                 </div>
             </div>
-        </div>
 
 				<div class="container">					
 					<div class="row featured-boxes">

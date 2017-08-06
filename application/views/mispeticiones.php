@@ -14,6 +14,9 @@
         <!-- Mobile Metas -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+        <!-- Fuente  -->
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800%7CShadows+Into+Light" rel="stylesheet" type="text/css">
+
         <!-- Libs CSS -->
         <link rel="stylesheet" href="<?=base_url()?>vendor/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" href="<?=base_url()?>vendor/font-awesome/css/font-awesome.css">
@@ -23,7 +26,9 @@
         <!-- Theme CSS -->
         <link rel="stylesheet" href="<?=base_url()?>css/theme.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-elements.css">
+        <link rel="stylesheet" href="<?=base_url()?>css/theme-blog.css">
         <link rel="stylesheet" href="<?=base_url()?>css/theme-shop.css">
+        <link rel="stylesheet" href="<?=base_url()?>css/theme-animate.css">
 
         <!-- Custom Loader -->
         <link rel="stylesheet" href="<?=base_url()?>css/loader.css">
@@ -72,13 +77,13 @@
             </div>
 
                 <div class="container">
-
-                    <button class="btn btn-success" onclick="add_asignatura()">
-                        <i class="glyphicon glyphicon-plus"></i> Asignatura
+                    <blockquote>
+                        A continuación puede ver las peticiones y/o solicitudes que ha realizado a la administración de este sitio. En cuanto estas sean atendidas, se habilitará el botón "Ver respuesta" con la resolución de su petición.
+                    </blockquote>
+                    <button class="btn btn-success" onclick="add_peticion()">
+                        <i class="glyphicon glyphicon-plus"></i> Petición
                     </button>
-                    <button class="btn btn-warning" onclick="eliminar_todos($(asignatura))">
-                        <i class="glyphicon glyphicon-trash"></i> Eliminar todos
-                    </button>
+                   
                     <button class="btn btn-default" onclick="reload_table()">
                         <i class="glyphicon glyphicon-refresh"></i> Refrescar
                     </button>
@@ -90,10 +95,10 @@
                     <thead>
                     <tr>
                         <th></th>
-                        <th>Asignatura</th>
-                        <th>Titulación</th>
-                        <th>Universidad</th>
-                        <th style="width:200px;">Acción</th>
+                        <th>Petición</th>
+                        <th>Fecha</th>
+                        <th>Atendida</th>
+                        <th>Acción</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -102,9 +107,9 @@
                     <tfoot>
                         <tr>
                             <th></th>
-                            <th>Asignatura</th>
-                            <th>Titulación</th>
-                            <th>Universidad</th>
+                            <th>Petición</th>
+                            <th>Fecha</th>
+                            <th>Atendida</th>
                             <th>Acción</th>
                         </tr>
                     </tfoot>
@@ -133,14 +138,14 @@
                                     "next": "Siguiente",
                                     "previous": "Anterior"
                                 },
-                                "search": "Buscar asignatura: ",
-                                "lengthMenu": "Mostrando _MENU_ asignaturas por página.",
-                                "loadingRecords": "Cargando asignaturas",
-                                "processing": "Cargando asignaturas",
+                                "search": "Buscar petición: ",
+                                "lengthMenu": "Mostrando _MENU_ peticiones por página.",
+                                "loadingRecords": "Cargando peticiones",
+                                "processing": "Cargando peticiones",
                                 "zeroRecords": "No se han encontrado registros",
-                                "emptyTable": "No hay asignaturas disponibles",
-                                "info": "Mostrando _START_ de _END_ asignaturas, de un total de _TOTAL_",
-                                "infoEmpty": "Mostrando 0 de 0 asignaturas",
+                                "emptyTable": "No hay peticiones disponibles",
+                                "info": "Mostrando _START_ de _END_ peticiones, de un total de _TOTAL_",
+                                "infoEmpty": "Mostrando 0 de 0 peticiones",
                                 "aria": {
                                     "sortAscending": ": ordenar columna ascendentemente",
                                     "sortDescending": ": ordenar columna descendentemente"
@@ -152,14 +157,14 @@
 
                             // Load data for the table's content from an Ajax source
                             "ajax": {
-                                "url": "<?php echo site_url('index.php/Asignatura/ajax_list')?>",
+                                "url": "<?php echo site_url('index.php/Mispeticiones/ajax_list')?>",
                                 "type": "POST"
                             },
 
                             //Set column definition initialisation properties.
                             "columnDefs": [
                             { 
-                                "targets": [ -1, 0 ], //last column
+                                "targets": [ -1,0 ], //last column
                                 "orderable": false, //set not orderable
                             },
                             ],
@@ -174,99 +179,84 @@
 
                     });
 
-                    function add_asignatura()
+                    function ver_peticion(iId)
                     {
-                        save_method = 'add';
-                        $('#form')[0].reset(); // reset form on modals
-                        $('.form-group').removeClass('has-error'); // clear error class
-                        $('.help-block').empty(); // clear error string
-                        $('#modal_form').modal('show'); // show bootstrap modal
-                        $('.modal-title').text('Añadir asignatura'); // Set Title to Bootstrap modal title
-                         $.ajax({
-                            url : "<?php echo site_url('index.php/Asignatura/ajax_obtener_universidad/')?>/",
-                            type: "GET",
-                            dataType: "JSON",
-                            success: function(data)
-                            {
-                                cargar_titulaciones(data.iId_Universidad);
-                            },
-                            error: function (jqXHR, textStatus, errorThrown)
-                            {
-                                swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba insertar la asignatura. Inténtelo más tarde.", "warning");
-                            }
-                        });
-                    }
-
-                    function editar_asignatura(iId)
-                    {
-                        save_method = 'update';
                         $('#form')[0].reset(); // reset form on modals
                         $('.form-group').removeClass('has-error'); // clear error class
                         $('.help-block').empty(); // clear error string
 
                         //Ajax Load data from ajax
                         $.ajax({
-                            url : "<?php echo site_url('index.php/Asignatura/ajax_edit/')?>/" + iId,
+                            url : "<?php echo site_url('index.php/Mispeticiones/ajax_edit/')?>/" + iId,
                             type: "GET",
                             dataType: "JSON",
                             success: function(data)
                             {
-                                $('[name="iId"]').val(data.iIdAsignatura);
-                                $('[name="sNombre"]').val(data.sNombre);  
-                                                              
-                                $('[name="iId_Titulacion"]').val(data.iId_Titulacion);
+                                $('[name="iId_Peticion"]').val(data.iId_Peticion);
+                                cargar_requerimiento();
+                                $('[name="iId_Peticion"]').prop("disabled", true);
+                                $('[name="sAsunto"]').val(data.sAsunto);  
+                                $('[name="sPeticion"]').val(data.sPeticion);                              
+                                $('[name="sAdjunto"]').val(data.sAdjunto);
                                 $('[name="iId_Universidad"]').val(data.iId_Universidad);
-                                cargar_titulaciones_aux(data.iId_Universidad, data.iId_Titulacion);
-                                $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
-                                $('.modal-title').text('Editar asignatura'); // Set title to Bootstrap modal title
+                               $('#modal_form').modal('show'); // show bootstrap modal when complete loaded
+                                $('.modal-title').text('Ver petición'); // Set title to Bootstrap modal title
+                                $('#btnSave').attr('disabled',true); // Desactivar botón.
                                 
 
                             },
                             error: function (jqXHR, textStatus, errorThrown)
                             {
-                                swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba editar la asignatura. Inténtelo más tarde.", "warning");
+                                swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaban recuperar los datos. Inténtelo más tarde.", "warning");
                             }
                         });
                     }
 
+                     function ver_respuesta(iId)
+                    {
+                        $('#form_respuesta')[0].reset(); // reset form on modals
+                        $('.form-group').removeClass('has-error'); // clear error class
+                        $('.help-block').empty(); // clear error string
+
+                        //Ajax Load data from ajax
+                        $.ajax({
+                            url : "<?php echo site_url('index.php/Mispeticiones/ajax_edit_leido/')?>/" + iId,
+                            type: "GET",
+                            dataType: "JSON",
+                            success: function(data)
+                            {
+                                // $('[name="sRespuesta"]').prop("disabled", true);
+                                $('[name="sRespuesta"]').val(data.sRespuesta);
+                                $('#dFecha_Respuesta').html("<b><i>Atendida el:</i></b> "+ data.dFecha_Respuesta);
+                                $('#modal_form_respuesta').modal('show'); // show bootstrap modal when complete loaded
+                                $('.modal-title').text('Ver respuesta'); // Set title to Bootstrap modal title
+                                $('#btnSave_respuesta').attr('disabled',true); // Desactivar botón.
+                            },
+                            error: function (jqXHR, textStatus, errorThrown)
+                            {
+                                swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaban recuperar los datos. Inténtelo más tarde.", "warning");
+                            }
+                        });
+                    }
+
+
+                    function add_peticion()
+                    {
+                        save_method = 'add';
+                        $('#form')[0].reset(); // reset form on modals
+                        $("#tipospeticiones").prop("disabled", false);
+                        $('#btnSave').attr('disabled',false); 
+                        $('.form-group').removeClass('has-error'); // clear error class
+                        $('.help-block').empty(); // clear error string
+                        cargar_requerimiento();
+                        $('#modal_form').modal('show'); // show bootstrap modal
+                        $('.modal-title').text('Añadir titulación'); // Set Title to Bootstrap modal title
+                    }
+
+
                     function reload_table()
                     {
                         table.ajax.reload(null,false); //reload datatable ajax 
-                    }
-
-                    function eliminar_todos(asignatura) {
-                        swal({
-                            title: "¿Estás seguro/a?",
-                            text: "¿Desea eliminar las asignaturas señaladas? Debe saber que hay asignaturas que no podrán eliminarse dado que tienen dependencias.",
-                            type: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#DD6B55",
-                            confirmButtonText: "Borrar",
-                            cancelButtonText: "No, dejarlo como está",
-                            closeOnConfirm: false
-                            },
-                            function(){
-                                $.ajax({
-                                    url : "<?php echo site_url('index.php/Asignatura/ajax_delete_todos')?>/",
-                                    type : "POST",
-                                    dataType : "JSON",
-                                    data : $('.asignatura:checked').serialize(),
-                                    success: function(data) {
-                                        if(data.status) //if success close modal and reload ajax table
-                                        {
-                                            $('#modal_form').modal('hide');
-                                            swal("Bien!", "Operación realizada con éxito", "success");
-                                            reload_table();
-                                        } else {
-                                            swal("Oops! algo no ha ido bien ...", data.error_string, "warning");
-                                        } 
-                                    },
-                                    error: function (jqXHR, textStatus, errorThrown)
-                                    {
-                                        swal("Oops! algo no fue bien ...", "Ha ocurrido un error mientras se intentaba eliminar los registros. Asegúrese que ha marcado alguno y que no existen dependencias.", "warning");
-                                    }
-                                });
-                            });
                     }
 
                     function save()
@@ -274,13 +264,8 @@
                         $('#btnSave').text('guardando ...'); // Cambiar valor del texto
                         $('#btnSave').attr('disabled',true); // Desactivar botón.
                         var url;
-
-                        if(save_method == 'add') {
-                            url = "<?php echo site_url('index.php/Asignatura/ajax_add')?>";
-                        } else {
-                            url = "<?php echo site_url('index.php/Asignatura/ajax_update')?>";
-                        }
-
+                         url = "<?php echo site_url('index.php/Mispeticiones/ajax_add')?>";
+                        
                         // AJAX añade datos a la base de datos.
 
                         $.ajax({
@@ -315,93 +300,22 @@
 
                             }
                         });
-                    }
-
-                    function borrar_asignatura(iId)
-                    {
-                        swal({
-                            title: "¿Estás seguro/a?",
-                            text: "Desea eliminar esta asignatura?",
-                            type: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#DD6B55",
-                            confirmButtonText: "Borrar",
-                            cancelButtonText: "No, dejarlo como está",
-                            closeOnConfirm: false
-                            },
-                            function(){
-                                $.ajax({
-                                    url : "<?php echo site_url('index.php/Asignatura/ajax_delete')?>/"+iId,
-                                    type: "POST",
-                                    dataType: "JSON",
-                                    success: function(data)
-                                    {
-                                        if(data.status) //if success close modal and reload ajax table
-                                        {
-                                            $('#modal_form').modal('hide');
-                                            swal("Bien!", "Operación realizada con éxito", "success");
-                                            reload_table();
-
-                                        } else {
-                                            swal("Oops! algo no ha ido bien ...", data.error_string, "warning");
-                                        }
-                                    },
-                                    error: function (jqXHR, textStatus, errorThrown)
-                                    {
-                                        swal("Oops! algo no fue bien ...", "Ocurrió un error al intentar eliminar la asignatura. Inténtelo más tarde.", "warning");
-                                    }
-                                });
-                            }); 
-                    }
-
-                    function cargar_titulaciones(iId)
-                    {  
-                        var iId_Universidad = $("#universidades option:selected").attr("value");
-                        $.get("<?php echo site_url('index.php/Asignatura/ajax_recarga_titulaciones')?>",
-                            {"universidad":iId_Universidad}, function(data) {
-                                var titulaciones = "";
-                                var titulacion = JSON.parse(data);
-                                for (datos in titulacion.titulaciones) {
-                                    titulaciones += '<option value="'+titulacion.titulaciones[datos].iId+'">'+
-                                    titulacion.titulaciones[datos].sTitulacion+'</option>';
-                                }
-                                $('select#titulaciones').html(titulaciones);
-                            });
                     } 
-                    function cargar_titulaciones_aux(iId_Universidad, iId_Titulacion)
-                    {  
-                        var iId_Universidad = $("#universidades option:selected").attr("value");
-                        $.get("<?php echo site_url('index.php/Asignatura/ajax_recarga_titulaciones')?>",
-                            {"universidad":iId_Universidad}, function(data) {
-                                var titulaciones = "";
-                                var titulacion = JSON.parse(data);
-                                for (datos in titulacion.titulaciones) {
-                                    if (titulacion.titulaciones[datos].iId == iId_Titulacion)
-                                        titulaciones += '<option value="'+titulacion.titulaciones[datos].iId+'" selected>'+
-                                        titulacion.titulaciones[datos].sTitulacion+'</option>';
-                                    else
-                                        titulaciones += '<option value="'+titulacion.titulaciones[datos].iId+'">'+
-                                        titulacion.titulaciones[datos].sTitulacion+'</option>';
-                                }
-                                $('select#titulaciones').html(titulaciones);
-                            });
-                    }
 
-                     function cargar_asignaturas(iId)
+                    function cargar_requerimiento()
                     {  
-                        var iId_Titulacion = $("#titulaciones option:selected").attr("value");
-                        $.get("<?php echo site_url('index.php/Asignatura/ajax_recarga_asignaturas')?>",
-                            {"titulacion":iId_Titulacion}, function(data) {
-                                var asignaturas = "";
-                                var titulacion = JSON.parse(data);
-                                for (datos in titulacion.titulaciones) {
-                                    titulaciones += '<option value="'+titulacion.titulaciones[datos].iId+'">'+
-                                    titulacion.titulaciones[datos].sTitulacion+'</option>';
+                        var iId_Peticion = $("#tipospeticiones option:selected").attr("value");
+                        $.get("<?php echo site_url('index.php/Mispeticiones/ajax_recarga_requerimiento')?>",
+                            {"peticion":iId_Peticion}, function(data) {
+                                var resultado = JSON.parse(data);
+                                for (datos in resultado.peticion) {
+                                    if (resultado.peticion[datos].sRequerimientos != "")
+                                        $('#sRequerimiento').html(resultado.peticion[datos].sRequerimientos);
+                                    else 
+                                        $('#sRequerimiento').html("Sin requerimientos especiales.");
                                 }
-                                $('select#titulaciones').html(titulaciones);
                             });
-                    } 
-                        
+                    }                        
                 </script>
 
                 <!-- Bootstrap modal -->
@@ -413,37 +327,46 @@
                                 <h3 class="modal-title">Alta de asignatura</h3>
                             </div>
                             <div class="modal-body form">
-                                <form action="#" id="form" class="form-horizontal">
+                                <form action="#" id="form" class="form-horizontal" enctype="multipart/form-data">
                                     <input type="hidden" value="" name="iId"/> 
                                     <div class="form-body">
                                         <div class="form-group">
-                                            <label class="control-label col-md-3">Asignatura *</label>
+                                            <label class="control-label col-md-3">Tipo *</label>
                                             <div class="col-md-9">
-                                                <input name="sNombre" placeholder="Asignatura" class="form-control" type="text">
+                                             <?php $atributos = 'class=form-control id="tipospeticiones" onChange="cargar_requerimiento();"'; ?>
+                                            <?=form_dropdown('iId_Peticion', $tipospeticiones, '', $atributos); ?>
+                                            <span class="help-block"></span>
+                                        </div>
+                                     </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3"><strong>Requerimientos</strong></label>
+                                            <div class="col-md-9">
+                                                <div id="sRequerimiento"></div>
+                                                
+                                                <span class="help-block"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3">Asunto *</label>
+                                            <div class="col-md-9">
+                                                <input name="sAsunto" placeholder="Asunto" class="form-control" type="text">
                                                 <span class="help-block"></span>
                                             </div>
                                         </div>
 
                                         <div class="form-group">
-                                            <label class="control-label col-md-3">Universidad *</label>
+                                            <label class="control-label col-md-3">Su petición *</label>
                                             <div class="col-md-9">
-                                                <?php $atributos = 'class=form-control id="universidades" onChange="cargar_titulaciones();"'; ?>
-                                                <?=form_dropdown('iId_Universidad', $universidades, '', $atributos); ?>
+                                                <textarea name="sPeticion" class="form-control" placeholder="Texto de la solicitud aquí"></textarea>
                                                 <span class="help-block"></span>
                                             </div>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label class="control-label col-md-3">Titulación *</label>
-                                            <div class="col-md-9">
-                                                 <?php $atributos2 = 'class=form-control id="titulaciones"'; ?>
-                                                <?=form_dropdown('iId_Titulacion', $titulaciones, '', $atributos2); ?>
-                                                <span class="help-block"></span>
-                                            </div>
-                                        </div>                                                                                                                    
+                                                                                                                                              
                                          <div class="form-group">
                                             <div class="col-md-9">
                                                 <sub><b>*</b> Datos obligatorios.</sub>
+                                                
                                             </div>
                                         </div>
                                         
@@ -461,7 +384,43 @@
                 </div><!-- /.modal -->
                 <!-- End Bootstrap modal -->
 
-                <!-- AJAX -->
+                <!-- Bootstrap modal para responder -->
+                <div class="modal fade" id="modal_form_respuesta" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h3 class="modal-title">Alta de asignatura</h3>
+                            </div>
+                            <div class="modal-body form">
+                                <form action="#" id="form_respuesta" class="form-horizontal" enctype="multipart/form-data">
+                                    <input type="hidden" value="" name="iId_Solicitud"/> 
+                                    <div class="form-body">
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-3">Respuesta *</label>
+                                            <div class="col-md-9">
+                                                <textarea name="sRespuesta" class="form-control" placeholder="Texto de la respusta aquí" rows="5"></textarea>
+                                                <span class="help-block"></span><br>
+                                                <div id="dFecha_Respuesta"></div>
+                                            </div>
+                                        </div>                                                                                             
+                                         <div class="form-group">
+                                            <div class="col-md-9">
+                                                <sub><b>*</b> Datos obligatorios.</sub> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                               
+                                <button type="button" id="btnCancel_respuesta" class="btn btn-danger" data-dismiss="modal">Salir</button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
+                <!-- End Bootstrap modal -->
                    
                     
                 <hr class="short">
@@ -470,7 +429,10 @@
             <?php $this->load->view('footer');?>
         </div>
 
-     
+        <!-- Libs -->
+        <script src="<?=base_url()?>vendor/jquery.appear.js"></script>
+        <script src="<?=base_url()?>vendor/jquery.easing.js"></script>
+        <script src="<?=base_url()?>vendor/jquery.cookie.js"></script>
         <script src="<?=base_url()?>vendor/bootstrap/js/bootstrap.js"></script>
         
         <script type="text/javascript">
@@ -479,7 +441,10 @@
             $('body').css({'overflow':'visible'});
         })
         </script>
-    
+        
+        <!-- Theme Initializer -->
+        <script src="<?=base_url()?>js/theme.plugins.js"></script>
+        <script src="<?=base_url()?>js/theme.js"></script>
         
         <!-- Custom JS -->
         <script src="<?=base_url()?>js/custom.js"></script>

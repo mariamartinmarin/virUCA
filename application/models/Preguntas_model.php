@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Preguntas_model extends CI_Model{
   var $table = 'pregunta';
-  var $column_order = array('sPregunta','sNombre', 'sApellidos', 'sCategoria', 'nPuntuacion', null);
+  var $column_order = array(null, 'sPregunta','sNombre', 'sApellidos', 'sCategoria', 'nPuntuacion', null);
   var $column_search = array('sPregunta', 'sNombre', 'sApellidos','sCategoria', 'nPuntuacion');
   var $order = array('iId' => 'desc');
 

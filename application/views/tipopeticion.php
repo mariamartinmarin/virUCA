@@ -196,7 +196,7 @@
                 {
 
                     $('[name="iId"]').val(data.iId);
-                    $('[name="sPeticion"]').val(data.sPeticion);
+                    $('[name="sPeticion"]').val(data.sPeticion_lista);
                     $('[name="sRequerimientos"]').val(data.sRequerimientos);
                     if (data.bActiva == 1) $("#bActiva").prop("checked", true);
                     $('[name="bActiva"]').val(data.bActiva);
